@@ -1,0 +1,44 @@
+.b-modal {
+  display: none;
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(34, 34, 34, 0.45);
+
+  &.open {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &__form {
+    background-color: #fff;
+    min-width: 320px;
+    max-width: 640px;
+    min-height: 100px;
+    padding: 50px;
+    box-shadow: 10px 10px 0px #111111;
+  }
+
+  &__title {
+      font-family: "Circe";
+      font-size: 30px;
+      color: #252525;
+      font-weight: 700;
+      line-height: 35px;
+  }
+
+  &__body {
+      display: flex;
+      flex-direction: column;
+      margin-top: 30px;
+  }
+
+  &__action {
+      display: flex;
+      justify-content: center;
+      margin-top: 30px;
+  }
+}

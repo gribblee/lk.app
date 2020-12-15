@@ -1,0 +1,231 @@
+.b-form {
+  &-end {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: "Circe";
+    font-size: 30px;
+    font-weight: 900;
+    z-index: 999;
+    background-color: #fff;
+    & > span {
+      max-width: 640px;
+      & > a {
+        color: #252525;
+        border-bottom: 2px solid #252525;
+        transition: border-bottom-color 0.18s;
+        &:hover {
+          border-bottom-color: #25252500;
+        }
+      }
+    }
+  }
+
+  &-row {
+    display: flex;
+    margin: 0 -10px;
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  &__field {
+    padding: 10px 10px 0 10px;
+    & > .error {
+      font-family: "Circe";
+      font-size: 14px;
+      margin-top: 5px;
+      color: #E8523F;
+    }
+    &.col {
+      width: 50%;
+    }
+    &:first-child {
+    }
+    & > input {
+      border-radius: 5px;
+      border: 2px solid #252525;
+      padding-left: 15px;
+      outline: none;
+      min-width: 250px;
+      font-size: 17px;
+      font-family: "Circe";
+      font-weight: 500;
+      background-color: #fff;
+      box-shadow: 0px 2px 0px rgba(34, 34, 34, 0.8);
+      transition: border-color 0.23s;
+      line-height: 40px;
+      width: 100%;
+      &.error {
+        border-bottom-color: #e8523f;
+      }
+      &::placeholder {
+        font-size: 17px;
+        font-family: "Circe";
+        font-weight: 500;
+      }
+    }
+  }
+
+  &-payment {
+    &__container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    &__more {
+      display: flex;
+      justify-content: center;
+      margin-top: 30px;
+    }
+
+    &__header {
+      display: flex;
+      align-items: center;
+      height: 100px;
+    }
+
+    &__title {
+      margin-top: 15px;
+      font-family: "Circe";
+      font-style: normal;
+      font-weight: 700;
+      font-size: 40px;
+      line-height: 45px;
+      color: #252525;
+    }
+
+    &__description {
+      font-size: 17px;
+      font-family: "Circe";
+      line-height: 20px;
+      font-weight: 400;
+      margin-top: 80px;
+    }
+
+    &__action {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 90px;
+      margin-top: 90px;
+    }
+
+    &__link {
+      font-family: "Circe";
+      font-style: normal;
+      font-weight: 800;
+      font-size: 20px;
+      line-height: 25px;
+      color: #252525;
+      border-bottom: 1px solid #252525;
+      transition: opacity 0.23s, border-bottom-color 0.18s;
+      background-color: transparent;
+      border-left: none;
+      border-top: none;
+      border-right: none;
+      cursor: pointer;
+      outline: none;
+      &:hover {
+        border-bottom-color: #25252500;
+        opacity: 0.65;
+      }
+    }
+  }
+
+  &-tariff {
+    margin-right: 20px;
+  }
+
+  &-col {
+    width: calc(33.3333% - 20px);
+    flex: 0 1 auto;
+    margin: 0 10px;
+    &-tariff {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100%;
+      background-color: #fff;
+      box-shadow: 10px 10px 0px #111111;
+      padding: 50px 20px;
+      border: 2px solid #0f1f4b;
+      text-align: center;
+      width: 100%;
+      &__title {
+        color: #252525;
+        font-size: 30px;
+        font-weight: 800;
+        font-family: "Circe";
+        line-height: 44px;
+      }
+      &__subtitle {
+        font-family: "Circe";
+        font-style: normal;
+        font-weight: 400;
+        font-size: 16px;
+        line-height: 24px;
+        color: #8794ba;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #2a407c;
+      }
+      &__price {
+        font-family: "Circe";
+        font-style: normal;
+        font-weight: 800;
+        font-size: 60px;
+        line-height: 60px;
+        color: #252525;
+        margin-top: 30px;
+      }
+      &__button {
+        margin-top: 30px;
+        & > button {
+        }
+      }
+    }
+  }
+
+  &--demo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 80px;
+    width: 500px;
+    max-width: 100%;
+    height: 570px;
+    background-color: #fff;
+    box-shadow: 10px 10px 0px #111111;
+    border: 2px solid #222222;
+  }
+
+  &-payment {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #fff;
+    display: none;
+    &.show {
+      display: block;
+    }
+  }
+
+  &__body {
+  }
+
+  &__group {
+    text-align: center;
+    margin-top: 30px;
+    &:first-child {
+      margin-top: 0;
+    }
+    &.isVisibility {
+      visibility: hidden;
+    }
+  }
+}

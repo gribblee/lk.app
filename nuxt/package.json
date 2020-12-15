@@ -1,0 +1,38 @@
+{
+  "name": "lk.leadz.monster",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "PORT=3333 HOST=0.0.0.0 nuxt-ts",
+    "build": "nuxt-ts build",
+    "start": "nuxt-ts start",
+    "generate": "nuxt-ts generate",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@mojs/core": "^0.288.2",
+    "@nuxt/typescript-runtime": "^2.0.0",
+    "@nuxtjs/auth": "^4.9.1",
+    "@nuxtjs/axios": "^5.12.3",
+    "ant-design-vue": "^1.6.5",
+    "core-js": "^3.6.5",
+    "node-sass": "^5.0.0",
+    "nuxt": "^2.14.6",
+    "nuxt-sass-resources-loader": "^2.0.5",
+    "parallax-js": "^3.1.0",
+    "reqwest": "^2.0.5",
+    "sass-loader": "^10.1.0",
+    "v-mask": "^2.2.3",
+    "vue-audio-recorder": "^3.0.1"
+  },
+  "devDependencies": {
+    "@nuxt/types": "^2.14.6",
+    "@nuxt/typescript-build": "^2.0.3",
+    "@vue/test-utils": "^1.1.0",
+    "babel-core": "7.0.0-bridge.0",
+    "babel-jest": "^26.5.0",
+    "jest": "^26.5.0",
+    "ts-jest": "^26.4.1",
+    "vue-jest": "^3.0.4"
+  }
+}
