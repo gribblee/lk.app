@@ -17,9 +17,7 @@ class UserController extends Controller
 {
     public function meUser(Request $request)
     {
-        return response()->header([
-            'content-type' => 'application/json'
-        ])->json([
+        return response()->json([
             'data' => User::with('manager')->find($request->user()->id)
         ], 200);
     }
