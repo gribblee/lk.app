@@ -24,13 +24,14 @@ Route::group([
     'prefix' => 'user'
 ], function () {
     Route::get('/updated', 'UserController@updated');
+    Route::get('/me', 'UserController@meUser');
 });
 
 
 /**
  * Здесь Get Запросы
  */
-Route::get('/me', 'UserController@meUser');
+
 
 /**
  * Start Ver1.0
