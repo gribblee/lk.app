@@ -80,7 +80,7 @@ export default {
             propertyName: 'token',
           },
           user: {
-            url: '/me',
+            url: '/user/me',
             method: 'get',
             propertyName: 'data'
           },
