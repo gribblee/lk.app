@@ -17,9 +17,9 @@ class UserController extends Controller
 {
     public function meUser(Request $request)
     {
-        return [
+        return response()->json([
             'data' => User::with('manager')->find($request->user()->id)
-        ];
+        ], 200);
     }
 
     public function updated(Request $request)
