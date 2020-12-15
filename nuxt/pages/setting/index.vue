@@ -881,7 +881,7 @@ export default {
       //this.$store.dispatch("statuses/setSettingForm", 0);
     }
     this.$axios
-      .get('/me')
+      .get('/user/me')
       .then(({ data }) => {
           this.form.setFieldsValue({
             email: data.data.email,
