@@ -49,6 +49,31 @@ class PaymentController extends Controller
         }
     }
 
+    /**
+     * @return JsonResponse
+     */
+    public function cardCreate(Request $request)
+    {
+        return response()->json([], 200);
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    public function requisiteCreate(Request $request)
+    {
+        return response()->json([], 200);
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    public function creditCreate(Request $request)
+    {
+        return response()->json([], 200);
+    }
+
+
     public function generalHistory(Request $request)
     {
         if ($request->user()->role == 'ROLE_ADMIN') {

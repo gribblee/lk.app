@@ -1,12 +1,12 @@
 <template>
-  <a-layout-content style="margin: 20px 16px 0 16px">
+  <a-layout-content>
     <a-page-header
       title="Редактирование направления"
       sub-title=""
       @back="() => $router.go(-1)"
     >
       <template slot="tags">
-        <a-tag :color="PPTagColor">{{ PPTagText }}</a-tag>
+        <a-tag :color="computedStatus.color">{{ computedStatus.text }}</a-tag>
       </template>
       <template slot="extra">
         <div :style="{ display: 'flex' }">
@@ -26,26 +26,87 @@
         </div>
       </template>
     </a-page-header>
-    <div :style="{ padding: '24px', background: '#fff', minHeight: '360px' }">
+    <div>
       <a-row type="flex" justify="space-around">
-        <a-col :span="6">
-          <a-form
-            id="components-form-demo-validate-other"
-            @submit.prevent="handleSubmit"
-          >
-            <a-form-item label="Направление" has-feedback>
-              <a-tooltip
-                :visible="helpTooltip == 2"
-                title="Выберите направление, по которому хотите получать клиентов. Справа, в синей рамке Вы увидите подробное описание выбранного направления - что за люди обращаются, что они хотят, и т.д."
-              >
+        <a-col :xs="22" :md="10" :lg="10">
+          <a-alert
+            message="Информация"
+            :description="direction.description"
+            type="info"
+            show-icon
+          />
+          <div class="iframe-container">
+            <iframe
+              class="second-iframe"
+              :src="direction.iframe_url"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen
+            ></iframe>
+          </div>
+          <div class="statistic-row">
+            <a-row :gutter="[24, 24]">
+              <a-col :span="24">
+                <a-card>
+                  <a-statistic
+                    title="Вы получите"
+                    :precision="2"
+                    :value="computedFunel.total"
+                    suffix="₽"
+                    :value-style="{ color: '#3f8600' }"
+                  />
+                </a-card>
+              </a-col>
+              <a-col :span="24">
+                <a-card>
+                  <a-statistic
+                    title="Заявок"
+                    :value="computedFunel.count"
+                    suffix=""
+                    :value-style="{ color: '#3f8600' }"
+                    style="margin-right: 50px"
+                  >
+                  </a-statistic>
+                </a-card>
+              </a-col>
+              <a-col :span="12">
+                <a-card>
+                  <a-statistic
+                    title="Встреч"
+                    :value="computedFunel.mettings"
+                    suffix=""
+                    :value-style="{ color: '#3f8600' }"
+                    style="margin-right: 50px"
+                  >
+                  </a-statistic>
+                </a-card>
+              </a-col>
+              <a-col :span="12">
+                <a-card>
+                  <a-statistic
+                    title="Сделок"
+                    :value="computedFunel.deals"
+                    suffix=""
+                    :value-style="{ color: '#3f8600' }"
+                    style="margin-right: 50px"
+                  >
+                  </a-statistic>
+                </a-card>
+              </a-col>
+            </a-row>
+          </div>
+        </a-col>
+        <a-col :xs="22" :md="8" :lg="8">
+          <a-card title="Настройка вашей заявки">
+            <div class="bid-form">
+              <div class="bid-item">
+                <div class="bid-label">Направление:</div>
                 <a-select
                   size="large"
                   placeholder="Выберите направление"
-                  v-model="formBid.direction_id"
-                  @change="handleDirectionChange"
+                  v-model="computedDirection"
+                  @change="handleDirection"
                   option-label-prop="label"
-                  :style="{ zIndex: '99' }"
-                  :disabled="BID_DATA.is_update == 1"
                 >
                   <a-select-option
                     v-for="direction in directory.directions"
@@ -56,581 +117,325 @@
                     {{ direction.name }}
                   </a-select-option>
                 </a-select>
-              </a-tooltip>
-              <span
-                v-if="helpTooltip == 2"
-                :style="{
-                  position: 'relative',
-                  zIndex: '99',
-                  display: 'block',
-                  textAlign: 'center',
-                }"
-              >
-                <a-button
-                  type="primary"
-                  @click.prevent="nextTooltip(3)"
-                  :style="{ color: '#FFFFFF' }"
-                  >Пропустить</a-button
-                >
-              </span>
-              <div
-                v-if="helpTooltip == 2"
-                :style="{
-                  position: 'fixed',
-                  left: '0',
-                  top: '0',
-                  width: '100%',
-                  height: '100%',
-                  zIndex: '98',
-                  backgroundColor: 'rgba(34, 34, 34, 0.4)',
-                }"
-              ></div>
-            </a-form-item>
-            <a-form-item label="Регионы" has-feedback>
-              <a-tooltip
-                title="Выберите регионы, по которым Вы хотите получать клиентов. Вы можете выбрать один либо несколько регионов. Обратите внимание - если Вы оставите поле пустым, Вы будете получать клиентов со всей регионов"
-                :visible="helpTooltip == 3"
-              >
+              </div>
+              <div class="bid-item">
+                <div class="bid-label">Регионы:</div>
                 <a-select
                   size="large"
                   placeholder="Выберите регионы"
                   mode="multiple"
-                  v-model="formBid.regions"
-                  @change="onRegionsSelected"
+                  v-model="computedRegions"
+                  @change="(e) => handleUpdate('regions')"
                   option-label-prop="label"
-                  :style="{ zIndex: '97' }"
                 >
                   <a-select-option
                     v-for="region in directory.regions"
                     :key="region.id"
-                    :value="JSON.stringify(region)"
+                    :value="region.id"
                     :label="region.name_with_type"
                   >
                     {{ region.name_with_type }}
                   </a-select-option>
                 </a-select>
-              </a-tooltip>
-              <span
-                v-if="helpTooltip == 3"
-                :style="{
-                  position: 'relative',
-                  zIndex: '97',
-                  display: 'block',
-                  textAlign: 'center',
-                }"
-              >
-                <a-button
-                  type="primary"
-                  @click.prevent="nextTooltip(4)"
-                  :style="{ color: '#FFFFFF' }"
-                  >Пропустить</a-button
-                >
-              </span>
-              <div
-                v-if="formBid.regions.length === 0"
-                :style="{
-                  marginTop: '10px',
-                  position: 'relative',
-                  zIndex: '97',
-                }"
-              >
-                <a-alert
-                  message="Вы будете получать заявки по всем регионам"
-                  type="info"
-                />
+                <div class="bid-info" v-if="computedIsRegions">
+                  <a-alert
+                    :show-icon="true"
+                    message="Вы будете получать заявки по всем регионам"
+                    type="info"
+                  />
+                </div>
+                <div class="bid-content" v-if="computedRegionsRate">
+                  <a-tooltip
+                    title="Вы можете настроить отдельно ставку по каждому региону. ДЛЯ ОПЫТНЫХ!"
+                  >
+                    <a-button
+                      size="large"
+                      type="primary"
+                      @click="(e) => (visibleRates = true)"
+                      >Настроить ставки</a-button
+                    >
+                  </a-tooltip>
+                </div>
               </div>
-              <div
-                v-if="helpTooltip == 3"
-                :style="{
-                  position: 'fixed',
-                  left: '0',
-                  top: '0',
-                  width: '100%',
-                  height: '100%',
-                  zIndex: '96',
-                  backgroundColor: 'rgba(34, 34, 34, 0.4)',
-                }"
-              ></div>
-            </a-form-item>
-            <a-form-item label="Количество заявок в день">
-              <a-tooltip
-                title="Укажите максимальное количество клиентов, которое Вы хотите получать. Минимум 5 заявок в день. Если Вы оставите поле пустым, будете получать заявки постоянно"
-                :visible="helpTooltip == 4"
-              >
+              <div class="bid-item">
+                <div class="bid-label">Количество заявок в день:</div>
                 <a-input-number
                   :min="0"
                   :max="1000"
                   size="large"
-                  v-model="formBid.dailyLimit"
-                  @blur="handleDayLimit"
-                  :style="{ width: '100%', zIndex: '95' }"
+                  v-model="daily_limit"
+                  @blur="handleDaily"
                 />
-              </a-tooltip>
-              <span
-                v-if="helpTooltip == 4"
-                :style="{
-                  position: 'relative',
-                  zIndex: '95',
-                  display: 'block',
-                  textAlign: 'center',
-                }"
-              >
-                <a-button
-                  type="primary"
-                  @click.prevent="nextTooltip(5)"
-                  :style="{ color: '#FFFFFF' }"
-                  >Пропустить</a-button
-                >
-              </span>
-              <div
-                v-if="formBid.dailyLimit <= 0 || formBid.dailyLimit == ''"
-                :style="{
-                  marginTop: '10px',
-                  position: 'relative',
-                  zIndex: '95',
-                }"
-              >
-                <a-alert
-                  message="Вы будете получать неограниченное количество заявок"
-                  type="info"
-                />
+                <div class="bid-info" v-if="computedDaily.status">
+                  <a-alert
+                    :show-icon="true"
+                    :message="computedDaily.message"
+                    :type="computedDaily.type"
+                  />
+                </div>
               </div>
-              <div
-                v-if="formBid.dailyLimit > 0 && formBid.dailyLimit < 5"
-                :style="{
-                  marginTop: '10px',
-                  position: 'relative',
-                  zIndex: '95',
-                }"
-              >
-                <a-alert
-                  message="Укажите от 5 лидов в день, либо оставьте поле пустым"
-                  type="error"
-                />
-              </div>
-              <div
-                v-if="helpTooltip == 4"
-                :style="{
-                  position: 'fixed',
-                  left: '0',
-                  top: '0',
-                  width: '100%',
-                  height: '100%',
-                  zIndex: '94',
-                  backgroundColor: 'rgba(34, 34, 34, 0.4)',
-                }"
-              ></div>
-            </a-form-item>
-            <a-form-item
-              label="Ставка за заявку"
-              v-if="formBid.rateFix === false"
-            >
-              <a-tooltip
-                title="Введите Вашу ставку за получение клиента. У нас аукционная система, и получает клиента тот, кто больше за него заплатит. Если Вы не знаете, какую ставку указать - нажмите “Рекомендуемая ставка”, тогда Вы с наибольшей вероятностью получите клиента”"
-                :visible="helpTooltip == 5"
-              >
-                <a-input
-                  v-model="formBid.bidPerRate"
+              <div class="bid-item">
+                <div class="bid-label">
+                  Сколько вы готовы платить за клиента:
+                </div>
+                <a-input-number
+                  v-model="computedVMConsumption"
+                  :min="0"
+                  :max="computedMaxConsumption"
                   size="large"
-                  @blur="handlePerRate"
-                  :style="{ position: 'relative', zIndex: '93' }"
+                  @blur="handleConsumption"
                 />
-              </a-tooltip>
-              <a-slider
-                v-model="formBid.bidPerRate"
-                :min="0"
-                :max="parseInt(user.balance) + 10000"
-                :step="1"
-                :tip-formatter="null"
-                :style="{
-                  margin: '6px 0 6px 0px',
-                  position: 'relative',
-                  zIndex: '93',
-                }"
-                @afterChange="handlePerRate"
-              />
-              <div
-                :style="{
-                  padding: '10px 10px',
-                  position: 'relative',
-                  zIndex: '93',
-                  backgroundColor: '#FFFFFF',
-                  margin: '0 -10px',
-                  borderRadius: '5px 5px 0 0',
-                }"
-                v-if="formBid.bidPerRate < minPerRate"
-              >
-                <a-alert
-                  v-if="formBid.bidPerRate < minPerRate"
-                  message="При такой ставке Вы не будете получать заявки"
-                  type="error"
+                <a-slider
+                  v-model="computedVMConsumption"
+                  :min="0"
+                  :max="computedMaxConsumption"
+                  :step="1"
+                  :tip-formatter="null"
+                  @afterChange="handleConsumption"
                 />
-              </div>
-              <div
-                class="space-justify-between"
-                :class="{
-                  visibHidden: formBid.bidPerRate >= recomendRate,
-                }"
-                :style="{
-                  position: 'relative',
-                  zIndex: '93',
-                  backgroundColor: '#FFFFFF',
-                  padding: '0 10px',
-                  margin: '0 -10px',
-                  borderRadius: '0 0 5px 5px',
-                }"
-              >
-                <div>
-                  <a href="javascript:void(0)" @click.prevent="handleRecommend">
-                    Рекомендуемая ставка {{ recomendRate }} ₽
-                  </a>
+                <div class="bid-info" v-if="computedRecommend.status">
+                  <div class="bid-recommend">
+                    <span class="bid-recommend-c">
+                      <a
+                        href="javascript:void(0)"
+                        @click="
+                          (e) => {
+                            consumption = computedRecommend.consumption;
+                            this.handleConsumption(e);
+                          }
+                        "
+                      >
+                        Рекомендуемая ставка
+                        {{ computedRecommend.consumption }} ₽
+                      </a>
+                    </span>
+                    <span class="bid-recommend-c">
+                      <a-tooltip title="Выше ставка - больше заявок">
+                        <a-icon
+                          type="exclamation-circle"
+                          :style="{ cursor: 'pointer' }"
+                        />
+                      </a-tooltip>
+                    </span>
+                  </div>
                 </div>
-                <div>
-                  <a-tooltip title="Выше ставка - больше заявок">
-                    <a-icon
-                      type="exclamation-circle"
-                      :style="{ cursor: 'pointer' }"
-                    />
-                  </a-tooltip>
-                </div>
-              </div>
-              <span
-                v-if="helpTooltip == 5"
-                :style="{
-                  position: 'relative',
-                  zIndex: '99',
-                  display: 'block',
-                  textAlign: 'center',
-                }"
-              >
-                <a-button
-                  type="primary"
-                  @click.prevent="nextTooltip(7)"
-                  :style="{ color: '#FFFFFF' }"
-                  >Пропустить</a-button
-                >
-              </span>
-              <div
-                v-if="helpTooltip == 5"
-                :style="{
-                  position: 'fixed',
-                  left: '0',
-                  top: '0',
-                  width: '100%',
-                  height: '100%',
-                  zIndex: '92',
-                  backgroundColor: 'rgba(34, 34, 34, 0.4)',
-                }"
-              ></div>
-            </a-form-item>
-            <a-form-item v-else>
-              <a-button
-                @click="handleRegions"
-                size="large"
-                type="primary"
-                :style="{ width: '100%' }"
-                >Настроить ставки</a-button
-              >
-            </a-form-item>
-            <a-form-item>
-              <div
-                :style="{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  position: 'relative',
-                }"
-              >
-                <span>
-                  <a-switch
-                    @change="onBidRegionsRate"
-                    v-model="formBid.rateFix"
+                <div class="bid-info" v-if="computedConsumption.status">
+                  <a-alert
+                    :show-icon="true"
+                    :type="computedConsumption.type"
+                    :message="computedConsumption.message"
                   />
-                  <span :style="{ marginLeft: '20px' }">
-                    Настроить ставку по регионам
-                  </span>
-                </span>
-                <a-tooltip
-                  title="Вы можете настроить отдельно ставку по каждому региону регион. ДЛЯ ОПЫТНЫХ!"
-                >
-                  <a-icon
-                    type="exclamation-circle"
-                    :style="{ cursor: 'pointer' }"
-                  />
-                </a-tooltip>
-              </div>
-            </a-form-item>
-            <a-form-item v-if="insurances.length > 0">
-              <p :style="{ fontSize: '18px', fontWeight: 'bold' }">
-                Количество заявок по страховке: {{ insuranceCount }}
-              </p>
-            </a-form-item>
-            <a-form-item v-if="insuranceCount == 0 && insurances.length > 0">
-              <div
-                :style="{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  width: '100%',
-                }"
-              >
-                <div>
-                  <a-switch v-model="onInsurance" @change="handleInsurance" />
-                  <span :style="{ marginLeft: '20px' }">
-                    Подключить страховку
-                  </span>
-                </div>
-                <div>
-                  <a-tooltip
-                    title="Покупка страховки позволит Вам заменить ВСЕ нецелевые заявки БЕСПЛАТНО"
-                  >
-                    <a-icon
-                      type="exclamation-circle"
-                      :style="{ cursor: 'pointer' }"
-                    />
-                  </a-tooltip>
                 </div>
               </div>
-            </a-form-item>
-            <a-form-item v-if="onInsurance || insuranceCount > 0">
-              <a-list item-layout="horizontal" :data-source="insurances">
-                <a-list-item slot="renderItem" slot-scope="item">
-                  <a-list-item-meta>
-                    <span slot="description">Стоимость: {{ item.price }}₽</span>
-                    <a slot="title">{{ item.name }} {{ item.count }} заявок</a>
-                  </a-list-item-meta>
-                  <a-popconfirm
-                    title="Вы уверены, что покупаете страховку"
-                    ok-text="Да"
-                    cancel-text="Нет"
-                    @confirm="buyInsurance(item.id, $event)"
-                    slot="actions"
-                  >
-                    <a>Подключить</a></a-popconfirm
-                  >
-                </a-list-item>
-              </a-list>
-            </a-form-item>
-            <a-form-item>
-              <a-tooltip
-                :visible="helpTooltip == 8"
-                title='Отлично! Осталось только запустить поток клиентов и пополнить бюджет. Нажмите кнопку "Запустить"'
-              >
-                <div
-                  :style="{
-                    position: 'relative',
-                    margin: '-10px',
-                    padding: '10px',
-                  }"
-                  :class="{ help_active_tool: helpTooltip == 8 }"
-                >
-                  <a-button
-                    size="large"
-                    :type="PPType"
-                    key="1"
-                    @click="handlePPAction"
-                    :style="{ width: '100%' }"
-                  >
-                    <a-icon :type="PPIcon" />
-                    {{ PPText }}
-                  </a-button>
+              <div class="bid-item" v-if="computedIsInsurances">
+                <div class="bid-label">Страховка</div>
+                <div class="bid-container">
+                  <div class="bid-content bc-space-bwn">
+                    <span>Количество заявок по страховке: {{ insurance }}</span>
+                    <span>
+                      <a-tooltip
+                        title="Покупка страховки позволит Вам заменить ВСЕ нецелевые заявки БЕСПЛАТНО"
+                      >
+                        <a-icon
+                          type="exclamation-circle"
+                          :style="{ cursor: 'pointer' }"
+                        /> </a-tooltip
+                    ></span>
+                  </div>
+                  <div class="bid-content">
+                    <div class="bid-content-switch">
+                      <a-switch
+                        v-model="isInsurance"
+                        @change="handleInsurance"
+                      />
+
+                      <span class="bid-insurance-label">
+                        Подключить страховку
+                      </span>
+                    </div>
+                    <div class="bid-info" v-if="isInsurance">
+                      <a-list
+                        item-layout="horizontal"
+                        :data-source="insurancesData"
+                      >
+                        <a-list-item slot="renderItem" slot-scope="item">
+                          <a-list-item-meta>
+                            <span slot="description"
+                              >Стоимость: {{ item.price }}₽</span
+                            >
+                            <a slot="title"
+                              >{{ item.name }} {{ item.count }} заявок</a
+                            >
+                          </a-list-item-meta>
+                          <a-popconfirm
+                            title="Вы уверены, что покупаете страховку"
+                            ok-text="Да"
+                            cancel-text="Нет"
+                            @confirm="handleIBuy(item.id, $event)"
+                            slot="actions"
+                          >
+                            <a>Подключить</a></a-popconfirm
+                          >
+                        </a-list-item>
+                      </a-list>
+                    </div>
+                  </div>
                 </div>
-              </a-tooltip>
-              <div
-                v-if="helpTooltip == 8"
-                :style="{ position: 'fixed' }"
-                :class="{ help_active_bg: helpTooltip == 8 }"
-              ></div>
-            </a-form-item>
-          </a-form>
-        </a-col>
-        <a-col :span="8">
-          <div :style="{ position: 'relative', zIndex: '99' }">
-            <a-alert
-              message="Информация"
-              :description="direction_description"
-              type="info"
-              show-icon
-            />
-          </div>
-          <div :style="{ marginTop: '20px' }">
-            <div class="row-container">
-              <iframe
-                class="second-row"
-                :src="direction_iframe"
-                frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen
-              ></iframe>
-            </div>
-          </div>
-          <a-tooltip
-            :visible="helpTooltip == 7"
-            placement="left"
-            title="Здесь указывается примерное количество встреч и сделок, которое Вы получите в месяц. Также указывается ожидаемый уровень дохода. ВНИМАНИЕ! Чтобы получить такие результаты, надо делать всё строго по нашим правилам."
-          >
-            <div
-              :style="{
-                position: 'relative',
-                margin: '0 -65px',
-                padding: '10px 65px',
-                zIndex: '89',
-                backgroundColor: '#FFFFFF',
-                borderRadius: '5px',
-              }"
-            >
-              <a-row :gutter="[24, 24]">
-                <a-col :span="24">
-                  <a-card>
-                    <a-statistic
-                      title="Вы получите"
-                      :precision="2"
-                      :value="incomeTotal"
-                      suffix="₽"
-                      :value-style="{ color: '#3f8600' }"
-                    />
-                  </a-card>
-                </a-col>
-                <a-col :span="24">
-                  <a-card>
-                    <a-statistic
-                      title="Заявок"
-                      :value="bidsCount"
-                      suffix=""
-                      :value-style="{ color: '#3f8600' }"
-                      style="margin-right: 50px"
-                    >
-                    </a-statistic>
-                  </a-card>
-                </a-col>
-                <a-col :span="12">
-                  <a-card>
-                    <a-statistic
-                      title="Встреч"
-                      :value="mettingsCount"
-                      suffix=""
-                      :value-style="{ color: '#3f8600' }"
-                      style="margin-right: 50px"
-                    >
-                    </a-statistic>
-                  </a-card>
-                </a-col>
-                <a-col :span="12">
-                  <a-card>
-                    <a-statistic
-                      title="Сделок"
-                      :value="dealsCount"
-                      suffix=""
-                      :value-style="{ color: '#3f8600' }"
-                      style="margin-right: 50px"
-                    >
-                    </a-statistic>
-                  </a-card>
-                </a-col>
-              </a-row>
-              <div
-                v-if="helpTooltip == 7"
-                :style="{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  marginTop: '20px',
-                }"
-              >
-                <a-button type="primary" @click="handleFunnelNext"
-                  >Продолжить</a-button
+              </div>
+              <div class="bid-item">
+                <a-button size="large" type="primary" @click="handleLaunch"
+                  >запустить</a-button
                 >
               </div>
             </div>
-          </a-tooltip>
-          <div
-            v-if="helpTooltip == 7"
-            :style="{
-              position: 'fixed',
-              left: '0',
-              top: '0',
-              width: '100%',
-              height: '100%',
-              zIndex: '88',
-              backgroundColor: 'rgba(34, 34, 34, 0.4)',
-            }"
-          ></div>
+          </a-card>
         </a-col>
       </a-row>
-      <a-modal
-        v-model="visibleRateRegions"
-        title="Настройка ставки по регионам"
-        @ok="handleOk"
-        cancelText="Отмена"
-        okText="Сохранить"
-      >
-        <a-form>
-          <a-form-item
-            v-for="_region in regionsRate"
-            :key="_region.id"
-            :label="_region.name_with_type"
+    </div>
+    <a-modal
+      v-model="visibleRates"
+      title="Настройка ставки по регионам"
+      @ok="
+        (e) => {
+          visibleRates = false;
+          handleUpdate('regions');
+        }
+      "
+      cancelText="Отмена"
+      okText="Сохранить"
+    >
+      <a-form>
+        <a-form-item
+          v-for="region in regions"
+          :key="region.id"
+          :label="region.name_with_type"
+        >
+          <a-input suffix="₽" v-model="region.rate" />
+        </a-form-item>
+      </a-form>
+    </a-modal>
+    <a-modal v-model="errorLaunch" title="Ошибка!" centred closable>
+      <a-space align="start" :size="20">
+        <a-icon
+          type="close-circle"
+          :style="{
+            color: 'red',
+            fontSize: '24px',
+          }"
+        />
+        <span
+          :style="{
+            color: 'red',
+          }"
+          >Для получения клиентов надо пополнить бюджет. Вы можете это сделать
+          по карте либо по расчётному счёту юрлица или ИП. Выберите способ
+          пополнения</span
+        >
+      </a-space>
+      <template slot="footer">
+        <a-space align="center" :size="20">
+          <a-button
+            type="primary"
+            @click="
+              (e) => {
+                errorLaunch = false;
+                $store.dispatch('payment/setVisiblePayRequisite', true);
+              }
+            "
+            >По Р/С</a-button
           >
-            <a-input suffix="₽" v-model="_region.rate" />
-          </a-form-item>
-        </a-form>
-      </a-modal>
-      <a-modal v-model="errorLaunch" title="Ошибка!" centred closable>
-        <a-space align="start" :size="20">
-          <a-icon
-            type="close-circle"
-            :style="{
-              color: 'red',
-              fontSize: '24px',
-            }"
-          />
-          <span
-            :style="{
-              color: 'red',
-            }"
-            >Для получения клиентов надо пополнить бюджет. Вы можете это сделать
-            по карте либо по расчётному счёту юрлица или ИП. Выберите способ
-            пополнения</span
+          <a-button
+            type="primary"
+            @click="
+              (e) => {
+                errorLaunch = false;
+                $store.dispatch('payment/setVisiblePayCard', true);
+              }
+            "
+            >По карте</a-button
           >
         </a-space>
-        <template slot="footer">
-          <a-space align="center" :size="20">
-            <a-button
-              type="primary"
-              @click="
-                (e) => {
-                  errorLaunch = false;
-                  $store.dispatch('directory/setPayReq', true);
-                }
-              "
-              >По Р/С</a-button
-            >
-            <a-button
-              type="primary"
-              @click="
-                (e) => {
-                  errorLaunch = false;
-                  $store.dispatch('directory/setPaycard', true);
-                }
-              "
-              >По карте</a-button
-            >
-          </a-space>
-        </template>
-      </a-modal>
-    </div>
+      </template>
+    </a-modal>
   </a-layout-content>
 </template>
 <style scoped>
-.row-container {
+.bid-form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.bid-item {
+  margin-top: 20px;
+  padding-top: 10px;
+  border-top: 1px solid #ccc;
+}
+
+.bid-content > *,
+.bid-item > * {
+  width: 100%;
+}
+
+.bid-item:first-child {
+  border-top: none;
+  padding-top: 0;
+  margin-top: 0;
+}
+
+.bid-info {
+  margin-top: 10px;
+}
+
+.bid-label {
+  padding-bottom: 10px;
+  font-weight: 800;
+}
+
+.bid-recommend {
+  display: flex;
+  justify-content: space-between;
+}
+
+.bid-recommend-c {
+}
+
+.bid-container {
+}
+
+.bid-content {
+  margin-top: 20px;
+}
+
+.bid-content.bc-space-bwn {
+  display: flex;
+  justify-content: space-between;
+}
+.bid-content.bc-space-bwn > * {
+  width: inherit;
+}
+
+.bid-content:first-child {
+  margin-top: 0;
+}
+
+.bid-insurance-label {
+  margin-left: 20px;
+  font-weight: 700;
+}
+
+.iframe-container {
   position: relative;
   display: flex;
   width: 100%;
-  height: 100%;
   padding-top: 56%;
   flex-direction: column;
   background-color: blue;
   overflow: hidden;
+  margin-top: 30px;
 }
 
-.second-row {
+.second-iframe {
   position: absolute;
   left: 0;
   top: 0;
@@ -642,135 +447,47 @@
   padding: 0;
 }
 
-.help_active_bg {
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 100;
-  background-color: rgba(34, 34, 34, 0.4);
+.statistic-row {
+  margin-top: 30px;
 }
 
-.help_active_tool {
-  z-index: 101;
-  background-color: #ffffff;
-  border-radius: 5px;
-}
-
-.space-justify-between {
-  display: flex;
-  justify-content: space-between;
-}
-.visibHidden {
-  visibility: hidden;
-}
-.funnel-container {
-  margin-top: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.funnel {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  width: 100%;
-  mask-position: center;
-  mask-repeat: no-repeat;
-  mask-size: contain;
-  padding-top: 10px;
-}
-
-@media screen and (max-width: 1024px) {
-  .funnel {
-    height: 60px;
-  }
-}
-
-@media screen and (max-width: 1400px) {
-  .funnel-1 {
-    width: 150%;
-  }
-}
-
-@media screen and (min-width: 1025px) {
-  .funnel {
-    height: 99px;
-  }
-}
-
-@media screen and (min-width: 1700px) {
-  .funnel {
-    height: 130px;
-  }
-}
-
-.funnel-1 {
-  background-color: #e8523f;
-  mask-image: url("/icons/funnel_1.svg");
-}
-.funnel-2 {
-  margin-top: 5px;
-  background-color: #e8d73f;
-  mask-image: url("/icons/funnel_2.svg");
-}
-
-.funnel-3 {
-  margin-top: 5px;
-  background-color: #3fe86e;
-  mask-image: url("/icons/funnel_3.svg");
+.bid-content-switch {
+  width: inherit;
 }
 </style>
 <script>
 export default {
-  data() {
+  head() {
     return {
-      minPerRate: 1080,
-      is_bidsInfo: true,
-      helpTooltip: 2,
-      BID_DATA: {},
-      directionDescription: "",
-      formBid: {
-        direction_id: [],
-        regions: [],
-        bidPerRate: 1080,
-        dayily_limit: 0,
-        dailyLimit: 0
-      },
-      direction_iframe: "",
-      insuranceCount: 0,
-      regionsRate: [],
-      visibleRateRegions: false,
-      PPType: "primary",
-      PPIcon: "play-circle",
-      PPText: "Запустить",
-      PPTagColor: "red",
-      PPTagText: "Остановлено",
-      bidsCount: 32,
-      mettingsCount: 12,
-      dealsCount: 5,
-      incomeTotal: 0,
-      recomendRate: 0,
-      directory: [],
-      maxRate: 0,
-      direction_description: "",
-      insurances: [],
-      onInsurance: false,
-      options: {
-        conversion_meetings: 0,
-        average_check: 0,
-        conversion_contract: 0,
-      },
-      errorLaunch: false,
-      errorLaunchMsg: "",
+      title: "Редактирование направления",
     };
   },
   validate({ params }) {
-    // Должен быть числом
     return /^\d+$/.test(params.id);
   },
+  data() {
+    return {
+      directory: [],
+      isInsurance: false,
+      insurancesData: [],
+      visibleRates: false,
+      errorLaunch: false,
+      //Данные формы
+      id: 0,
+      is_launch: false,
+      daily_limit: 0,
+      insurance: -1,
+      regions: [],
+      direction: {},
+      options: {},
+      consumption: 0,
+      max_rate: 0,
+      rate_fix: false,
+      is_notification: false,
+    };
+  },
   created() {
+    const { bidStorage } = this.$store.state;
     this.$axios
       .get("/directory")
       .then(({ data }) => {
@@ -779,335 +496,216 @@ export default {
       .catch((_err) => {
         console.error(_err);
       });
+    this.$axios.post(`/bid/${this.$route.params.id}`).then(({ data }) => {
+      this.setData(data);
+      //this.rate_fix = data.rate_fix;
+    });
     this.$axios
-      .post(`/bid/${this.$route.params.id}`)
-      .then(({ data }) => {
-        this.BID_DATA = data;
-        this.formBid = {
-          direction_id: data.direction.id,
-          regions: data.regions.map((current) => {
-            return JSON.stringify(current);
-          }),
-          dailyLimit: parseInt(data.daily_limit),
-          daily_limit: parseInt(data.daily_limit),
-          bidPerRate: parseInt(data.consumption),
-          rateFix: Boolean(data.rateFix),
-        };
-        this.options = data.options;
-
-        this.regionsRate = data.regions;
-        if (data.MAX_RATE) {
-          this.recomendRate = data.MAX_RATE;
-        } else {
-          this.recomendRate = 1080;
-        }
-        this.direction_description = data.direction_description;
-        this.direction_iframe = data.direction.iframe_url;
-        this.insuranceCount = data.insurance;
-        this.minPerRate = data.options.min_per_rate;
-        this.updateLaunch(data.is_launch);
-        this.updateFunel();
-      })
-      .catch((_err) => {
-        console.error(_err);
-      });
-    this.form = this.$form.createForm(this, { name: "create_bid" });
-    this.loadInsurance();
+      .get("/insurance")
+      .then(({ data }) => (this.insurancesData = data));
   },
-  mounted() {
-    if (!localStorage.bidsInfo != "undefined") {
-      this.is_bidsInfo = !(localStorage.bidsInfo == "close");
-    } else {
-      this.bidsInfo = true;
-    }
-    if (localStorage.helpTooltip) {
-      this.helpTooltip = localStorage.helpTooltip;
-    }
-  },
+  mounted() {},
   methods: {
-    closeInfo() {
-      localStorage.bidsInfo = "close";
+    //Обдщие методы
+    setData(data) {
+      this.id = data.id;
+      this.is_launch = data.is_launch;
+      this.daily_limit = data.daily_limit;
+      this.insurance = data.insurance;
+      this.regions = data.regions;
+      this.direction = data.direction;
+      this.options = data.options;
+      this.consumption = Number(data.consumption);
+      this.max_rate = Number(data.max_rate);
+      this.is_notification = data.is_notification;
     },
-    nextTooltip(n) {
-      if (parseInt(localStorage.helpTooltip) < n) {
-        this.helpTooltip = n;
-        localStorage.helpTooltip = n;
+    //Методы событий
+    handleUpdate(arg) {
+      const postData = {};
+      switch (arg) {
+        case "direction":
+          postData.direction_id = this.direction.id;
+          break;
+        case "daily":
+          postData.daily_limit = this.daily_limit;
+          break;
+        case "consumption":
+          postData.consumption = this.consumption;
+          break;
+        case "regions":
+          postData.regions = this.regions;
+          break;
       }
+      this.$axios.post(`/bid/${this.id}/update`, postData).then(({ data }) => {
+        this.setData(data.data);
+        this.$message.success(data.message);
+      });
     },
-    handleFunnelNext(e) {
-      if (localStorage.helpTooltip.toString() == "7") {
-        localStorage.helpTooltip = "8";
-        window.scrollTo(0, window.innerHeight);
-        this.helpTooltip = localStorage.helpTooltip;
-      }
-    },
-    updateFunel() {
-      this.bidsCount = Math.ceil(
-        this.formBid.daily_limit <= 0 ? 100 : this.formBid.daily_limit * 30
-      );
-      this.mettingsCount = Math.ceil(
-        this.bidsCount * (this.options.conversion_meetings / 100)
-      );
-      this.dealsCount = Math.ceil(
-        this.mettingsCount * (this.options.conversion_contract / 100)
-      );
-      this.incomeTotal = Math.ceil(
-        this.dealsCount * this.options.average_check
-      );
-    },
-    buyInsurance(id, e) {
+    handleDelete(e) {},
+    handleRegion(e) {},
+    handleRates(e) {},
+    handleLaunch(e) {
       this.$axios
-        .post(`/bid/${this.BID_DATA.id}/buy_insurance`, {
-          insurance_id: id,
-        })
-        .then(({ data }) => {
-          if (data.success == true) {
-            this.$message.success(data.message);
-            this.BID_DATA = data.bid;
-            this.insuranceCount = data.bid.insurance;
-          } else {
-            this.$message.error(data.error);
-          }
-        })
-        .catch((err) => {
-          if (typeof err.response.message != "undefined") {
-            this.$message.error(err.response.message);
-          } else {
-            this.$message.error(err.response);
-          }
-        });
-    },
-    loadInsurance() {
-      this.$axios
-        .get("/insurance")
-        .then(({ data }) => {
-          if (data.success == true) {
-            this.insurances = data.data;
-          } else {
-            console.log('Non Insurance');
-          }
-        })
-        .catch((err) => {
-          if (typeof err.response.message != "undefined") {
-            this.$message.error(err.response.message);
-          } else {
-            this.$message.error(err.response);
-          }
-        });
-    },
-    updateLaunch(isLaunch) {
-      if (isLaunch === 1 || isLaunch === true) {
-        this.PPType = "danger";
-        this.PPIcon = "pause-circle";
-        this.PPText = "Остановить";
-        this.PPTagColor = "green";
-        this.PPTagText = "Запущено";
-        this.$metrika.reachGoal("67456357", "client_order", {
-          order_price: this.formBid.bidPerRate,
-          currency: "RUB",
-        });
-      } else {
-        this.PPType = "primary";
-        this.PPIcon = "play-circle";
-        this.PPText = "Запустить";
-        this.PPTagColor = "red";
-        this.PPTagText = "Остановлено";
-      }
-    },
-    handlePPAction(_e) {
-      if (localStorage.helpTooltip.toString() == "8") {
-        localStorage.helpTooltip = "9";
-        this.helpTooltip = localStorage.helpTooltip;
-      }
-      this.$axios
-        .post(`/bid/${this.BID_DATA.id}/launch`)
+        .post(`/bid/${this.id}/launch`, { is_launch: this.is_launch })
         .then(({ data }) => {
           if (data.code === 1004) {
             this.errorLaunch = true;
-            this.errorLaunchMsg = data.msg;
+            this.$message.error(data.message);
           }
           if (data.code == 1003) {
             this.$message.error(data.msg);
           }
-          this.updateLaunch(data.is_launch);
-        })
-        .catch((_err) => {
-          console.error(_err);
+          this.is_launch = data.is_launch;
         });
     },
-    handleSubmit(_e) {
-      this.form.validateFieldsAndScroll((err, values) => {
-        if (!err) {
-          console.log("Received values of form: ", values);
-        }
-      });
+    handleRecommend(e) {},
+    handleDaily(e) {
+      this.handleUpdate("daily");
     },
-    handleOkTooltip() {
-      if (localStorage.helpTooltip.toString() == "7") {
-        localStorage.helpTooltip = "8";
-        this.helpTooltip = localStorage.helpTooltip;
-      }
+    handleDirection(e) {
+      this.handleUpdate("direction");
     },
-    handleRecommend(_e) {
-      this.formBid.bidPerRate = this.recomendRate;
+    handleConsumption(e) {
+      this.handleUpdate("consumption");
+    },
+    handleInsurance(e) {},
+    handleIBuy(id, e) {
       this.$axios
-        .post(`/bid/${this.BID_DATA.id}/update`, {
-          perRate: this.formBid.bidPerRate,
-        })
+        .post(`/bid/${this.id}/buy_insurance`, { insurance_id: id })
         .then(({ data }) => {
-          if (localStorage.helpTooltip == "5") {
-            localStorage.helpTooltip = "7"; //Здесь был переход на страховку т.е. 6
-            this.helpTooltip = localStorage.helpTooltip;
+          if (data.success == true) {
+            this.setData(data);
+          } else {
+            this.$message.error(data.message);
           }
-          this.$message.success("Обновлено");
-          this.direction_description = data.direction_description;
-          this.direction_iframe = data.direction.iframe_url;
-          this.updateFunel();
-        })
-        .catch((_err) => {
-          console.error(_err);
-        });
-
-      //   if (localStorage.helpTooltip == "5") {
-      //     localStorage.helpTooltip = "6";
-      //     this.helpTooltip = localStorage.helpTooltip;
-      //   }
-      this.updateFunel();
-    },
-    handleDelete(_e) {
-      this.$axios
-        .post(`/bid/${this.$route.params.id}/delete`)
-        .then(({ data }) => {
-          this.$message.success("Удалено");
-          this.$router.push("/");
-        })
-        .catch((_err) => {
-          console.error(_err);
         });
     },
-    handleInsurance() {
-      if (localStorage.helpTooltip == "6") {
-        localStorage.helpTooltip = "7";
-        this.helpTooltip = localStorage.helpTooltip;
-      }
-    },
-    async onBidRegionsRate(_e) {
-      await this.$axios
-        .post(`/bid/${this.BID_DATA.id}/rate_fix_regions`, {
-          rateFix: this.formBid.rateFix,
-        })
-        .then(({ data }) => {
-          if (data.success === false) {
-            this.$message.error(data.errors);
+  },
+  computed: {
+    computedStatus() {
+      return this.is_launch
+        ? {
+            color: "green",
+            text: "Запущено",
           }
-        })
-        .catch((_err) => {
-          console.error(_err);
-        });
-    },
-    handleOk(_e) {
-      this.visibleRateRegions = false;
-      this.saveRegions();
-    },
-    handleRegions(_e) {
-      this.visibleRateRegions = true;
-    },
-    onRegionsSelected(_v) {
-      this.formBid.regions = _v;
-      this.regionsRate = _v.map((_mpc_) => {
-        const current = this.json(_mpc_);
-        const region = this.BID_DATA.regions.find(
-          (element, index, array) => element.id === current.id
-        );
-        if (region === undefined) {
-          return {
-            rate: this.formBid.bidPerRate,
-            bids_id: this.BID_DATA.id,
-            region_id: current.id,
-            region: current,
+        : {
+            color: "red",
+            text: "Остановлено",
           };
-        } else {
-          return region;
+    },
+    computedRecommend() {
+      const recommendReturn = {
+        status: false,
+        consumption: this.max_rate === 0 ? 1080 : this.max_rate,
+      };
+
+      recommendReturn.status = this.consumption < recommendReturn.consumption;
+
+      return recommendReturn;
+    },
+    computedFunel() {
+      const _count = Math.ceil(
+        this.daily_limit <= 0 ? 100 : this.daily_limit * 30
+      );
+      const _mettings = Math.ceil(
+        _count * (this.direction.conversion_meetings / 100)
+      );
+      const _deals = Math.ceil(
+        _mettings * (this.direction.conversion_contract / 100)
+      );
+      const _total = Math.ceil(_deals * this.direction.average_check);
+      return {
+        count: _count,
+        mettings: _mettings,
+        deals: _deals,
+        total: _total,
+      };
+    },
+    computedIsRegions() {
+      return this.regions.length === 0;
+    },
+    computedDaily() {
+      const dailyReturn = {
+        status: false,
+        message: "",
+        type: "info",
+      };
+
+      if (this.daily_limit <= 0 || this.daily_limit === "") {
+        dailyReturn.status = true;
+        dailyReturn.type = "info";
+        dailyReturn.message =
+          "Вы будете получать неограниченное количество заявок";
+      } else {
+        if (this.daily_limit > 0 && this.daily_limit < 5) {
+          dailyReturn.status = true;
+          dailyReturn.type = "error";
+          dailyReturn.message =
+            "Укажите от 5 лидов в день, либо оставьте поле пустым";
         }
-      });
-      this.saveRegions();
+      }
+      return dailyReturn;
     },
-    saveRegions() {
-      this.$axios
-        .post(`/bid/${this.BID_DATA.id}/update_region`, {
-          regions: this.regionsRate,
-        })
-        .then(({ data }) => {
-          this.$message.success("Обновлено");
-        })
-        .catch((_err) => {
-          console.error(_err);
+    computedMaxConsumption() {
+      return Number(this.user.balance) + 10000;
+    },
+    computedConsumption() {
+      const consumptionReturn = {
+        status: false,
+        message: "",
+        type: "info",
+      };
+      const cost_price = Number(this.direction.cost_price);
+      if (this.consumption < cost_price + cost_price * 0.05) {
+        consumptionReturn.status = true;
+        consumptionReturn.message =
+          "При такой ставке Вы не будете получать заявки";
+        consumptionReturn.type = "error";
+      }
+      return consumptionReturn;
+    },
+    computedIsInsurances() {
+      return this.insurancesData.length > 0;
+    },
+    computedRegionsRate() {
+      return this.regions.length > 0;
+    },
+    computedVMConsumption: {
+      set(value) {
+        if (typeof value === "number") {
+          this.consumption = Number(value);
+        }
+      },
+      get() {
+        return this.consumption;
+      },
+    },
+    computedRegions: {
+      set(value) {
+        const { regions } = this.directory;
+
+        this.regions = value.map((v) => {
+          let region = regions.find((r) => r.id === v);
+          return {
+            ...region,
+            bid_id: this.id,
+            rate: this.consumption,
+          };
         });
-    },
-    handlePerRate() {
-      this.$axios
-        .post(`/bid/${this.BID_DATA.id}/update`, {
-          perRate: this.formBid.bidPerRate,
-        })
-        .then(({ data }) => {
-          if (localStorage.helpTooltip == "5") {
-            localStorage.helpTooltip = "7"; //Переход на пункт 7 6 это страхвока
-            this.helpTooltip = localStorage.helpTooltip;
-          }
-          this.$message.success("Обновлено");
-          this.direction_description = data.direction_description;
-          this.direction_iframe = data.direction.iframe_url;
-          this.updateFunel();
-        })
-        .catch((_err) => {
-          console.error(_err);
+      },
+      get() {
+        return this.regions.map((r) => {
+          return r.id;
         });
+      },
     },
-    handleDayLimit() {
-      this.$axios
-        .post(`/bid/${this.BID_DATA.id}/update`, {
-          dailyLimit: this.formBid.dailyLimit,
-        })
-        .then(({ data }) => {
-          if (localStorage.helpTooltip.toString() == "4") {
-            localStorage.helpTooltip = "5";
-            this.helpTooltip = localStorage.helpTooltip;
-          }
-          this.$message.success("Обновлено");
-          this.direction_description = data.direction_description;
-          this.direction_iframe = data.direction.iframe_url;
-          this.updateFunel();
-        })
-        .catch((_err) => {
-          console.error(_err);
-        });
-    },
-    handleDirectionChange(_v) {
-      this.$axios
-        .post(`/bid/${this.BID_DATA.id}/update`, {
-          direction_id: _v,
-        })
-        .then(({ data }) => {
-          if (localStorage.helpTooltip.toString() == "2") {
-            localStorage.helpTooltip = "3";
-            this.helpTooltip = localStorage.helpTooltip;
-          }
-          this.BID_DATA.is_update = true;
-          this.$message.success("Обновлено");
-          this.direction_description = data.direction_description;
-          this.direction_iframe = data.direction.iframe_url;
-          this.options.conversion_meetings = data.conversion_meetings;
-          this.average_check = data.average_check;
-          this.conversion_contract = data.conversion_contract;
-          this.minPerRate = data.min_per_rate;
-          this.updateFunel();
-        })
-        .catch((_err) => {
-          console.error(_err);
-        });
-    },
-    json(JString) {
-      return JSON.parse(JString);
+    computedDirection: {
+      set(value) {
+        this.direction = this.directory.directions.find((f) => f.id === value);
+      },
+      get() {
+        return this.direction.id;
+      },
     },
   },
 };

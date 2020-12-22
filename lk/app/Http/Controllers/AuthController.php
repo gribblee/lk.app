@@ -45,6 +45,9 @@ class AuthController extends Controller
         $this->smsRu = new smsRuHelper(ENV('SMS_RU_TOKEN'));
     }
 
+    /**
+     * @return JsonResponse
+     */
     public function authorizeToken(Request $request)
     {
         if ($request->headers->has('Authorize-Validation')) {
@@ -104,7 +107,9 @@ class AuthController extends Controller
         }
     }
 
-
+    /**
+     * @return JsonResponse
+     */
     public function register(Request $request)
     {
         $validator = $this->validator($request->all());
@@ -162,7 +167,7 @@ class AuthController extends Controller
                     'status_text' => $smsResponse->status_text
                 ];
                 $Response->success = false;
-                $Response->errors = [ 'phone' => 'Ошибка! ' . $smsResponse->status_text ];
+                $Response->errors = ['phone' => 'Ошибка! ' . $smsResponse->status_text];
             }
 
             return response()->json($Response, 200);
@@ -174,6 +179,9 @@ class AuthController extends Controller
         return response()->json($Response, 200);
     }
 
+    /**
+     * @return JsonResponse
+     */
     public function login(Request $request)
     {
         $Response = new stdObject([
@@ -246,6 +254,9 @@ class AuthController extends Controller
         return response()->json($Response, 200);
     }
 
+    /**
+     * @return JsonResponse
+     */
     public function logout()
     {
         $this->auth->invalidate();
@@ -303,7 +314,7 @@ class AuthController extends Controller
     protected function getRandManager()
     {
         return User::where('role', 'ROLE_MANAGER')
-                    ->inRandomOrder()->first();
+            ->inRandomOrder()->first();
     }
 
     protected function hasUser(array $data)

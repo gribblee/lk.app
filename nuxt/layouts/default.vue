@@ -533,7 +533,7 @@ export default {
         {
           name: "База знаний",
           icon: "book",
-          url: "http://baza-znani.com",
+          url: "https://leadz.monster/knowledge-base",
           rolesHidden: [],
           target: "_blank",
           type: "Link"
@@ -846,7 +846,7 @@ export default {
   max-width: 100%;
   padding-top: 15.625%;
   overflow: hidden;
-  background-image: url("/offers/tinkoff_bg.png");
+  /* background-image: url("/offers/tinkoff_bg.png"); */
   background-position: center;
   background-size: cover;
   min-height: 200px;

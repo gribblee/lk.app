@@ -37,6 +37,28 @@ Route::group([
  * Start Ver1.0
  */
 
+Route::group([
+    'prefix' => 'payment'
+], function () {
+    Route::group([
+        'prefix' => 'card'
+    ], function () {
+        Route::post('create', "PaymentController@cardCreate");
+    });
+
+    Route::group([
+        'prefix' => 'requisite'
+    ], function () {
+        Route::post('create', "PaymentController@requisiteCreate");
+    });
+
+    Route::group([
+        'prefix' => 'credit'
+    ], function () {
+        Route::post('create', "PaymentController@creditCreate");
+    });
+});
+
 Route::group(['prefix' => 'deals'], function () {
     Route::post('', "DealController@index");
 
@@ -52,7 +74,7 @@ Route::group(['prefix' => 'deals'], function () {
 
 Route::group([
     'prefix' => 'deal'
-], function() {
+], function () {
     Route::post('{id}', "DealController@show");
 });
 
@@ -88,7 +110,6 @@ Route::group([
     Route::post('{id}/launch', 'BidController@launch');
     Route::post('{id}/buy_insurance', 'BidController@buyInsurance');
     Route::post('{id}/delete', 'BidController@delete');
-    Route::post('{id}/rate_fix_regions', 'BidController@rateFixRegions');
     Route::post('{id}/update_region', 'BidController@updateRegion');
 });
 

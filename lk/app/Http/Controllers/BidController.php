@@ -9,12 +9,16 @@ use App\Models\Bid;
 use App\Models\Deal;
 use App\Models\Direction;
 use App\Models\Region;
+use App\Models\Insurance;
+use App\Models\User;
 
 use App\Helpers\stdObject;
 
 class BidController extends Controller
 {
-
+    /**
+     * @return JsonResponse
+     */
     public function index(Request $request)
     {
         /**
@@ -84,26 +88,28 @@ class BidController extends Controller
          */
     }
 
+    /**
+     * @return JsonResponse
+     */
     public function show(Request $request, int $id)
     {
         $bid = Bid::where('id', $id)
             ->where('is_delete', false)
             ->with('direction')
             ->firstOrFail();
-
-        $bidRecommend = Bid::selectRaw('(FLOOR(MAX(bids.consumption) + (MAX(bids.consumption) * 0.05))) AS MAX_RATE')->where('is_launch', true)
+        $bidRecommend = Bid::selectRaw('coalesce((FLOOR(MAX(bids.consumption) + (MAX(bids.consumption) * 0.05))), 0) AS max_rate')->where('is_launch', true)
             ->where('is_delete', false)
             ->when($bid->all_region == false, function ($q) use ($id, $bid, $request) {
                 $regionSort = [];
                 foreach ($bid->regions as $region) {
-                    $regionSort[] = $region['id'];
+                    $regionSort[]['id'] = $region['id'];
                 }
                 return $q->whereJsonContains('regions', $regionSort);
             })->first();
-        if ($bidRecommend['MAX_RATE'] == -1) {
-            $bid['MAX_RATE'] = $bid['direction']['cost_price'] + ($bid['direction']['cost_price'] * ($bid['direction']['extra'] / 100) + ($bid['direction']['cost_price'] * 0.05));
+        if ($bidRecommend['max_rate'] == -1) {
+            $bid['max_rate'] = $bid['direction']['cost_price'] + ($bid['direction']['cost_price'] * ($bid['direction']['extra'] / 100) + ($bid['direction']['cost_price'] * 0.05));
         } else {
-            $bid['MAX_RATE'] = $bidRecommend['MAX_RATE'];
+            $bid['max_rate'] = $bidRecommend['max_rate'];
         }
         $bid['direction_description'] = $bid->direction->description;
 
@@ -121,6 +127,9 @@ class BidController extends Controller
         return response()->json($bid, 200);
     }
 
+    /**
+     * @return JsonResponse
+     */
     public function create(Request $request)
     {
         /**
@@ -170,6 +179,9 @@ class BidController extends Controller
          */
     }
 
+    /**
+     * @return JsonResponse
+     */
     public function launch(Request $request, int $id)
     {
         $bid = Bid::with('user')->with('direction')->findOrFail($id);
@@ -209,70 +221,103 @@ class BidController extends Controller
         }
         return response()->json([
             'is_launch' => $isLaunch,
-            'msg' => $msg,
+            'message' => $msg,
             'code' => $code
         ]);
     }
 
     public function buyInsurance(Request $request, int $id)
     {
+        $Response = new stdObject([
+            'success' => false,
+            'message' => 'Вы не выбрали страховку',
+            'data' => []
+        ]);
+        if ($request->has('insurance_id')) {
+            $insurance = Insurance::findOrFail($request->insurance_id);
+
+            if ($request->user()->balance < $insurance->price) {
+                $Response->success  = false;
+                $Response->message = 'Не достаточно средств';
+                $Response->data = [];
+            } else {
+                $bid = Bid::find($id)->where('user_id', $request->user()->id);
+                if ($bid) {
+                    $user = User::findOrFail($request->user()->id);
+                    $bid->insurance = $bid->insurance + $insurance->price;
+                    $bid->update();
+                    
+                    $user->balance = $user->balance - $insurance->price;
+                    $user->update();
+
+                    $Response->success = true;
+                    $Response->message = 'Обновлено';
+                    $Response->data = $bid;
+                } else {
+                    $Response->success = false;
+                    $Response->message = 'Это не ваша заявка';
+                    $Response->data = [];
+                }
+            }
+        }
+        return response()->json($Response, 200);
     }
 
-    public function rateFixRegions(Request $request, int $id)
-    {
-    }
-
+    /**
+     * @return JsonResponse
+     */
     public function update(Request $request, int $id)
     {
+        //Здесь куча хуйни всё поправить
         $bid = Bid::with('direction')->findOrFail($id);
-        $bidRecommend = Bid::selectRaw('(MAX(bids.consumption) + (MAX(bids.consumption) * 0.05)) AS MAX_RATE')->where('is_launch', true)
+        $qOnly = $request->only([
+            'regions',
+            'direction_id',
+            'consumption',
+            'daily_limit',
+            'insurance'
+        ]);
+        if ($request->has('daily_limit')) {
+            if ($qOnly['daily_limit'] > 0 && $qOnly['daily_limit'] < 5) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Нужно чтобы заявок было не меньше 5'
+                ]);
+            }
+        }
+        $bid->update($qOnly);
+
+        $bidReturn = Bid::with('direction')->find($id);
+        $bidRecommend = Bid::selectRaw('coalesce((FLOOR(MAX(bids.consumption) + (MAX(bids.consumption) * 0.05))), 0) AS max_rate')
+            ->where('is_launch', true)
+            ->whereNotIn('id', [$bid->id])
             ->where('is_delete', false)
             ->when($bid->all_region == false, function ($q) use ($id, $bid, $request) {
                 $regionSort = [];
                 foreach ($bid->regions as $region) {
-                    $regionSort[] = $region['id'];
+                    $regionSort[]['id'] = $region['id'];
                 }
                 return $q->whereJsonContains('regions', $regionSort);
-            })->first()->first();
+            })->first();
 
-        if ($bid->user_id === $request->user()->id) {
-            if (isset($request->perRate)) {
-                $bid->consumption = $request->perRate;
-                if ($request->perRate < $bid->direction['cost_price'] + ($bid->direction['cost_price'] * ($bid->direction['extra'] / 100))) {
-                    $bid->is_launch = false;
-                }
-            }
-            if ($request->has('dailyLimit')) {
-                if ($request->dailyLimit < 0 || empty($request->dailyLimit)) {
-                    $request->dailyLimit = 0;
-                }
-                $bid->daily_limit = $request->dailyLimit;
-                if ($request->dailyLimit > 0 && $request->dailyLimit < 5) {
-                    $bid->is_launch = false;
-                }
-            }
-            if (isset($request->direction_id) && $bid->is_update == false) {
-                $bid->direction_id = $request->direction_id;
-                $bid->is_update = true;
-            }
-            $bid->save();
-            return response()->json([
-                'success' => true,
-                'MAX_RATE' => $bidRecommend['MAX_RATE'],
-                'direction_description' => $bid->direction->description,
-                'conversion_contract' => $bid->direction['conversion_contract'],
-                'conversion_meetings' => $bid->direction['conversion_meetings'],
-                'average_check' => $bid->direction['average_check'],
-                'min_per_rate' => $bid->direction['cost_price'] * ($bid->direction['cost_price'] * ($bid->direction['extra'] / 100)),
-                'direction' => $bid->direction
-
-            ], 200);
+        if ($bidRecommend['max_rate'] == -1) {
+            $bidReturn['max_rate'] = $bidReturn['direction']['cost_price'] + ($bidReturn['direction']['cost_price'] * ($bidReturn['direction']['extra'] / 100) + ($bidReturn['direction']['cost_price'] * 0.05));
+        } else {
+            $bidReturn['max_rate'] = $bidRecommend['max_rate'];
         }
+        return response()->json([
+            'success' => true,
+            'message' => 'Обновлено',
+            'data' => $bidReturn
+        ]);
         return response()->json([
             'success' => false
         ], 403);
     }
 
+    /**
+     * @return JsonResponse
+     */
     public function delete(Request $request, int $id)
     {
         $bid = Bid::find($id);
