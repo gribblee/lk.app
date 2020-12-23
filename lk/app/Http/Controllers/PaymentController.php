@@ -201,7 +201,7 @@ class PaymentController extends Controller
             $payment = Payment::create([
                 'type' => HelperPayment::TYPE_CD,
                 'status' => HelperPayment::CD_STATUS_CREATE,
-                'requisites_id' => null,
+                'requisite_id' => null,
                 'user_id' => $request->user()->id,
                 'paysum' => $request->paysum,
                 'before_balance' => $request->user()->balance,
@@ -263,7 +263,7 @@ class PaymentController extends Controller
                 $paymentData = Payment::create([
                     'type' => HelperPayment::TYPE_RQ,
                     'status' => HelperPayment::RQ_STATUS_CREATE,
-                    'requisites_id' => $requis->id,
+                    'requisite_id' => $requis->id,
                     'user_id' => $request->user()->id,
                     'paysum' => $request->paysum,
                     'before_balance' => $request->user()->balance,
@@ -273,13 +273,13 @@ class PaymentController extends Controller
                 /**
                  *  BEGIN
                  */
-                $pdfPath = '/payment/pdf/' . date("dmY", strtotime($paymentData->created_at)) . '-' . str_pad($paymentData->id . $paymentData->requisites_id, 6, '000000', STR_PAD_LEFT) . '.pdf';
+                $pdfPath = '/payment/pdf/' . date("dmY", strtotime($paymentData->created_at)) . '-' . str_pad($paymentData->id . $paymentData->requisite_id, 6, '000000', STR_PAD_LEFT) . '.pdf';
 
                 $pdf = PDF::loadView('pdf.contract', [
                     'payment' => $paymentData,
                     'requisite' => $requis,
-                    'title' => date("dmY", strtotime($paymentData->created_at)) . '-' . str_pad($paymentData->id . $paymentData->requisites_id, 6, '000000', STR_PAD_LEFT),
-                    'bill' => str_pad($paymentData->id . $paymentData->requisites_id, 6, '000000', STR_PAD_LEFT),
+                    'title' => date("dmY", strtotime($paymentData->created_at)) . '-' . str_pad($paymentData->id . $paymentData->requisite_id, 6, '000000', STR_PAD_LEFT),
+                    'bill' => str_pad($paymentData->id . $paymentData->requisite_id, 6, '000000', STR_PAD_LEFT),
                     'sum_to_string' => HelperPayment::number2string($paymentData->paysum)
                 ]);
                 $pdf->save(Storage::disk('public')->path($pdfPath));
@@ -296,7 +296,7 @@ class PaymentController extends Controller
                     $message->subject('Счёт на пополнение в сервисе Leadz.Monster');
                     $message->to($request->user()->email)->cc($request->user()->email);
                     $message->attach(Storage::disk('public')->path($pdfPath));
-                    $message->setBody('<h1>Здравствуйте</h1><br/><p>Вам выставлен счёт № ' . date("dmY", strtotime($paymentData->created_at)) . '-' . str_pad($paymentData->id . $paymentData->requisites_id, 6, '000000', STR_PAD_LEFT) . ' на сумму ' . $paymentData->paysum . ' ₽ в сервисе Leadz.Monster</p>', 'text/html');
+                    $message->setBody('<h1>Здравствуйте</h1><br/><p>Вам выставлен счёт № ' . date("dmY", strtotime($paymentData->created_at)) . '-' . str_pad($paymentData->id . $paymentData->requisite_id, 6, '000000', STR_PAD_LEFT) . ' на сумму ' . $paymentData->paysum . ' ₽ в сервисе Leadz.Monster</p>', 'text/html');
                 });
 
                 return response()->json([
@@ -334,7 +334,7 @@ class PaymentController extends Controller
             $payment = Payment::create([
                 'type' => HelperPayment::TYPE_CT,
                 'status' => HelperPayment::CT_STATUS_CREATE,
-                'requisites_id' => null,
+                'requisite_id' => null,
                 'user_id' => $request->user()->id,
                 'paysum' => $request->sum,
                 'before_balance' => $request->user()->balance,
@@ -412,7 +412,7 @@ class PaymentController extends Controller
     public function paymentDocument(Request $request, int $id)
     {
         $payment = Payment::with('requisite')->findOrFail($id);
-        $pdfPath = '/payment/pdf/' . date("dmY", strtotime($payment->created_at)) . '-' . str_pad($payment->id . $payment->requisites_id, 6, '000000', STR_PAD_LEFT) . '.pdf';
+        $pdfPath = '/payment/pdf/' . date("dmY", strtotime($payment->created_at)) . '-' . str_pad($payment->id . $payment->requisite_id, 6, '000000', STR_PAD_LEFT) . '.pdf';
 
         return Storage::disk('public')->download($pdfPath);
         // response(
