@@ -28,11 +28,13 @@ class PaymentController extends Controller
             $payment->payment_id = $request->PaymentId;
             $payment->card = $request->Pan;
             $payment->updated_at = date("d-m-Y H:i:s");
+            
             if ($request->Status == 'CONFIRMED' && $request->Success == true) {
                 $user = User::find($payment->user_id);
+                return response()->json($user);
                 $user->balance = $user->balance + $payment->paysum;
                 $user->save();
-
+                
                 $payment->after_balance = $user->balance;
                 $payment->status = HelperPayment::CD_STATUS_PAID;
                 HistoryPayment::create([
