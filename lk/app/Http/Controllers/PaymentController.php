@@ -25,6 +25,7 @@ class PaymentController extends Controller
     {
         if ($request->has('OrderId')) {
             $payment = Payment::find($request->OrderId);
+            return response()->json($payment);
             $payment->payment_id = $request->PaymentId;
             $payment->card = $request->Pan;
             $payment->updated_at = date("d-m-Y H:i:s");
