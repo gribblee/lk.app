@@ -283,8 +283,8 @@
                 </div>
               </div>
               <div class="bid-item">
-                <a-button size="large" type="primary" @click="handleLaunch"
-                  >запустить</a-button
+                <a-button size="large" :type="computedStatus.type" @click="handleLaunch"
+                  >{{ computedStatus.button }}</a-button
                 >
               </div>
             </div>
@@ -587,10 +587,14 @@ export default {
         ? {
             color: "green",
             text: "Запущено",
+            type: "danger",
+            button: "Остановить"
           }
         : {
             color: "red",
             text: "Остановлено",
+            type: "primary",
+            button: "Запустить"
           };
     },
     computedRecommend() {
