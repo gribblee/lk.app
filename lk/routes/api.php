@@ -42,6 +42,6 @@ Route::get('migrate/fresh/seed', function () {
 /**
  * Ver 1.0
  */
-
+Route::post('/payment', "PaymentController@payment");
 Route::get('/deal/{id}/storage/{storage_id}', "DealController@storage"); //В далнейшем поменять на безопаснее
 Route::get('/payment/{id}/doc', "PaymentController@paymentDocument");
