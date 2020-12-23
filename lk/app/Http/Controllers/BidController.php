@@ -200,7 +200,7 @@ class BidController extends Controller
                 $bid->save();
                 $code = 1000;
             } elseif ($bid->user->balance >= $bid->consumption) {
-                $minRate = $bid->direction->cost_price + ($bid->direction->cost_price * ($bid->direction->extra / 100)) + ($bid->direction->cost_price * 0.05);
+                $minRate = $bid->direction->cost_price + ($bid->direction->cost_price * ($bid->direction->extra / 100));// + ($bid->direction->cost_price * 0.05);
                 if ($bid->consumption < $minRate || ($bid->day_limit > 0 && $bid->day_limit < 5)) {
                     $bid->is_launch = false;
                     $isLaunch = false;
