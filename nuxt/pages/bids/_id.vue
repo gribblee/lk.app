@@ -656,7 +656,8 @@ export default {
         type: "info",
       };
       const cost_price = Number(this.direction.cost_price);
-      if (this.consumption < cost_price + cost_price * 0.05) {
+      const extra = Number(this.direction.extra);
+      if (this.consumption < cost_price + (cost_price * (extra / 100))) {
         consumptionReturn.status = true;
         consumptionReturn.message =
           "При такой ставке Вы не будете получать заявки";

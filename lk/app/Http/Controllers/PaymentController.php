@@ -25,14 +25,12 @@ class PaymentController extends Controller
     {
         if ($request->has('OrderId')) {
             $payment = Payment::find($request->OrderId);
-            return response()->json($payment);
             $payment->payment_id = $request->PaymentId;
             $payment->card = $request->Pan;
             $payment->updated_at = date("d-m-Y H:i:s");
             
             if ($request->Status == 'CONFIRMED' && $request->Success == true) {
                 $user = User::find($payment->user_id);
-                return response()->json($user);
                 $user->balance = $user->balance + $payment->paysum;
                 $user->save();
                 
