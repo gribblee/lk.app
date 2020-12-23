@@ -40,6 +40,9 @@ Route::group([
 Route::group([
     'prefix' => 'payment'
 ], function () {
+
+    Route::post('', "PaymentController@payment");
+
     Route::group([
         'prefix' => 'card'
     ], function () {
@@ -50,6 +53,8 @@ Route::group([
         'prefix' => 'requisite'
     ], function () {
         Route::post('create', "PaymentController@requisiteCreate");
+        Route::post('update', "PaymentController@requisiteUpdate");
+        Route::post('history', "PaymentController@generalHistory");
     });
 
     Route::group([
