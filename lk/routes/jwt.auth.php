@@ -41,8 +41,6 @@ Route::group([
     'prefix' => 'payment'
 ], function () {
 
-    Route::post('', "PaymentController@payment");
-
     Route::group([
         'prefix' => 'card'
     ], function () {
