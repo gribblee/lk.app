@@ -14,7 +14,7 @@ class Payment extends Model
         'status',
         'card',
         'payment_id',
-        'users_id',
+        'user_id',
         'requisite_id',
         'paysum',
         'paybonus',
