@@ -17,7 +17,6 @@ class Payment extends Model
         'user_id',
         'requisite_id',
         'paysum',
-        'paybonus',
         'before_balance',
         'after_balance',
         'before_bonus',
