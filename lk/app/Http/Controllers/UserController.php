@@ -85,14 +85,44 @@ class UserController extends Controller
                     created_at as date_at,
                     id AS key
                 ')->where('user_id', $request->user()->id)
-                    ->whereRaw('created_at = NOW()', $data['date_at'])
-                    ->orderBy('date_at', 'DESC')->get();
+                ->whereRaw('created_at = NOW()', $data['date_at'])
+                ->orderBy('date_at', 'DESC')->get();
         }
         return response()->json($historyPayment);
     }
 
+    /**
+     * @return JsonResponse
+     */
     public function update(Request $request)
     {
+        $user = User::find($request->user()->id);
+        if ($user) {
+            if ($request->has('name') && empty($request->name) == false && !empty($request->email)) {
+                if ($request->has('name')) {
+                    $user->name = $request->name;
+                }
+                if ($request->has('email')) {
+                    $user->email = $request->email;
+                }
+                if ($request->has('email_notification')) {
+                    $user->email_notification = $request->email_notification;
+                }
+                if ($request->has('phone')) {
+                    $user->phone = $request->phone;
+                }
+                $user->save();
+                return response()->json([
+                    'success' => true,
+                    'msg' => 'Настройки обновлены'
+                ]);
+            }
+            return response()->json([
+                'success' => false,
+                'error' => 'Поля заполнены не правильно'
+            ]);
+        }
+        return response('ДОСТУП ЗАПРЕЩЁН', 403);
     }
 
     public function updateCategory(Request $request)

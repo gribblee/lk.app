@@ -11,7 +11,11 @@ class Disput extends Model
 
     protected $table = 'disput';
 
+    const STATUS_START = 500; //Спор создан
+    const STATUS_CONFIRMED = 501; //Закрыт в пользу клиента 
+    const STATUS_REJECT = 502; //Закрыт в пользу сервиса
+
     public static function noClose() {
-        return self::where('close', 0)->get();
+        return self::where('status', self::STATUS_START)->get();
     }
 }

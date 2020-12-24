@@ -38,6 +38,12 @@ Route::group([
  */
 
 Route::group([
+    'prefix' => 'disput'
+], function () {
+    Route::post('', "DisputController@index");
+});
+
+Route::group([
     'prefix' => 'payment'
 ], function () {
 
@@ -52,7 +58,6 @@ Route::group([
     ], function () {
         Route::post('create', "PaymentController@requisiteCreate");
         Route::post('update', "PaymentController@requisiteUpdate");
-        Route::post('history', "PaymentController@generalHistory");
     });
 
     Route::group([
@@ -60,6 +65,14 @@ Route::group([
     ], function () {
         Route::post('create', "PaymentController@creditCreate");
     });
+    /**
+     * Start Ver 1.0
+     */
+    Route::post('history', "PaymentController@generalHistory");
+    Route::post('requisites', "PaymentController@bills");
+    /**
+     * End Ver 1.0
+     */
 });
 
 Route::group(['prefix' => 'deals'], function () {

@@ -21,6 +21,45 @@ use PDF;
 class PaymentController extends Controller
 {
 
+    /**
+     * @return JsonResponse
+     */
+    public function bills(Request $request)
+    {
+        if ($request->user()->role == 'ROLE_ADMIN') {
+            $payments = Payment::with('user', 'requisite')->where('type', HelperPayment::TYPE_RQ)
+                ->whereNotIn('status', [
+                    HelperPayment::RQ_STATUS_CANCEL,
+                    HelperPayment::RQ_STATUS_ERROR
+                ])->orderBy('id', 'DESC')->orderBy('status', 'DESC');
+            if ($request->has('action')) {
+                switch ($request->action) {
+                    case 1:
+                        $payments->where('status', HelperPayment::RQ_STATUS_CREATE);
+                        break;
+                    case 2:
+                        $payments->where('status', HelperPayment::RQ_STATUS_PARTIAL_PAYMENT);
+                        break;
+                    case 7:
+                        $payments->where('status', HelperPayment::RQ_STATUS_PAID);
+                        break;
+                }
+            }
+            if ($request->has('search')) {
+                foreach ($request->search as $key => $value) {
+                    $payments->whereHas('requisite', function ($q) use ($key, $value) {
+                        return $q->where($key, 'LIKE',  "%$value%");
+                    });
+                }
+            }
+            return response()->json($payments->paginate(20));
+        }
+        return response()->json(['Доступ запрещён!'], 403);
+    }
+
+    /**
+     * @return JsonResponse
+     */
     public function payment(Request $request)
     {
         if ($request->has('OrderId')) {
@@ -28,12 +67,12 @@ class PaymentController extends Controller
             $payment->payment_id = $request->PaymentId;
             $payment->card = $request->Pan;
             $payment->updated_at = date("d-m-Y H:i:s");
-            
+
             if ($request->Status == 'CONFIRMED' && $request->Success == true) {
                 $user = User::find($payment->user_id);
                 $user->balance = $user->balance + $payment->paysum;
                 $user->save();
-                
+
                 $payment->after_balance = $user->balance;
                 $payment->status = HelperPayment::CD_STATUS_PAID;
                 HistoryPayment::create([

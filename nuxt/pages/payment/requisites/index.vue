@@ -79,10 +79,10 @@
               }}</a-button>
             </template>
             <template slot="created_at" slot-scope="text">
-              {{ $dateFns.format(text, 'dd-MM-yyyy H:I') }}
+              {{ text }}
             </template>
             <template slot="updated_at" slot-scope="text">
-              {{ $dateFns.format(text, 'dd-MM-yyyy H:I') }}
+              {{ text }}
             </template>
           </a-table>
         </div>
