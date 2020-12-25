@@ -85,7 +85,7 @@ class UserController extends Controller
                     created_at as date_at,
                     id AS key
                 ')->where('user_id', intval($request->user()->id))
-                ->whereRaw('created_at = NOW()', $data['date_at'])
+                ->whereRaw('created_at = NOW()')
                 ->orderBy('date_at', 'DESC')->get();
         }
         return response()->json($historyPayment);
