@@ -64,10 +64,9 @@ class UserController extends Controller
     {
         if ($request->has('is')) {
             $user = User::findOrFail($request->user()->id);
-            $user->with_bonus = boolval($request->input('is'));
-            $user->save();
+            $user->update(['with_bonus' => $request->input('is')]);
             return response()->json([
-                'with_bonus' => $user->with_bonus
+                'with_bonus' => $request->input('is')
             ]);
         }
     }
