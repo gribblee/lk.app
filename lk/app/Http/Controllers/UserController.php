@@ -66,7 +66,7 @@ class UserController extends Controller
             $user = User::findOrFail($request->user()->id);
             $user->update(['with_bonus' => $request->input('is')]);
             return response()->json([
-                'pay_bonus' => $user->pay_bonus
+                'pay_bonus' => $user->with_bonus
             ]);
         }
     }
