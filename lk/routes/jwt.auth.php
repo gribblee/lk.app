@@ -128,6 +128,7 @@ Route::group([
     Route::post('update_type', 'UserController@updateCategory');
     Route::post('update', 'UserController@update');
     Route::post('balance/history', 'UserController@history');
+    Route::post('pay_bonus', "UserController@payBonus");
 });
 Route::group([
     'prefix' => 'bids'

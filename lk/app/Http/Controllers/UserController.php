@@ -57,6 +57,23 @@ class UserController extends Controller
      * Start Ver 1.0
      */
 
+    /**
+     * @return JsonResponse
+     */
+    public function payBonus(Request $request)
+    {
+        if ($request->has('is')) {
+            $user = User::findOrFail($request->user()->id);
+            $user->update(['with_bonus' => $request->input('is')]);
+            return response()->json([
+                'pay_bonus' => $user->pay_bonus
+            ]);
+        }
+    }
+
+    /**
+     * @return JsonResponse
+     */
     public function history(Request $request)
     {
         $historyPayment = HistoryPayment::selectRaw('
