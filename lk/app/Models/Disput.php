@@ -15,7 +15,18 @@ class Disput extends Model
     const STATUS_CONFIRMED = 501; //Закрыт в пользу клиента 
     const STATUS_REJECT = 502; //Закрыт в пользу сервиса
 
-    public static function noClose() {
+    public function deal()
+    {
+        return $this->belongsTo(Deals::class);
+    }
+
+    public function disputType()
+    {
+        return $this->hasOne(DisputType::class);
+    }
+
+    public static function noClose()
+    {
         return self::where('status', self::STATUS_START)->get();
     }
 }

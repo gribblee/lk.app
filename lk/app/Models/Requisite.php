@@ -27,6 +27,11 @@ class Requisite extends Model
         'is_delete'
     ];
 
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'requisite_id', 'id');
+    }
+
     public static function getNonDelete(int $userId)
     {
         return self::where('user_id', $userId)->where('is_delete', false);

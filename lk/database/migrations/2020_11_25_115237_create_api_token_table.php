@@ -16,11 +16,19 @@ class CreateApiTokenTable extends Migration
         Schema::create('api_token', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('hash');
+
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')
                 ->references('id')
                 ->on('users');
             $table->unsignedBigInteger('count_deals');
+
+            $table->unsignedBigInteger('direction_id');
+            $table->foreign('direction_id')
+                ->references('id')
+                ->on('directions');
+            $table->unsignedBigInteger('count_deals');
+
             $table->timestamps();
         });
     }

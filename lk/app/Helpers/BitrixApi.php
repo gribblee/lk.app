@@ -12,6 +12,7 @@ class BitrixApi extends Helper
 
     protected $DATA_REQUEST = [];
 
+    public $UTM_MARK = [];
     public $SOURCE_ID = 3;
     public $SOURCE_REGISTER_ID = 5;
     public $RESPONSIBLE_ID = 29;
@@ -45,6 +46,7 @@ class BitrixApi extends Helper
                     : false;
         }
         $this->DATA_REQUEST['FIELDS'] = array_merge($this->DATA_REQUEST['FIELDS'], $UTM_MARK);
+        $this->UTM_MARK = $UTM_MARK;
         return $this;
     }
 

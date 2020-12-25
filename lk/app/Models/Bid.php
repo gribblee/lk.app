@@ -93,6 +93,11 @@ class Bid extends Model
         }
     }
 
+    public function dealsToday()
+    {
+        return $this->hasMany(Deal::class)->whereRaw("deals.created_at = date_trunc('day', current_date)");
+    }
+
     /**
      * Start Ver 1.0
      */

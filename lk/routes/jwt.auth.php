@@ -36,11 +36,24 @@ Route::group([
 /**
  * Start Ver1.0
  */
+Route::group([
+    'prefix' => 'webmaster'
+], function() {
+    Route::group([
+        'prefix' => 'token'
+    ], function() {
+        Route::get('load', "WebmasterController@tokenLoad");
+        Route::post('create', "WebmasterController@tokenCreate");
+        Route::post("delete", "WebmasterController@tokenDelete");
+    });
+});
 
 Route::group([
     'prefix' => 'disput'
 ], function () {
     Route::post('', "DisputController@index");
+    Route::post('info', "DisputController@info");
+    Route::post('{id}/close', "DisputController@close");
 });
 
 Route::group([
@@ -68,8 +81,13 @@ Route::group([
     /**
      * Start Ver 1.0
      */
-    Route::post('history', "PaymentController@generalHistory");
-    Route::post('requisites', "PaymentController@bills");
+    Route::get('history', "PaymentController@generalHistory");
+    Route::group([
+        'prefix' => 'requisites'
+    ], function () {
+        Route::post('', "PaymentController@bills");
+        Route::post('update', "PaymentController@requisitePayment");
+    });
     /**
      * End Ver 1.0
      */

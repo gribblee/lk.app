@@ -20,24 +20,31 @@ Route::group([
     Route::post('/authorize', 'AuthController@authorizeToken');
 });
 
+Route::group([
+    'prefix' => 'app',
+    'middleware' => ['app.auth']
+], function () {
+    Route::post('{hash}/push', "AppController@push");
+});
+
 /**
  * Миграции
  */
-Route::get('migrate', function () {
-    dd(\Artisan::call('migrate'));
-});
+// Route::get('migrate', function () {
+//     dd(\Artisan::call('migrate'));
+// });
 
-Route::get('migrate/fresh', function () {
-    dd(\Artisan::call('migrate:fresh'));
-});
+// Route::get('migrate/fresh', function () {
+//     dd(\Artisan::call('migrate:fresh'));
+// });
 
-Route::get('migrate/seed', function () {
-    dd(\Artisan::call('migrate --seed'));
-});
+// Route::get('migrate/seed', function () {
+//     dd(\Artisan::call('migrate --seed'));
+// });
 
-Route::get('migrate/fresh/seed', function () {
-    dd(\Artisan::call('migrate:fresh --seed'));
-});
+// Route::get('migrate/fresh/seed', function () {
+//     dd(\Artisan::call('migrate:fresh --seed'));
+// });
 
 /**
  * Ver 1.0

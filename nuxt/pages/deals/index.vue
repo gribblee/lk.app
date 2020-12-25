@@ -113,11 +113,11 @@
             @change="handleTableChange"
             >
             <a
-                @click.prevent="showDrawer(record.DEAL_ID, record, $event)"
+                @click.prevent="showDrawer(record.deal_id, record, $event)"
                 href="javascript:;"
                 slot="name"
                 slot-scope="text, record"
-                :to="{ path: `/deals/${record.DEAL_ID}` }"
+                :to="{ path: `/deals/${record.deal_id}` }"
                 >{{ record.name }}</a
             >
             <span slot="status_name" slot-scope="text, record">
@@ -171,7 +171,7 @@
                 </template>
             </template>
             <template slot="created_at" slot-scope="text, record">
-                {{ $dateFns.format(record.created_at, "dd-M-yyyy") }}
+                {{ record.created_at }}
             </template>
             </a-table>
         </a-config-provider>
@@ -184,7 +184,7 @@
       :visible="visible"
       @close="onClose"
     >
-      <p :style="[pStyle, pStyle2]">Клиент #{{ dealData.DEAL_ID }}</p>
+      <p :style="[pStyle, pStyle2]">Клиент #{{ dealData.deal_id }}</p>
       <p :style="pStyle">Информация</p>
       <a-row>
         <a-col :span="24" v-if="user.role != 'ROLE_MANAGER'">
@@ -236,21 +236,21 @@
             />
           </a-col>
           <a-col :span="12">
-            <description-item title="ФИО" :content="dealData.name" />
+            <b-description-item title="ФИО" :content="dealData.name" />
           </a-col>
           <a-col :span="12">
-            <description-item title="E-mail" :content="dealData.email" />
+            <b-description-item title="E-mail" :content="dealData.email" />
           </a-col>
         </a-row>
         <a-row>
           <a-col :span="12">
-            <description-item
+            <b-description-item
               title="Регион"
               :content="dealData.region.name_with_type"
             />
           </a-col>
           <a-col :span="12">
-            <description-item
+            <b-description-item
               title="Направление"
               :content="dealData.bids.direction.name"
             />
@@ -258,10 +258,10 @@
         </a-row>
         <a-row>
           <a-col :span="12">
-            <description-item title="Телефон" :content="dealData.phone" />
+            <b-description-item title="Телефон" :content="dealData.phone" />
           </a-col>
           <a-col :span="12">
-            <description-item title="Стоимость" :content="`${dealData.price} ₽`" />
+            <b-description-item title="Стоимость" :content="`${dealData.price} ₽`" />
           </a-col>
         </a-row>
         <tempalte
@@ -271,7 +271,7 @@
             <p :style="pStyle">UTM метки</p>
             <a-row :style="{ marginTop: '20px' }">
               <a-col :span="12" v-for="(item, index) in utms" :key="index">
-                <description-item :title="index" :content="item" />
+                <b-description-item :title="index" :content="item" />
               </a-col>
             </a-row>
           </div>
@@ -279,7 +279,7 @@
             <p :style="pStyle">Источник/запросы</p>
             <a-row :style="{ marginTop: '20px' }">
               <a-col :span="12">
-                <description-item title="Источник" :content="refererDeal" />
+                <b-description-item title="Источник" :content="refererDeal" />
               </a-col>
             </a-row>
             <a-row>
@@ -291,7 +291,7 @@
                 <p :style="{ fontSize: '14px', fontWeight: 'bold' }">
                   {{ index }}
                 </p>
-                <description-item
+                <b-description-item
                   v-for="(itm, idx) in item"
                   :key="idx"
                   :title="idx"
@@ -386,8 +386,8 @@
 const columns = [
   {
     title: "ID",
-    dataIndex: "DEAL_ID",
-    key: "DEAL_ID",
+    dataIndex: "deal_id",
+    key: "deal_id",
   },
   {
     title: "Состояние",
@@ -485,7 +485,7 @@ export default {
       dealStatus: "",
       statusDisputId: 0,
       dealData: {
-        DEAL_ID: 1,
+        deal_id: 1,
         bids: {
           direction: {
             name: "",
@@ -559,7 +559,7 @@ export default {
         this.modalVisible = true;
       } else {
         this.$axios
-          .post(`/deal/${this.dealData.DEAL_ID}/status_update`, {
+          .post(`/deal/${this.dealData.deal_id}/status_update`, {
             status_id: _e.target.value.id,
           })
           .then(({ data }) => {
@@ -581,14 +581,14 @@ export default {
     },
     handleOk() {
       this.$axios
-        .post(`/deal/${this.dealData.DEAL_ID}/disput/create`, {
+        .post(`/deal/${this.dealData.deal_id}/disput/create`, {
           message: this.disputComment,
           type_id: this.disputType,
         })
         .then(({ data }) => {
           if (data.status === "OK") {
             this.$axios
-              .post(`/deal/${this.dealData.DEAL_ID}/status_update`, {
+              .post(`/deal/${this.dealData.deal_id}/status_update`, {
                 status_id: this.statusDisputId,
               })
               .then(({ data }) => {
@@ -627,7 +627,7 @@ export default {
         .post(`/deal/${_id}`)
         .then(({ data }) => {
           this.dealData = data;
-          this.uploadURL = `http://lk.leadz.monster/api/deal/${this.dealData.DEAL_ID}/upload`;
+          this.uploadURL = `http://lk.leadz.monster/api/deal/${this.dealData.deal_id}/upload`;
           this.dealStatus = data.status.id.toString();
           this.fileList.splice(0, this.fileList.length);
           if (record.is_view == false) {
@@ -639,7 +639,7 @@ export default {
               uid: _n.id,
               name: _n.name,
               status: "done",
-              url: `http://lk.leadz.monster/api/deal/${data.DEAL_ID}/storage/${_n.id}`,
+              url: `http://lk.leadz.monster/api/deal/${data.deal_id}/storage/${_n.id}`,
             });
           });
           if (
@@ -663,9 +663,9 @@ export default {
       const { response, uid } = this.fileList[this.fileList.indexOf(file)];
       this.deleteURL = "";
       if (response !== undefined) {
-        this.deleteURL = `/deal/${this.dealData.DEAL_ID}/storage/${response.uid}/delete`;
+        this.deleteURL = `/deal/${this.dealData.deal_id}/storage/${response.uid}/delete`;
       } else {
-        this.deleteURL = `/deal/${this.dealData.DEAL_ID}/storage/${uid}/delete`;
+        this.deleteURL = `/deal/${this.dealData.deal_id}/storage/${uid}/delete`;
       }
 
       this.$axios
@@ -692,10 +692,10 @@ export default {
         this.statusDisputId = e.item.value.id;
         this.modalVisible = true;
         this.$axios
-          .post(`/deal/${record.DEAL_ID}`)
+          .post(`/deal/${record.deal_id}`)
           .then(({ data }) => {
             this.dealData = data;
-            this.uploadURL = `http://lk.leadz.monster/api/deal/${this.dealData.DEAL_ID}/upload`;
+            this.uploadURL = `http://lk.leadz.monster/api/deal/${this.dealData.deal_id}/upload`;
             this.dealStatus = data.status.id.toString();
             this.fileList.splice(0, this.fileList.length);
           })

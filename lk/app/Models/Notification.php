@@ -10,6 +10,9 @@ class Notification extends Model
     use HasFactory;
 
     protected $table = 'notifications';
+    protected $fillable = [
+        'id', 'description', 'is_view', 'user_id', 'created_at', 'updated_at'
+    ];
 
     public static function nonView($userId)
     {
