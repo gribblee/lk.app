@@ -69,7 +69,7 @@ class UserController extends Controller
             SUM(after_bonus) AS after_bonus,
             created_at AS date_at,
             array_agg(id) AS key
-        ')->where('user_id', $request->user()->id)
+        ')->where('user_id', intval($request->user()->id))
             ->orderBy('created_at', 'DESC')
             ->groupByRaw('payment_history.created_at')
             ->paginate(20);
@@ -84,7 +84,7 @@ class UserController extends Controller
                     after_bonus,
                     created_at as date_at,
                     id AS key
-                ')->where('user_id', $request->user()->id)
+                ')->where('user_id', intval($request->user()->id))
                 ->whereRaw('created_at = NOW()', $data['date_at'])
                 ->orderBy('date_at', 'DESC')->get();
         }
