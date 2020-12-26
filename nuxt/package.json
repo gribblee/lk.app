@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "nuxt-ts",
-    "build": "nuxt-ts build",
-    "start": "nuxt-ts start",
+    "dev": "NODE_BASE_URL=http://lk.leadz.monster/api nuxt-ts",
+    "build": "NODE_BASE_URL=https://lk.leadz.monster/api nuxt-ts build",
+    "start": "NODE_BASE_URL=https://lk.leadz.monster/api nuxt-ts start",
     "generate": "nuxt-ts generate",
     "test": "jest"
   },
