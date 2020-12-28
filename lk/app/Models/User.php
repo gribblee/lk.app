@@ -8,8 +8,6 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
-use App\Bundles\Bids\Models\Bids;
-
 class User extends Authenticatable implements JWTSubject
 {
     use HasFactory, Notifiable;
@@ -71,7 +69,7 @@ class User extends Authenticatable implements JWTSubject
     
     public function bids()
     {
-        return $this->hasMany(Bids::class, 'user_id', 'id');
+        return $this->hasMany(Bid::class, 'user_id', 'id');
     }
 
     public function notification()

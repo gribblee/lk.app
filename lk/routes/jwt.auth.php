@@ -163,6 +163,20 @@ Route::group(['prefix' => 'insurance'], function () {
     Route::post('{id}/delete', "InsuranceController@delete");
 });
 
+Route::group([
+    'prefix' => 'admin'
+], function () {
+    Route::post('statistic', "UserController@statistic");
+});
+
+Route::group([], function() {
+    Route::post('users', "UserController@index");
+    Route::post('user/show', "AdminController@getUser");
+    Route::post('user/updates', "AdminController@updateUser");
+    Route::post('manager', "AdminController@getManagers");
+});
+
+
 /**
  * End Ver1.0
  */

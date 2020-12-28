@@ -520,7 +520,7 @@ export default {
           name: "Статистика",
           icon: "pie-chart",
           url: "/statistics",
-          rolesHidden: ["ROLE_USER", "ROLE_WEBMASTER", "ROLE_MANAGER", "ROLE_ACCOUNAT"],
+          rolesHidden: ["ROLE_USER", "ROLE_MANAGER", "ROLE_ACCOUNAT"],
           type: "Route"
         },
         {

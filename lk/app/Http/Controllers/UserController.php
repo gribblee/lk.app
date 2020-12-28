@@ -15,6 +15,69 @@ use App\Helpers\stdObject;
 
 class UserController extends Controller
 {
+    /**
+     * @return JsonResponse
+     */
+    public function index(Request $request)
+    {
+        $users = User::withCount('bids')->with('manager')->orderBy('id', 'DESC');
+        if ($request->has('is_delete')) {
+            $users->where('is_delete', $request->is_delete);
+        } else {
+            $users->where('is_delete', false);
+        }
+        if ($request->has('search')) {
+            $search = (object)$request->search;
+            if (empty($search->id) == false) {
+                $users->where('id', $search->id);
+            } else {
+                if (empty($search->name) == false) {
+                    $users->where('name', 'LIKE', "%{$search->name}%");
+                }
+                if (empty($search->phone) == false) {
+                    $users->where('phone', 'LIKE', "%{$search->phone}%");
+                }
+                if (empty($search->email) == false) {
+                    $users->where('email', 'LIKE', "%{$search->email}%");
+                }
+                if (empty($search->role) == false) {
+                    $users->where('role', $search->role);
+                }
+                if (empty($search->manager) == false) {
+                    $users->whereHas('manager', function ($q) use ($search) {
+                        return $q->where('name', 'LIKE', "%{$search->manager}%")->orWhere('email', 'LIKE', "%{$search->manager}%");
+                    });
+                }
+            }
+        }
+        return response()->json($users->paginate(10));
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    public function statistic(Request $request)
+    {
+        if (
+            $request->user()->role === 'ROLE_ADMIN'
+            || $request->user()->role == 'ROLE_WEBMASTER'
+        ) {
+            $general = [];
+            $source = [];
+
+            return response()->json([
+                'success' => true,
+                'statistic' => [
+                    'source' => $source,
+                    'general' => $general
+                ]
+            ]);
+        }
+        return response('ДОСТУП ЗАПРЕЩЁН', 403);
+    }
+    /**
+     * @return JsonResponse
+     */
     public function meUser(Request $request)
     {
         return response()->json([
