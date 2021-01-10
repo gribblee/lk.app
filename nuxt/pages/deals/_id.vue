@@ -46,7 +46,7 @@
           {{ DEAL_DATA.direction.name }}
         </a-descriptions-item>
         <a-descriptions-item label="Стоимость">
-          {{ DEAL_DATA.rate }} ₽
+          {{ DEAL_DATA.amount }} ₽
         </a-descriptions-item>
       </a-descriptions>
       <div>
@@ -89,6 +89,7 @@ export default {
     return {
       visible: false,
       DEAL_DATA: {
+        amount: 0,
         name: '',
         direction: {
           name: '',

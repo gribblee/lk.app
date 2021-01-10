@@ -25,7 +25,27 @@ Route::group([
 ], function () {
     Route::get('/updated', 'UserController@updated');
     Route::get('/me', 'UserController@meUser');
+
+    Route::post('show', "AdminController@showUser");
+    Route::post('add', "AdminController@addUser");
+    Route::post('updates', "AdminController@updateUser");
+    Route::post('delete', "AdminController@deleteUser");
+    Route::post('active', "AdminController@deleteActive");
 });
+
+Route::group(['prefix' => 'category'], function () {
+    Route::post('create', "CategoryController@create");
+    Route::post('update', "CategoryController@update");
+    Route::post('delete', "CategoryController@delete");
+});
+
+Route::group(['prefix' => 'disput_status'], function () {
+    Route::get('', "DisputTypeController@index");
+    Route::post('create', "DisputTypeController@create");
+    Route::post('update', "DisputTypeController@update");
+    Route::post('delete', "DisputTypeController@delete");
+});
+
 
 
 /**
@@ -38,10 +58,10 @@ Route::group([
  */
 Route::group([
     'prefix' => 'webmaster'
-], function() {
+], function () {
     Route::group([
         'prefix' => 'token'
-    ], function() {
+    ], function () {
         Route::get('load', "WebmasterController@tokenLoad");
         Route::post('create', "WebmasterController@tokenCreate");
         Route::post("delete", "WebmasterController@tokenDelete");
@@ -131,6 +151,11 @@ Route::group([
     Route::post('pay_bonus', "UserController@payBonus");
 });
 Route::group([
+    'prefix' => 'manager'
+], function () {
+    Route::post('users', "ManagerController@getUsers");
+});
+Route::group([
     'prefix' => 'bids'
 ], function () {
     Route::post('', 'BidController@index');
@@ -149,11 +174,13 @@ Route::group([
 });
 
 Route::group(['prefix' => 'directory'], function () {
-    Route::get('/', "DirectoryController@index");
-    // Route::post('/direction/save', "Directory\Controllers\DirectoryApi@direction_save");
-    // Route::post('/regions/save', "Directory\Controllers\DirectoryApi@regions_save");
-    // Route::post('/status/save', "Directory\Controllers\DirectoryApi@status_save");
-    // Route::post('/options_save', "Directory\Controllers\DirectoryApi@options_save");
+    Route::get('', "DirectoryController@index");
+    Route::post('direction/save', "DirectoryController@directionSave");
+    Route::post('regions/save', "DirectoryController@regionsSave");
+    Route::post('status/save', "DirectoryController@statusSave");
+    Route::post('options_save', "DirectoryController@optionsSave");
+    //Поменять маршрут потом потом
+    Route::post('options_save', "OptionController@update");
 });
 
 Route::group(['prefix' => 'insurance'], function () {
@@ -169,7 +196,7 @@ Route::group([
     Route::post('statistic', "UserController@statistic");
 });
 
-Route::group([], function() {
+Route::group([], function () {
     Route::post('users', "UserController@index");
     Route::post('user/show', "AdminController@getUser");
     Route::post('user/updates', "AdminController@updateUser");

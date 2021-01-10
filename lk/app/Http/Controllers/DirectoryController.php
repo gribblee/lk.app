@@ -24,7 +24,7 @@ class DirectoryController extends Controller
             'categories' => []
         ]);
 
-        $Response->directions = Direction::when($request->user()->role == 'ROLE_ADMIN', function($q) use($request) {
+        $Response->directions = Direction::when($request->user()->role == 'ROLE_ADMIN', function ($q) use ($request) {
             return $q->whereJsonContains('categories', $request->user()->category_id);
         })->get();
         $Response->options = Option::getKeyValue();
@@ -33,5 +33,13 @@ class DirectoryController extends Controller
         $Response->regions = Region::all();
 
         return response()->json($Response, 200);
+    }
+
+    /**
+     * @return JsonResponse
+     */
+
+    public function directionSave(Request $request)
+    {
     }
 }

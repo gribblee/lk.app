@@ -104,6 +104,11 @@ export default {
     localStorage: true,
     strategies: {
       local: {
+        token: {
+          property: "token"
+          // required: true,
+          // type: 'Bearer'
+        },
         endpoints: {
           login: {
             url: "/authorize",
@@ -144,7 +149,7 @@ export default {
    ** See https://axios.nuxtjs.org/options
    */
   axios: {
-    baseURL: "https://lk.leadz.monster/api"
+    baseURL: `${process.env.NODE_BASE_URL}`
   },
 
   // Build Configuration (https://go.nuxtjs.dev/config-build)

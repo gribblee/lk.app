@@ -171,7 +171,7 @@
                 </template>
             </template>
             <template slot="created_at" slot-scope="text, record">
-                {{ record.created_at }}
+                {{ getDate(record.created_at) }}
             </template>
             </a-table>
         </a-config-provider>
@@ -261,7 +261,7 @@
             <b-description-item title="Телефон" :content="dealData.phone" />
           </a-col>
           <a-col :span="12">
-            <b-description-item title="Стоимость" :content="`${dealData.price} ₽`" />
+            <b-description-item title="Стоимость" :content="`${dealData.amount} ₽`" />
           </a-col>
         </a-row>
         <tempalte
@@ -523,6 +523,10 @@ export default {
       });
   },
   methods: {
+    getDate(date) {
+      const dt = new Date(date);
+      return `${dt.getDate()}-${dt.getMonth()}-${dt.getFullYear()} ${dt.getHours()}:${dt.getMinutes()}`;
+    },
     handleTableChange(pagination, filters, sorters) {
       const pager = { ...this.pagination };
       pager.current = pagination.current;

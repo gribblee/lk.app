@@ -1,10 +1,6 @@
 <template>
   <a-layout-content style="margin: 20px 16px 0 16px">
-    <a-page-header
-      title="Статистика"
-      sub-title=""
-      @back="() => $router.go(-1)"
-    >
+    <a-page-header title="Статистика" sub-title="" @back="() => $router.go(-1)">
       <div slot="extra">
         <div :style="{ display: 'flex' }"></div>
       </div>
@@ -20,7 +16,10 @@
         <div :style="{ display: 'flex', alignItems: 'center', height: '33px' }">
           <a-space :size="20">
             <span>Сортировать по:</span>
-            <a-switch v-model="models.isTypeSort" @change="handleUpdateColumn" /><span :style="{ marginRight: '20px' }">{{ typeSortTitle }}</span>
+            <a-switch
+              v-model="models.isTypeSort"
+              @change="handleUpdateColumn"
+            /><span :style="{ marginRight: '20px' }">{{ typeSortTitle }}</span>
           </a-space>
           <a-space :size="20">
             <div v-if="models.isTypeSort">
@@ -31,10 +30,7 @@
                 placeholder="Выберите регион"
                 option-label-prop="label"
               >
-                <a-select-option
-                  :key="0"
-                  label="По всем регионам"
-                >
+                <a-select-option :key="0" label="По всем регионам">
                   Все регионы
                 </a-select-option>
                 <a-select-option
@@ -88,16 +84,16 @@
             <a-col :span="wrapperCol.span">
               <div :style="{ border: '1px solid #ccc', padding: '15px' }">
                 <a-tooltip title="(нужно / запущенных / на паузе)">
-                    <a-statistic
+                  <a-statistic
                     title="Необходимо заявок"
                     :value="generalStatistic.LEAD_COUNT"
                     style="margin-right: 50px"
-                    >
-                        <template #suffix>
-                            / {{ generalStatistic.BIDS_NO_PAUSE }} /
-                            {{ generalStatistic.BIDS_ON_PAUSE }}
-                        </template>
-                    </a-statistic>
+                  >
+                    <template #suffix>
+                      / {{ generalStatistic.BIDS_NO_PAUSE }} /
+                      {{ generalStatistic.BIDS_ON_PAUSE }}
+                    </template>
+                  </a-statistic>
                 </a-tooltip>
               </div>
             </a-col>
@@ -200,9 +196,15 @@
               :data-source="dataSource"
               :loading="isLoading"
             >
-            <template slot="budget" slot-scope="text, record">
-              {{ record.AVG_COST_PRICE * record.LEAD_COUNT}}
-            </template>
+              <template slot="AVG_RATE" slot-scope="text">
+                {{ text }} ₽
+              </template>
+              <template slot="MAX_RATE" slot-scope="text">
+                {{ text }} ₽
+              </template>
+              <template slot="budget" slot-scope="text">
+                {{ text }} ₽
+              </template>
             </a-table>
           </a-config-provider>
         </div>
@@ -211,14 +213,14 @@
   </a-layout-content>
 </template>
 <script>
-const columns = []
+const columns = [];
 
 export default {
-  middleware: 'roleWebmaster',
+  middleware: "roleWebmaster",
   head() {
     return {
-      title: 'Статистика',
-    }
+      title: "Статистика",
+    };
   },
   data() {
     return {
@@ -233,153 +235,157 @@ export default {
       wrapperCol: {
         span: 6,
       },
-      typeSortTitle: 'Регионам',
+      typeSortTitle: "Регионам",
       dataSource: [],
       generalStatistic: [],
       columns,
       statisticTitles: [
-        'Статистика за неделю',
-        'Статистика за месяц',
-        'Статистика за год',
+        "Статистика за неделю",
+        "Статистика за месяц",
+        "Статистика за год",
       ],
-      statisticDropdownTitle: 'Статистика за неделю',
+      statisticDropdownTitle: "Статистика за неделю",
       isLoading: false,
-    }
+    };
   },
   created() {
-    this.updateStatistic()
-    this.handleUpdateColumn()
+    this.updateStatistic();
+    this.handleUpdateColumn();
   },
   methods: {
     handleUpdateColumn(e) {
-      this.typeSortTitle = this.models.isTypeSort ? 'Регионам' : 'Направлениям'
-      if(this.models.isTypeSort) {
+      this.typeSortTitle = this.models.isTypeSort ? "Регионам" : "Направлениям";
+      if (this.models.isTypeSort) {
         this.columns = [
-            {
-              title: 'Направление',
-              dataIndex: 'DIRECTION_NAME',
-              key: 'DIRECTION_NAME',
-              scopedSlots: { customRender: 'DIRECTION_NAME' },
-            },
-            {
-              title: 'Сгенерировать',
-              dataIndex: 'LEAD_COUNT',
-              key: 'LEAD_COUNT',
-            },
-            {
-              title: 'Бюджет',
-              dataIndex: 'budget',
-              key: 'budget',
-              scopedSlots: { customRender: 'budget' },
-            },
-            {
-              title: 'Кол-во клиентов',
-              dataIndex: 'USERS_COUNT',
-              key: 'USERS_COUNT',
-            },
-            {
-              title: 'Макс. стоимость',
-              dataIndex: 'MAX_RATE',
-              key: 'MAX_RATE',
-            },
-            {
-              title: 'Сред. стоимость',
-              dataIndex: 'AVG_RATE',
-              key: 'AVG_RATE',
-            },
-            {
-              title: 'Поступление заявки',
-              dataIndex: 'LAST_DEAL_CREATE',
-              key: 'LAST_DEAL_CREATE',
-            },
-            {
-              title: 'Распределение заявки',
-              dataIndex: 'LAST_DEAL_DISTRIBUTION',
-              key: 'LAST_DEAL_DISTRIBUTION',
-            },
-        ]
+          {
+            title: "Направление",
+            dataIndex: "DIRECTION_NAME",
+            key: "DIRECTION_NAME",
+            scopedSlots: { customRender: "DIRECTION_NAME" },
+          },
+          {
+            title: "Сгенерировать",
+            dataIndex: "LEAD_COUNT",
+            key: "LEAD_COUNT",
+          },
+          {
+            title: "Бюджет",
+            dataIndex: "budget",
+            key: "budget",
+            scopedSlots: { customRender: "budget" },
+          },
+          {
+            title: "Кол-во клиентов",
+            dataIndex: "USERS_COUNT",
+            key: "USERS_COUNT",
+          },
+          {
+            title: "Макс. стоимость",
+            dataIndex: "MAX_RATE",
+            key: "MAX_RATE",
+          },
+          {
+            title: "Сред. стоимость",
+            dataIndex: "AVG_RATE",
+            key: "AVG_RATE",
+          },
+          {
+            title: "Поступление заявки",
+            dataIndex: "LAST_DEAL_CREATE",
+            key: "LAST_DEAL_CREATE",
+          },
+          {
+            title: "Распределение заявки",
+            dataIndex: "LAST_DEAL_DISTRIBUTION",
+            key: "LAST_DEAL_DISTRIBUTION",
+          },
+        ];
       } else {
         this.columns = [
-            {
-              title: 'Регион',
-              dataIndex: 'REGION_NAME',
-              key: 'REGION_NAME',
-              scopedSlots: { customRender: 'REGION_NAME' },
-            },
+          {
+            title: "Регион",
+            dataIndex: "REGION_NAME",
+            key: "REGION_NAME",
+            scopedSlots: { customRender: "REGION_NAME" },
+          },
 
-            {
-              title: 'Сгенерировать',
-              dataIndex: 'LEAD_COUNT',
-              key: 'LEAD_COUNT',
-            },
-            {
-              title: 'Бюджет',
-              dataIndex: 'budget',
-              key: 'budget',
-              scopedSlots: { customRender: 'budget' },
-            },
-            {
-              title: 'Кол-во клиентов',
-              dataIndex: 'USERS_COUNT',
-              key: 'USERS_COUNT',
-            },
-            {
-              title: 'Макс. стоимость',
-              dataIndex: 'MAX_RATE',
-              key: 'MAX_RATE',
-            },
-            {
-              title: 'Сред. стоимость',
-              dataIndex: 'AVG_RATE',
-              key: 'AVG_RATE',
-            },
-            {
-              title: 'Поступление заявки',
-              dataIndex: 'LAST_DEAL_CREATE',
-              key: 'LAST_DEAL_CREATE',
-            },
-            {
-              title: 'Распределение заявки',
-              dataIndex: 'LAST_DEAL_DISTRIBUTION',
-              key: 'LAST_DEAL_DISTRIBUTION',
-            },
-        ]
+          {
+            title: "Сгенерировать",
+            dataIndex: "LEAD_COUNT",
+            key: "LEAD_COUNT",
+          },
+          {
+            title: "Бюджет",
+            dataIndex: "budget",
+            key: "budget",
+            scopedSlots: { customRender: "budget" },
+          },
+          {
+            title: "Кол-во клиентов",
+            dataIndex: "USERS_COUNT",
+            key: "USERS_COUNT",
+          },
+          {
+            title: "Макс. стоимость",
+            dataIndex: "MAX_RATE",
+            key: "MAX_RATE",
+            scopedSlots: { customRender: "MAX_RATE" },
+          },
+          {
+            title: "Сред. стоимость",
+            dataIndex: "AVG_RATE",
+            key: "AVG_RATE",
+            scopedSlots: { customRender: "AVG_RATE" },
+          },
+          {
+            title: "Поступление заявки",
+            dataIndex: "LAST_DEAL_CREATE",
+            key: "LAST_DEAL_CREATE",
+          },
+          {
+            title: "Распределение заявки",
+            dataIndex: "LAST_DEAL_DISTRIBUTION",
+            key: "LAST_DEAL_DISTRIBUTION",
+          },
+        ];
       }
-    }, 
+    },
     handleRegionChange(e) {
-      this.updateStatistic()
+      this.updateStatistic();
     },
     handleDirectionChange(e) {
-      this.updateStatistic()
+      this.updateStatistic();
     },
     updateStatistic() {
-      this.isLoading = true
-      let postData = {}
+      this.isLoading = true;
+      let postData = {};
       if (!this.models.isTypeSort) {
-        postData.directionSort = this.models.directionSort
+        postData.directionSort = this.models.directionSort;
       }
       if (this.models.isTypeSort) {
-        postData.regionSort = this.models.regionSort
+        postData.regionSort = this.models.regionSort;
       }
-      if(Object.keys(postData).length > 0) {
-	      this.$axios
-		.post('/admin/statistic', postData)
-		.then(({ data }) => {
-		  if (data.success === true) {
-		    const { statistic } = data
-		    this.dataSource = statistic.source
-		    this.generalStatistic = statistic.general
-		    this.generalStatistic.BUDGET_MIN_LEAD_GENERATE  = statistic.general.BUDGET_MIN_LEAD_GENERATE.toFixed(2)
-		    this.isLoading = false
-		  } else {
-		    this.$message.error(data.msg)
-		  }
-		})
-		.catch(({ response }) => {
-		  this.$message.error(response.data)
-		})
-        }
+      if (Object.keys(postData).length > 0) {
+        this.$axios
+          .post("/admin/statistic", postData)
+          .then(({ data }) => {
+            if (data.success === true) {
+              const { statistic } = data;
+              this.dataSource = statistic.source;
+              this.generalStatistic = statistic.general;
+              this.generalStatistic.BUDGET_MIN_LEAD_GENERATE = statistic.general.BUDGET_MIN_LEAD_GENERATE.toFixed(
+                2
+              );
+              this.isLoading = false;
+            } else {
+              this.$message.error(data.msg);
+            }
+          })
+          .catch(({ response }) => {
+            this.$message.error(response.data);
+          });
+      }
     },
   },
-}
+};
 </script>

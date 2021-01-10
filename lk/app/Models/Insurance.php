@@ -10,6 +10,7 @@ class Insurance extends Model
     use HasFactory;
 
     protected $table = 'insurance';
+    public $timestamps = false;
     protected $fillable = [
         'name',
         'price',

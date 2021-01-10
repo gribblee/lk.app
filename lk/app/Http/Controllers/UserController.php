@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Carbon;
 
 use App\Models\User;
 use App\Models\Deal;
@@ -10,8 +12,11 @@ use App\Models\Disput;
 use App\Models\Category;
 use App\Models\Notification;
 use App\Models\HistoryPayment;
+use App\Models\Bid;
+use App\Models\AppToken;
 
 use App\Helpers\stdObject;
+use App\Models\Direction;
 
 class UserController extends Controller
 {
@@ -62,18 +67,168 @@ class UserController extends Controller
             $request->user()->role === 'ROLE_ADMIN'
             || $request->user()->role == 'ROLE_WEBMASTER'
         ) {
-            $general = [];
             $source = [];
+            $bidCollect = Bid::with('direction')
+                ->with('user')
+                ->where([
+                    'is_launch' => true,
+                    'is_delete' => false
+                ])
+                ->when($request->has('directionSort') && !empty($request->directionSort), function ($query) use ($request) {
+                    return $query->where('direction_id', $request->directionSort);
+                })
+                ->when($request->has('regionSort') && !empty($request->regionSort) && $request->regionSort != 0, function ($query) use ($request) {
+                    return $query->whereJsonContains('regions', [
+                        'id' => $request->regionSort
+                    ]);
+                })
+                ->groupByRaw('bids.user_id, bids.id')
+                ->orderByDesc('consumption')
+                ->get();
 
+            $regions = [];
+            $regions[0] = [];
+            $source = [];
+            $rgC = 1;
+
+            foreach ($bidCollect as $cl) {
+                if (count($cl->regions) > 0) {
+                    $rgC = 1;
+                    foreach ($cl->regions as $region) {
+                        if ($regions[$region->id]) {
+                            $regions[$region->id]['LEAD_COUNT'] = $regions[$region->id]['LEAD_COUNT'] + 1;
+                            $regions[$region->id]['balance'] = $regions[$region->id]['balance'] + $cl->user->balance;
+                            if ($regions[$region->id]['MAX_RATE'] < $cl->consumption) {
+                                $regions[$region->id]['MAX_RATE'] = 0;
+                            }
+                            $regions[$region->id]['AVG_RATE'] = $regions[$region->id]['AVG_RATE'] + $cl->consumption;
+                            $regions[$region->id]['COUNT'] = $rgC;
+                        } else {
+                            $regions[$region->id] = [
+                                'REGION_NAME' => $region->name,
+                                'LEAD_COUNT' => 0,
+                                'balance' => $cl->user->balance,
+                                'USERS_COUNT' => 1,
+                                'MAX_RATE' => $cl->consumption,
+                                'AVG_RATE' => $cl->consumption,
+                                'LAST_DEAL_CREATE' => '02-09-2020 12:33',
+                                'LAST_DEAL_DISTRIBUTION' => '02-09-2020 12:33',
+                                'COUNT' => $rgC,
+                                'direction' => $cl->direction
+                            ];
+                        }
+                    }
+                } else {
+                    $rgC = 1;
+                    if (count($regions[0]) > 0) {
+                        $regions[0]['LEAD_COUNT'] = $regions[0]['LEAD_COUNT'] + 1;
+                        $regions[0]['balance'] = $regions[0]['balance'] + $cl->user->balance;
+                        if ($regions[0]['MAX_RATE'] < $cl->consumption) {
+                            $regions[0]['MAX_RATE'] = 0;
+                        }
+                        $regions[0]['AVG_RATE'] = $regions[0]['AVG_RATE'] + $cl->consumption;
+                        $regions['COUNT'] = $rgC;
+                    } else {
+                        $regions[0] = [
+                            'REGION_NAME' => 'Регион не определён',
+                            'LEAD_COUNT' => 0,
+                            'USERS_COUNT' => 1,
+                            'MAX_RATE' => $cl->consumption,
+                            'AVG_RATE' => $cl->consumption,
+                            'LAST_DEAL_CREATE' => '02-09-2020 12:33',
+                            'LAST_DEAL_DISTRIBUTION' => '02-09-2020 12:33',
+                            'balance' => $cl->user->balance,
+                            'COUNT' => $rgC,
+                            'direction' => $cl->direction
+                        ];
+                    }
+                }
+                $rgC++;
+            }
+            if (count($regions) > 0 && count($regions[0]) > 0) {
+                foreach ($regions as $region) {
+                    $region['AVG_RATE'] = $region['AVG_RATE'] / $region['COUNT'];
+                    $region['USERS_COUNT'] = count($bidCollect) / $region['COUNT'];
+                    $region['LEAD_COUNT'] = ceil($region['balance'] / $region['AVG_RATE']);
+                    $region['budget'] = $region['direction']->cost_price * $region['LEAD_COUNT'];
+
+                    $source[] = [
+                        'DIRECTION_NAME' => $region['direction']->name,
+                        'REGION_NAME' => $region['REGION_NAME'],
+                        'LEAD_COUNT' => $region['LEAD_COUNT'],
+                        'USERS_COUNT' => $region['USERS_COUNT'],
+                        'MAX_RATE' => $region['MAX_RATE'],
+                        'AVG_RATE' => $region['AVG_RATE'],
+                        'LAST_DEAL_CREATE' => $region['LAST_DEAL_CREATE'],
+                        'LAST_DEAL_DISTRIBUTION' => $region['LAST_DEAL_DISTRIBUTION'],
+                        'balance' => $region['balance'],
+                        'budget' => $region['budget']
+                    ];
+                }
+            }
             return response()->json([
                 'success' => true,
                 'statistic' => [
                     'source' => $source,
-                    'general' => $general
+                    'general' => $this->getGeneralStatistic($request)
                 ]
             ]);
         }
         return response('ДОСТУП ЗАПРЕЩЁН', 403);
+    }
+
+    protected function getGeneralStatistic(Request $request)
+    {
+        $bidNoPause = Bid::where([
+            'is_launch' => true,
+            'is_delete' => false
+        ])->get();
+        $bidUser = Bid::with('user')
+            ->groupByRaw('bids.user_id, bids.id')
+            ->get();
+        $dayLeadGenerate = (($bidUser->avg('user.balance') / $bidUser->avg('consumption')) / ($bidUser->sum('daily_limit') || 1)) / 1.5;
+        $LastDealDistributionData = Deal::orderByDesc('updated_at')->first();
+        $LastDealCreateData = Deal::orderByDesc('created_at')->first();
+        $LastNoDistributionData = Deal::noDistributed();
+
+        if ($LastDealCreateData) {
+            $LastDealCreate = Carbon::createFromFormat("Y-m-d H:i:s", $LastDealCreateData->created_at)->format("d-m-Y H:i:s");
+        } else {
+            $LastDealCreate = 'Нету';
+        }
+
+        if ($LastDealDistributionData) {
+            $LastDealDistribution = Carbon::createFromFormat("Y-m-d H:i:s", $LastDealDistributionData->updated_at)->format("d-m-Y H:i:s");
+        } else {
+            $LastDealDistribution = 'Нету';
+        }
+
+        if ($LastNoDistributionData) {
+            $LastNoDistribution = Carbon::createFromFormat("Y-m-d H:i:s", $LastDealCreateData->created_at)->format("d-m-Y H:i:s");
+        } else {
+            $LastNoDistribution = 'Нету';
+        }
+
+        $LEAD_COUNT = ceil($bidUser->sum('user.balance') / $bidUser->count() / $bidUser->avg('consumption'));
+        return [
+            'DEALS_COUNT' => Deal::all()->count(),
+            'API_APP_COUNT' => AppToken::all()->count(),
+            'LEAD_COUNT' => $LEAD_COUNT,
+            'AVG_COST_PRICE' => $bidUser->avg('direction.cost_price'),
+            'BUDGET_MIN_LEAD_GENERATE' => $LEAD_COUNT * 400,
+            'DAY_LEAD_GENERATE' => ceil($dayLeadGenerate),
+            'BIDS_USER_COUNT' => $bidUser->count(),
+            'MAX_BID_RATE' => $bidNoPause->max('consumption'),
+            'AVG_RATE' => $bidNoPause->avg('consumption'),
+            'BIDS_NO_PAUSE' => $bidNoPause->count(),
+            'BIDS_ON_PAUSE' => Bid::where([
+                'is_launch' => false,
+                'is_delete' => false
+            ])->get()->count(),
+            'LAST_DEAL_CREATE' => $LastDealCreate,
+            'LAST_DEAL_DISTRIBUTION' => $LastDealDistribution,
+            'DEALS_NO_DISTRIBUTION' => $LastNoDistribution,
+        ];
     }
     /**
      * @return JsonResponse
@@ -140,34 +295,37 @@ class UserController extends Controller
      */
     public function history(Request $request)
     {
-        $historyPayment = HistoryPayment::selectRaw('
+        $historyPayment = HistoryPayment::selectRaw("
             0 as type_transaction,
             SUM(paysum) AS paysum,
             SUM(paybonus) AS paybonus,
-            (SELECT before_balance FROM payment_history hp WHERE hp.user_id = ' . intval($request->user()->id) . ' ORDER BY hp.id ASC LIMIT 1) AS before_balance,
-            (SELECT after_balance FROM payment_history hp WHERE hp.user_id = ' . intval($request->user()->id) . ' ORDER BY hp.id DESC LIMIT 1) AS after_balance,
+            (SELECT before_balance FROM payment_history hp WHERE hp.user_id = {$request->user()->id} ORDER BY hp.id ASC LIMIT 1) AS before_balance,
+            (SELECT after_balance FROM payment_history hp WHERE hp.user_id = {$request->user()->id} ORDER BY hp.id DESC LIMIT 1) AS after_balance,
             SUM(before_bonus) AS before_bonus,
             SUM(after_bonus) AS after_bonus,
-            created_at AS date_at,
+            to_char(payment_history.created_at, 'FMDD-MM-YYYY') AS date_at,
+            to_char(payment_history.created_at, 'FMDD-MM-YYYY') as created_at,
             array_agg(id) AS key
-        ')->where('user_id', intval($request->user()->id))
-            ->orderBy('created_at', 'DESC')
-            ->groupByRaw('payment_history.created_at')
+        ")->where('user_id', intval($request->user()->id))
+            ->orderBy('date_at')
+            ->groupByRaw("date_at")
             ->paginate(20);
 
         foreach ($historyPayment->items() as $idx => $data) {
-            $historyPayment->items()[$idx]['children'] = HistoryPayment::selectRaw('type_transaction,
+            $historyPayment->items()[$idx]['children'] = HistoryPayment::selectRaw("
+                    type_transaction,
                     paysum,
                     paybonus,
                     before_balance,
                     after_balance,
                     before_bonus,
                     after_bonus,
-                    created_at as date_at,
+                    to_char(payment_history.created_at, 'FMDD-MM-YYYY HH:MI') as date_at,
                     id AS key
-                ')->where('user_id', intval($request->user()->id))
-                ->whereRaw('created_at = NOW()')
-                ->orderBy('date_at', 'DESC')->get();
+                ")->where('user_id', intval($request->user()->id))
+                // ->whereRaw('created_at = NOW()')
+                ->whereRaw("to_char(payment_history.created_at, 'FMDD-MM-YYYY') = '{$data['date_at']}'")
+                ->orderByDesc('date_at')->get();
         }
         return response()->json($historyPayment);
     }

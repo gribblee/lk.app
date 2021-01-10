@@ -163,8 +163,8 @@ const columns = [
   },
   {
       title: 'Активность',
-      dataIndex: 'date_online',
-      key: 'date_online'
+      dataIndex: 'was_online',
+      key: 'was_online'
   },
   {
     title: "Кол-во. заявок",
@@ -174,9 +174,9 @@ const columns = [
   },
   {
       title: 'Регистрация',
-      dataIndex: "created_at",
-      key: "created_at",
-      scopedSlots: { customRender: "created_at" },
+      dataIndex: "registration_at",
+      key: "registration_at",
+      scopedSlots: { customRender: "registration_at" },
       defaultSortOrder: 'descend',
       sortDirections: ['descend', 'ascend'],
       onFilter: (value, record) => {},

@@ -17,7 +17,6 @@ class AdminController extends Controller
     /**
      * @return JsonResponse
      */
-
     public function getManagers(Request $request)
     {
         if ($request->user()->role == 'ROLE_MANAGER' || $request->user()->role == 'ROLE_ADMIN') {
@@ -127,6 +126,78 @@ class AdminController extends Controller
             }
             return response('Доступ запрещён!', 403);
             return response()->json($user->first());
+        }
+        return response('Доступ запрещён!', 403);
+    }
+
+    /**
+     * @return JsonResponse
+     */
+
+    public function addUser(Request $request)
+    {
+        if ($request->user()->role == 'ROLE_ADMIN') {
+            $user = User::create([
+                'name' => time(),
+                'balance' => 0.0,
+                'bonus' => 0.0,
+                'phone' => '',
+                'role' => 'ROLE_USER'
+            ]);
+            return response()->json([
+                'success' => true,
+                'user_id' => $user->id
+            ]);
+        }
+        return response('Доступ запрещён!', 403);
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    public function showUser(Request $request)
+    {
+        if ($request->user()->role == 'ROLE_ADMIN' || $request->user()->role == 'ROLE_MANAGER') {
+            $user = User::where('id', $request->user_id);
+            if ($request->user()->role == 'ROLE_MANAGER') {
+                $user->where('manager_id', $request->user()->id);
+            }
+            return response()->json($user->first());
+        }
+        return response('Доступ запрещён!', 403);
+    }
+    /**
+     * @return JsonResponse
+     */
+    public function deleteUser(Request $request)
+    {
+        if ($request->user()->role == 'ROLE_ADMIN' && $request->has('ids')) {
+            $ids = [];
+            foreach ($request->ids as $user) {
+                $ids[] = $user['id'];
+            }
+            User::whereIn('id', $ids)->update(['is_delete' => true]);
+            return response()->json([
+                'success' => true
+            ]);
+        }
+        return response('Доступ запрещён!', 403);
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    public function deleteActive(Request $request)
+    {
+        if ($request->user()->role == 'ROLE_ADMIN' && $request->has('ids')) {
+            $ids = [];
+            foreach ($request->ids as $user) {
+                $ids[] = $user['id'];
+            }
+            User::whereIn('id', $ids)->update(['is_delete' => false]);
+            return response()->json([
+                'success' => true
+            ]);
         }
         return response('Доступ запрещён!', 403);
     }

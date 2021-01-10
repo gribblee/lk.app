@@ -417,7 +417,7 @@
                       <a-input
                         :style="{ marginTop: '10px', width: '80%' }"
                         placeholder="Ссылка на видео"
-                        v-model="k.iframe_src"
+                        v-model="k.iframe_url"
                       />
                       <a-select
                         mode="multiple"
@@ -850,7 +850,7 @@ export default {
             id: cur.id,
             name: cur.name,
             updated_at: cur.updated_at,
-            iframe_src: cur.iframe_src
+            iframe_url: cur.iframe_url
           };
         });
         this.formRegionModel = data.regions;

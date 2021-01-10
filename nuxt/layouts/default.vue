@@ -498,7 +498,7 @@ export default {
         {
           name: "Мои клиенты",
           icon: "user",
-          url: "/insurance",
+          url: "/manager/users",
           rolesHidden: ["ROLE_USER", "ROLE_WEBMASTER", "ROLE_ACCOUNAT"],
           type: "Route"
         },
