@@ -145,8 +145,9 @@ class UserController extends Controller
                 }
                 $rgC++;
             }
-            if (count($regions) > 0 && count($regions[0]) > 0) {
-                foreach ($regions as $region) {
+            // if (count($regions) > 0 || count($regions[0]) > 0) {
+            foreach ($regions as $region) {
+                if (count($region) > 0) {
                     $region['AVG_RATE'] = $region['AVG_RATE'] / $region['COUNT'];
                     $region['USERS_COUNT'] = count($bidCollect) / $region['COUNT'];
                     $region['LEAD_COUNT'] = ceil($region['balance'] / $region['AVG_RATE']);
@@ -166,6 +167,7 @@ class UserController extends Controller
                     ];
                 }
             }
+            //            }
             return response()->json([
                 'success' => true,
                 'statistic' => [
