@@ -95,6 +95,7 @@ class UserController extends Controller
                 if (count($cl->regions) > 0) {
                     $rgC = 1;
                     foreach ($cl->regions as $region) {
+                        $region = (object)$region;
                         if ($regions[$region->id]) {
                             $regions[$region->id]['LEAD_COUNT'] = $regions[$region->id]['LEAD_COUNT'] + 1;
                             $regions[$region->id]['balance'] = $regions[$region->id]['balance'] + $cl->user->balance;
