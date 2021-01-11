@@ -75,14 +75,13 @@ class UserController extends Controller
                     'is_delete' => false
                 ])
                 ->when($request->has('directionSort') && !empty($request->directionSort), function ($query) use ($request) {
-                    return $query->where('direction_id', $request->directionSort);
+                    return $query->where('direction_id', $request->directionSort)->groupByRaw('bids.user_id, bids.id');
                 })
                 ->when($request->has('regionSort') && !empty($request->regionSort) && $request->regionSort != 0, function ($query) use ($request) {
                     return $query->whereJsonContains('regions', [
                         ['id' => $request->regionSort]
-                    ]);
+                    ])->groupByRaw('bids.direction_id, bids.user_id, bids.id');
                 })
-                ->groupByRaw('bids.user_id, bids.id')
                 ->orderByDesc('consumption')
                 ->get();
 
@@ -90,10 +89,14 @@ class UserController extends Controller
             $regions[0] = [];
             $source = [];
             $rgC = 1;
+
             foreach ($bidCollect as $cl) {
                 if (count($cl->regions) > 0) {
                     $rgC = 1;
                     foreach ($cl->regions as $region) {
+                        if ($request->has('regionSort')) {
+                            $region['id'] = $region['id'] . $cl->direction->id;
+                        }
                         if (isset($regions[$region['id']])) {
                             $regions[$region['id']]['LEAD_COUNT'] = $regions[$region['id']]['LEAD_COUNT'] + 1;
                             $regions[$region['id']]['balance'] = $regions[$region['id']]['balance'] + $cl->user->balance;
