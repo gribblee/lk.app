@@ -95,16 +95,17 @@ class UserController extends Controller
                 if (count($cl->regions) > 0) {
                     $rgC = 1;
                     foreach ($cl->regions as $region) {
-                        if ($regions[$region['id']]) {
-                            $regions[$region['id']]['LEAD_COUNT'] = $regions[$region['id']]['LEAD_COUNT'] + 1;
-                            $regions[$region['id']]['balance'] = $regions[$region['id']]['balance'] + $cl->user->balance;
-                            if ($regions[$region['id']]['MAX_RATE'] < $cl->consumption) {
-                                $regions[$region['id']]['MAX_RATE'] = 0;
+                        $region = json_decode($region);
+                        if ($regions[$region->id]) {
+                            $regions[$region->id]['LEAD_COUNT'] = $regions[$region->id]['LEAD_COUNT'] + 1;
+                            $regions[$region->id]['balance'] = $regions[$region->id]['balance'] + $cl->user->balance;
+                            if ($regions[$region->id]['MAX_RATE'] < $cl->consumption) {
+                                $regions[$region->id]['MAX_RATE'] = 0;
                             }
-                            $regions[$region['id']]['AVG_RATE'] = $regions[$region['id']]['AVG_RATE'] + $cl->consumption;
-                            $regions[$region['id']]['COUNT'] = $rgC;
+                            $regions[$region->id]['AVG_RATE'] = $regions[$region->id]['AVG_RATE'] + $cl->consumption;
+                            $regions[$region->id]['COUNT'] = $rgC;
                         } else {
-                            $regions[$region['id']] = [
+                            $regions[$region->id] = [
                                 'REGION_NAME' => $region->name,
                                 'LEAD_COUNT' => 0,
                                 'balance' => $cl->user->balance,
