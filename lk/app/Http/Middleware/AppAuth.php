@@ -52,8 +52,6 @@ class AppAuth
                 $request->http_region = [];
                 $request->region = [];
             }
-        } else {
-            return abort(400, 'Bad Request');
         }
         return $next($request);
     }
