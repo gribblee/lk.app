@@ -105,9 +105,9 @@ export default {
     strategies: {
       local: {
         token: {
-          property: "token"
-          // required: true,
-          // type: 'Bearer'
+          property: "token",
+          required: true,
+          type: 'Bearer'
         },
         endpoints: {
           login: {
@@ -149,7 +149,7 @@ export default {
    ** See https://axios.nuxtjs.org/options
    */
   axios: {
-    baseURL: 'https://lk.leadz.monster/api'
+    baseURL: 'https://lk.leadz.monster/api',//`${process.env.NODE_BASE_URL}`
   },
 
   // Build Configuration (https://go.nuxtjs.dev/config-build)
