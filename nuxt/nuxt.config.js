@@ -101,7 +101,7 @@ export default {
    */
 
   auth: {
-    localStorage: true,
+    localStorage: false,
     strategies: {
       local: {
         token: {
