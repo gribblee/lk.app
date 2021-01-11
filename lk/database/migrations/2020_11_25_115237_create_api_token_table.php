@@ -27,7 +27,6 @@ class CreateApiTokenTable extends Migration
             $table->foreign('direction_id')
                 ->references('id')
                 ->on('directions');
-            $table->unsignedBigInteger('count_deals');
 
             $table->timestamps();
         });

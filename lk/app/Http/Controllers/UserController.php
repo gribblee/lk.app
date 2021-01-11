@@ -94,19 +94,18 @@ class UserController extends Controller
             foreach ($bidCollect as $cl) {
                 if (count($cl->regions) > 0) {
                     $rgC = 1;
-                    $cl->regions = json_decode($cl->regions);
                     foreach ($cl->regions as $region) {
-                        if ($regions[$region->id]) {
-                            $regions[$region->id]['LEAD_COUNT'] = $regions[$region->id]['LEAD_COUNT'] + 1;
-                            $regions[$region->id]['balance'] = $regions[$region->id]['balance'] + $cl->user->balance;
-                            if ($regions[$region->id]['MAX_RATE'] < $cl->consumption) {
-                                $regions[$region->id]['MAX_RATE'] = 0;
+                        if (isset($regions[$region['id']])) {
+                            $regions[$region['id']]['LEAD_COUNT'] = $regions[$region['id']]['LEAD_COUNT'] + 1;
+                            $regions[$region['id']]['balance'] = $regions[$region['id']]['balance'] + $cl->user->balance;
+                            if ($regions[$region['id']]['MAX_RATE'] < $cl->consumption) {
+                                $regions[$region['id']]['MAX_RATE'] = 0;
                             }
-                            $regions[$region->id]['AVG_RATE'] = $regions[$region->id]['AVG_RATE'] + $cl->consumption;
-                            $regions[$region->id]['COUNT'] = $rgC;
+                            $regions[$region['id']]['AVG_RATE'] = $regions[$region['id']]['AVG_RATE'] + $cl->consumption;
+                            $regions[$region['id']]['COUNT'] = $rgC;
                         } else {
-                            $regions[$region->id] = [
-                                'REGION_NAME' => $region->name,
+                            $regions[$region['id']] = [
+                                'REGION_NAME' => $region['name'],
                                 'LEAD_COUNT' => 0,
                                 'balance' => $cl->user->balance,
                                 'USERS_COUNT' => 1,
@@ -124,7 +123,7 @@ class UserController extends Controller
                     if (count($regions[0]) > 0) {
                         $regions[0]['LEAD_COUNT'] = $regions[0]['LEAD_COUNT'] + 1;
                         $regions[0]['balance'] = $regions[0]['balance'] + $cl->user->balance;
-                        if ($regions[0]['MAX_RATE'] < $cl->consumption) {
+                        if (isset($regions[0]['MAX_RATE']) < $cl->consumption) {
                             $regions[0]['MAX_RATE'] = 0;
                         }
                         $regions[0]['AVG_RATE'] = $regions[0]['AVG_RATE'] + $cl->consumption;
@@ -190,7 +189,10 @@ class UserController extends Controller
         $dayLeadGenerate = (($bidUser->avg('user.balance') / $bidUser->avg('consumption')) / ($bidUser->sum('daily_limit') || 1)) / 1.5;
         $LastDealDistributionData = Deal::orderByDesc('updated_at')->first();
         $LastDealCreateData = Deal::orderByDesc('created_at')->first();
-        $LastNoDistributionData = Deal::noDistributed();
+        $LastNoDistributionData = Deal::where('is_delete', false)
+            ->whereHas('status', function ($q) {
+                $q->where('type', 1004);
+            })->first();
 
         if ($LastDealCreateData) {
             $LastDealCreate = Carbon::createFromFormat("Y-m-d H:i:s", $LastDealCreateData->created_at)->format("d-m-Y H:i:s");
