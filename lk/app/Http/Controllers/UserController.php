@@ -94,7 +94,7 @@ class UserController extends Controller
             foreach ($bidCollect as $cl) {
                 if (count($cl->regions) > 0) {
                     $rgC = 1;
-                    $cl->regions = json_decode($region);
+                    $cl->regions = json_decode($cl->regions);
                     foreach ($cl->regions as $region) {
                         if ($regions[$region->id]) {
                             $regions[$region->id]['LEAD_COUNT'] = $regions[$region->id]['LEAD_COUNT'] + 1;
