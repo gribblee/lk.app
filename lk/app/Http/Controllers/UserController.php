@@ -79,7 +79,7 @@ class UserController extends Controller
                 })
                 ->when($request->has('regionSort') && !empty($request->regionSort) && $request->regionSort != 0, function ($query) use ($request) {
                     return $query->whereJsonContains('regions', [
-                        'id' => $request->regionSort
+                        ['id' => $request->regionSort]
                     ]);
                 })
                 ->groupByRaw('bids.user_id, bids.id')
@@ -90,7 +90,6 @@ class UserController extends Controller
             $regions[0] = [];
             $source = [];
             $rgC = 1;
-
             foreach ($bidCollect as $cl) {
                 if (count($cl->regions) > 0) {
                     $rgC = 1;
