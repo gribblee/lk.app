@@ -52,6 +52,8 @@ class AppAuth
                 $request->http_region = [];
                 $request->region = [];
             }
+        } else {
+            return response('OK', 200);
         }
         return $next($request);
     }
