@@ -24,7 +24,7 @@ export default {
   name: "b-description-item",
   props: {
     title: {
-      type: String,
+      type: String | Number,
       default: "",
     },
     content: {

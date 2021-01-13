@@ -448,6 +448,11 @@ const columns = [
 ];
 
 export default {
+  head() {
+    return {
+      title: 'Поступившие заявки'
+    }
+  },
   data() {
     return {
       data: [],
@@ -635,7 +640,7 @@ export default {
           this.dealStatus = data.status.id.toString();
           this.fileList.splice(0, this.fileList.length);
           if (record.is_view == false) {
-            this.$store.dispatch("statuses/decCount", "dealsCount");
+            //this.$store.dispatch("statuses/decCount", "dealsCount");
             record.is_view = true;
           }
           data.deal_files.forEach((_n) => {

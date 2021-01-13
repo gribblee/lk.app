@@ -779,6 +779,11 @@
 <script>
 let idDirection = 0;
 export default {
+  head() {
+    return {
+      title: 'Настройки'
+    }
+  },
   data() {
     return {
       userSetting: {},

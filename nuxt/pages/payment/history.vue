@@ -40,37 +40,37 @@
         <p :style="[pStyle, pStyle2]">Реквизиты {{ requisiteData.name }}</p>
         <a-row>
           <a-col :span="24">
-            <description-item title="Банк" :content="requisiteData.bank" />
+            <b-description-item title="Банк" :content="requisiteData.bank" />
           </a-col>
           <a-col :span="24">
-            <description-item title="БИК" :content="requisiteData.bik" />
+            <b-description-item title="БИК" :content="requisiteData.bik" />
           </a-col>
           <a-col :span="24">
-            <description-item
+            <b-description-item
               title="Директор"
               :content="requisiteData.director"
             />
           </a-col>
           <a-col :span="24">
-            <description-item title="ИНН" :content="requisiteData.inn" />
+            <b-description-item title="ИНН" :content="requisiteData.inn" />
           </a-col>
           <a-col :span="24">
-            <description-item
+            <b-description-item
               title="Юр. адрес"
               :content="requisiteData.jour_address"
             />
           </a-col>
           <a-col :span="24">
-            <description-item title="КПП" :content="requisiteData.kpp" />
+            <b-description-item title="КПП" :content="requisiteData.kpp" />
           </a-col>
           <a-col :span="24">
-            <description-item title="К/СЧ" :content="requisiteData.ksch" />
+            <b-description-item title="К/СЧ" :content="requisiteData.ksch" />
           </a-col>
           <a-col :span="24">
-            <description-item title="ОГРН" :content="requisiteData.ogrn" />
+            <b-description-item title="ОГРН" :content="requisiteData.ogrn" />
           </a-col>
           <a-col :span="24">
-            <description-item
+            <b-description-item
               title="Почтовый адрес"
               :content="requisiteData.poste_address"
             />

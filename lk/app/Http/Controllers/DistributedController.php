@@ -16,7 +16,7 @@ class DistributedController extends Controller
     public function index(Request $request)
     {
         if ($request->user()->role === 'ROLE_ADMIN' || $request->user()->role === 'ROLE_WEBMASTER') {
-            $distributed = Deal::select('*', 'deals.id AS DEAL_ID')
+            $distributed = Deal::select('*', 'deals.id AS deal_id')
                 ->with('region')
                 ->with('direction')
                 ->with('status')
@@ -35,6 +35,18 @@ class DistributedController extends Controller
 
     public function deal(Request $request, int $id)
     {
+        if ($request->user()->role === 'ROLE_ADMIN' || $request->user()->role === 'ROLE_WEBMASTER') {
+            $deal = Deal::select('*', 'deals.id as deal_id')
+                ->where('deals.id', $id)
+                ->with('direction')
+                ->with('disput')
+                ->with('region')
+                ->with('status')
+                ->where('is_delete', false)
+                ->firstOrFail();
+            return response()->json($deal);
+        }
+        return response('Доступ запрещён', 403);
     }
 
     public function status(Request $request, int $id)

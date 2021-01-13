@@ -17,17 +17,17 @@
       <div :style="{ margin: '20px -24px 0 -24px' }">
         <a-table :columns="columns" :data-source="dataDistributed" :loading="dataIsLoading">
           <a
-            @click.prevent="showDrawer(record.DEAL_ID, $event)"
+            @click.prevent="showDrawer(record.deal_id, $event)"
             href="javascript:;"
             slot="name"
             slot-scope="text, record"
-            :to="{ path: `/deals/${record.DEAL_ID}` }"
+            :to="{ path: `/deals/${record.deal_id}` }"
           >{{ record.name }}</a>
           <span slot="status_name" slot-scope="text, record">
             <a-dropdown :trigger="['click']">
               <a
                 @click.prevent="(_e) => {
-                    onHandleStatus($event, record.DEAL_ID)
+                    onHandleStatus($event, record.deal_id)
                 }"
               >Распределить</a>
             </a-dropdown>
@@ -38,7 +38,7 @@
       </div>
     </div>
     <a-drawer width="640" placement="right" :closable="false" :visible="visible" @close="onClose">
-      <p :style="[pStyle, pStyle2]">Клиент #{{ dealData.DEAL_ID }}</p>
+      <p :style="[pStyle, pStyle2]">Клиент #{{ dealData.deal_id }}</p>
       <p :style="pStyle">Информация</p>
       <a-row :style="{ marginTop: '20px' }">
         <a-col :span="24">
@@ -50,10 +50,10 @@
       </a-row>
       <a-row :style="{ marginTop: '20px' }">
         <a-col :span="12">
-          <description-item title="ФИО" :content="dealData.name" />
+          <b-description-item title="ФИО" :content="dealData.name" />
         </a-col>
         <a-col :span="12">
-          <description-item title="E-mail" :content="dealData.email" />
+          <b-description-item title="E-mail" :content="dealData.email" />
         </a-col>
       </a-row>
       <a-row>
@@ -98,7 +98,7 @@
       </a-row>
       <a-row>
         <a-col :span="12">
-          <description-item title="Телефон" :content="dealData.phone" />
+          <b-description-item title="Телефон" :content="dealData.phone" />
         </a-col>
       </a-row>
       <tempalte v-if="user.role === 'ROLE_ADMIN' || user.role === 'ROLE_WEBMASTER'">
@@ -106,7 +106,7 @@
           <p :style="pStyle">UTM метки</p>
           <a-row :style="{ marginTop: '20px' }">
             <a-col :span="12" v-for="(item, index) in utms" :key="index">
-              <description-item :title="index" :content="item" />
+              <b-description-item :title="index" :content="item" />
             </a-col>
           </a-row>
         </div>
@@ -114,13 +114,13 @@
           <p :style="pStyle">Источник/запросы</p>
           <a-row :style="{ marginTop: '20px' }">
             <a-col :span="12">
-              <description-item title="Источник" :content="refererDeal" />
+              <b-description-item title="Источник" :content="refererDeal" />
             </a-col>
           </a-row>
           <a-row>
             <a-col :span="12" v-for="(item, index) in requestDeal" :key="index">
               <p :style="{ fontSize: '14px', fontWeight: 'bold' }">{{ index }}</p>
-              <description-item v-for="(itm, idx) in item" :key="idx" :title="idx" :content="itm" />
+              <b-description-item v-for="(itm, idx) in item" :key="idx" :title="idx" :content="itm" />
             </a-col>
           </a-row>
         </div>
@@ -132,8 +132,8 @@
 const columns = [
   {
     title: 'ID',
-    dataIndex: 'DEAL_ID',
-    key: 'DEAL_ID',
+    dataIndex: 'deal_id',
+    key: 'deal_id',
   },
   {
     title: 'ФИО',
@@ -199,7 +199,7 @@ export default {
       },
       visible: false,
       dealData: {
-        DEAL_ID: 1,
+        deal_id: 1,
         bids: {
           direction: {
             name: '',
@@ -271,9 +271,9 @@ export default {
       }
     },
     onHandleStatus(_e, _id = 0) {
-      const DEAL_ID = _id === 0 ? this.dealData.DEAL_ID : _id
+      const deal_id = _id === 0 ? this.dealData.deal_id : _id
       this.$axios
-        .post(`/deals/distributed/${DEAL_ID}/status/`)
+        .post(`/deals/distributed/${deal_id}/status/`)
         .then(({ data }) => {
           if (data.success === true) {
             this.visible = false
@@ -289,7 +289,7 @@ export default {
     },
     onDeleteDeal(_e) {
       this.$axios
-        .post(`/deals/distributed/${this.dealData.DEAL_ID}/delete/`)
+        .post(`/deals/distributed/${this.dealData.deal_id}/delete/`)
         .then(({ data }) => {
           if (data.success === true) {
             this.visible = false
@@ -306,7 +306,7 @@ export default {
     udpateDeal(update_data) {
       this.$axios
         .post(
-          `/deals/distributed/${this.dealData.DEAL_ID}/update/`,
+          `/deals/distributed/${this.dealData.deal_id}/update/`,
           update_data
         )
         .then(({ data }) => {
