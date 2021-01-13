@@ -130,6 +130,11 @@ Route::group([
     'prefix' => 'deal'
 ], function () {
     Route::post('{id}', "DealController@show");
+    Route::post('{id}/upload', "DealController@uploadAudio");
+    Route::post('{id}/storage/{storage_id}/delete', "DealController@storageDelete");
+    Route::post('{id}/status_update', "DealController@statusUpdate");
+    //Исправить
+    Route::post('{id}/disput/create', 'DisputController@create');
 });
 
 Route::get('/requisites', "RequisiteController@index");
@@ -159,6 +164,7 @@ Route::group([
     'prefix' => 'bids'
 ], function () {
     Route::post('', 'BidController@index');
+    Route::post('action_update', "BidController@actionUpdate");
 });
 
 Route::group([

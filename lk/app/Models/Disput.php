@@ -17,7 +17,7 @@ class Disput extends Model
 
     public function deal()
     {
-        return $this->belongsTo(Deals::class);
+        return $this->belongsTo(Deal::class);
     }
 
     public function disputType()

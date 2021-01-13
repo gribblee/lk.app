@@ -6,6 +6,7 @@ use App\Models\Disput;
 use App\Models\DisputType;
 use App\Models\Notification;
 use App\Models\Status;
+use App\Models\Deal;
 
 use Illuminate\Http\Request;
 
@@ -46,6 +47,31 @@ class DisputController extends Controller
     /**
      * @return JsonResponse
      */
+
+    public function create(Request $request, int $id)
+    {
+        $deal = Deal::with('bids')->find($id);
+        if (empty(Disput::where('deal_id', $id)->first())) {
+            $disput = new Disput;
+            $disput->deal_id = $id;
+            $disput->name = "Заявка по клиенту #{$id} от " . date("Y-m-d H:i:s");
+            $disput->description = $request->input('message');
+            $disput->status = Disput::STATUS_START;
+            $disput->disput_type_id = $request->input('type_id');
+            $disput->save();
+            return response()->json([
+                'status' => 'OK'
+            ]);
+        }
+        return response()->json([
+            'status' => 'error',
+            'error' => 'Вы не можете переключить на статус спорная'
+        ]);
+    }
+
+    /**
+     * @return JsonResponse
+     */
     public function close(Request $request, int $id)
     {
         if ($request->user()->role == 'ROLE_ADMIN' || $request->user()->role == 'ROLE_WEBMASTER' || $request->user()->role == 'ROLE_MODERATOR') {
@@ -70,17 +96,16 @@ class DisputController extends Controller
                         ->bids
                         ->user
                         ->update([
-                            'bonus' => $disput->deal->bids->user->bonus += $disput->deal->bids->rate
+                            'bonus' => $disput->deal->bids->user->bonus += $disput->deal->bids->consumption
                         ]);
                     Notification::create([
-                        'description' => "Спор по заявке #{$disput->deal->id} закрыт в Вашу пользу, мы вернули {$disput->deal->bids->rate} руб. на Ваш бонусный счёт",
+                        'description' => "Спор по заявке #{$disput->deal->id} закрыт в Вашу пользу, мы вернули {$disput->deal->bids->consumption} руб. на Ваш бонусный счёт",
                         'user_id' => $disput->deal->bids->user->id
                     ]);
                     $disput->deal->is_delete = true;
                     $disput->deal->save();
                     break;
             }
-            $disput->close = true;
             $disput->save();
             return response()->json([
                 'success' => true,
