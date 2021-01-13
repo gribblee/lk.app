@@ -145,7 +145,7 @@
                 </span>
             </span>
             <span slot="region" slot-scope="text, record">{{
-                record.region.name_with_type
+                record.region && record.region.name_with_type
             }}</span>
             <span slot="direction" slot-scope="text, record">{{
                 record.direction.name
@@ -708,7 +708,7 @@ export default {
           });
       } else {
         this.$axios
-          .post(`/deal/${record.DEAL_ID}/status_update`, {
+          .post(`/deal/${record.deal_id}/status_update`, {
             status_id: e.item.value.id,
           })
           .then(({ data }) => {

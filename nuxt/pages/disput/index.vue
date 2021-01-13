@@ -47,7 +47,7 @@
                 <a
                     slot="title"
                     href="javascript:void(0)"
-                    @click.prevent="showDrawer(item.deals_id, $event)"
+                    @click.prevent="showDrawer(item.deal_id, $event)"
                 >{{ item.name }}</a>
                 </a-list-item-meta>
                 <!-- <div>
@@ -62,30 +62,30 @@
       </div>
     </div>
     <a-drawer width="640" placement="right" :closable="false" :visible="visible" @close="onClose">
-      <p :style="[pStyle, pStyle2]">Клиент #{{ dealData.DEAL_ID }}</p>
+      <p :style="[pStyle, pStyle2]">Клиент #{{ dealData.deal_id }}</p>
       <p :style="pStyle">Информация</p>
       <a-row :style="{ marginTop: '20px' }">
         <a-col :span="12">
-          <description-item title="ФИО" :content="dealData.name" />
+          <b-description-item title="ФИО" :content="dealData.name" />
         </a-col>
         <a-col :span="12">
-          <description-item title="E-mail" :content="dealData.email" />
-        </a-col>
-      </a-row>
-      <a-row>
-        <a-col :span="12">
-          <description-item title="Регион" :content="dealData.region.name_with_type" />
-        </a-col>
-        <a-col :span="12">
-          <description-item title="Направление" :content="dealData.bids.direction.name" />
+          <b-description-item title="E-mail" :content="dealData.email" />
         </a-col>
       </a-row>
       <a-row>
         <a-col :span="12">
-          <description-item title="Телефон" :content="dealData.phone" />
+          <b-description-item title="Регион" :content="dealData.region.name_with_type" />
         </a-col>
         <a-col :span="12">
-          <description-item title="Стоимость" content="1080 ₽" />
+          <b-description-item title="Направление" :content="dealData.bids.direction.name" />
+        </a-col>
+      </a-row>
+      <a-row>
+        <a-col :span="12">
+          <b-description-item title="Телефон" :content="dealData.phone" />
+        </a-col>
+        <a-col :span="12">
+          <b-description-item title="Стоимость" content="1080 ₽" />
         </a-col>
       </a-row>
       <tempalte v-if="user.role === 'ROLE_ADMIN' || user.role === 'ROLE_WEBMASTER'">
@@ -93,7 +93,7 @@
           <p :style="pStyle">UTM метки</p>
           <a-row :style="{ marginTop: '20px' }">
             <a-col :span="12" v-for="(item, index) in utms" :key="index">
-              <description-item :title="index" :content="item" />
+              <b-description-item :title="index" :content="item" />
             </a-col>
           </a-row>
         </div>
@@ -101,13 +101,13 @@
           <p :style="pStyle">Источник/запросы</p>
           <a-row :style="{ marginTop: '20px' }">
             <a-col :span="12">
-              <description-item title="Источник" :content="refererDeal" />
+              <b-description-item title="Источник" :content="refererDeal" />
             </a-col>
           </a-row>
           <a-row>
             <a-col :span="12" v-for="(item, index) in requestDeal" :key="index">
               <p :style="{ fontSize: '14px', fontWeight: 'bold' }">{{ index }}</p>
-              <description-item v-for="(itm, idx) in item" :key="idx" :title="idx" :content="itm" />
+              <b-description-item v-for="(itm, idx) in item" :key="idx" :title="idx" :content="itm" />
             </a-col>
           </a-row>
         </div>
@@ -148,7 +148,7 @@ export default {
       requestDeal: {},
       refererDeal: '',
       dealData: {
-        DEAL_ID: 1,
+        deal_id: 1,
         bids: {
           direction: {
             name: '',
@@ -218,7 +218,7 @@ export default {
           this.dealData = data
           this.fileList = data.deal_files.map((current) => {
             return {
-              url: `http://lk.leadz.monster/api/deal/${data.DEAL_ID}/storage/${current.id}`,
+              url: `http://lk.leadz.monster/api/deal/${data.deal_id}/storage/${current.id}`,
               ext: ['mp3'],
             }
           })
