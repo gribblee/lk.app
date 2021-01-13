@@ -153,7 +153,7 @@ class UserController extends Controller
                     $region['AVG_RATE'] = $region['AVG_RATE'] / $region['COUNT'];
                     $region['USERS_COUNT'] = count($bidCollect) / $region['COUNT'];
                     $region['LEAD_COUNT'] = ceil($region['balance'] / $region['AVG_RATE']);
-                    $region['budget'] = $region['direction']->cost_price * $region['LEAD_COUNT'];
+                    $region['budget'] = ceil( ($region['direction']->cost_price * $region['LEAD_COUNT']) / $region['AVG_RATE']);
 
                     $source[] = [
                         'DIRECTION_NAME' => $region['direction']->name,
