@@ -31,13 +31,14 @@ class AppAuth
         if ($request->has('kladr_id')) {
             $request->region = Region::where('kladr_id', str_pad($request->kladr_id, 13, '0', STR_PAD_RIGHT))->first();
             $request->http_region = [];
-        } elseif ($request->input('phone')) {
+        } elseif ($request->has('phone') || $request->has('Phone')) {
             try {
+                $phone = $request->has('phone') ? $request->phone : $request->Phone;
                 $httpResponse =
                     Http::timeout(3)->get('https://api.regius.name/iface/phone-number.php?phone=' . str_replace(
                         [' ', '-', '(', ')'],
                         '',
-                        $request->input('phone')
+                        $phone
                     ))->json();
                 $indexOf = strpos($httpResponse->region ?? 'Не определено', ' * ');
                 $indexOf ? $httpRegion = substr(
