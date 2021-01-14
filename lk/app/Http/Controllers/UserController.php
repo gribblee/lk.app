@@ -351,8 +351,8 @@ class UserController extends Controller
                 if ($request->has('email')) {
                     $user->email = $request->email;
                 }
-                if ($request->has('email_notification')) {
-                    $user->email_notification = $request->email_notification;
+                if ($request->has('emailNotification')) {
+                    $user->email_notification = $request->emailNotification;
                 }
                 if ($request->has('phone')) {
                     $user->phone = $request->phone;
@@ -360,7 +360,7 @@ class UserController extends Controller
                 $user->save();
                 return response()->json([
                     'success' => true,
-                    'msg' => 'Настройки обновлены'
+                    'message' => 'Настройки обновлены'
                 ]);
             }
             return response()->json([

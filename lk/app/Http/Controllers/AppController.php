@@ -204,6 +204,7 @@ class AppController extends Controller
             ->field('CURRENCY_ID', 'RUB')
             ->field('EMAIL', $request->email, 'WORK')
             ->field('PHONE', $request->phone, 'WORK')
+            ->field('NAME', $request->name ?? 'Без имени')
             ->field('ASSIGNED_BY_ID', $Bid->user->contact_id)
             ->add();
     }
