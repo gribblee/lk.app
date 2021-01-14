@@ -56,7 +56,7 @@
     </a-layout>
   </a-layout-content>
 </template>
-<script lang="ts">
+<script lang="js">
 import Vue from "vue";
 import bLayoutSider from "../../components/b-layout-sider.vue";
 
@@ -69,7 +69,7 @@ export default Vue.extend({
     };
   },
   data() {
-    let ValidateEmail = (rule: any, value: any, callback: any) => {
+    let ValidateEmail = (rule, value, callback) => {
       const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
       if (!re.test(String(value).toLowerCase()) && String(value).length > 0) {
         callback(new Error("Пожалуйста введите email адрес"));
@@ -77,7 +77,7 @@ export default Vue.extend({
         callback();
       }
     };
-    let ValidatePhone = (rule: any, value: any, callback: any) => {
+    let ValidatePhone = (rule, value, callback) => {
       const re = /(\+7)([ .-]?)\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2?([ .-]?)([0-9]{2})([ .-]?)([0-9]{2})/;
       if (!re.test(String(value).toLowerCase())) {
         callback(new Error("Введите коректный телефон"));
@@ -119,10 +119,10 @@ export default Vue.extend({
     };
   },
   methods: {
-    submitForm(formName: any) {
-      this.$refs[formName].validate((valid: any) => {
+    submitForm(formName) {
+      this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.$axios.post("/user/update", this.userForm).then(({ data }) => {
+          $axios.post("/user/update", this.userForm).then(({ data}) => {
             if (data.success) {
               this.$message.success(data.message);
             } else {
