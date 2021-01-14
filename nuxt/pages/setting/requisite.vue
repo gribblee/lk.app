@@ -8,7 +8,7 @@
     <a-layout class="setting-layout-sider">
       <b-layout-sider :menu-key="$route.name" />
       <a-layout-content class="setting-layout-content">
-        Content
+        <h1>Функционал в разработке</h1>
       </a-layout-content>
     </a-layout>
   </a-layout-content>
