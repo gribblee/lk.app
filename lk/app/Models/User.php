@@ -44,7 +44,6 @@ class User extends Authenticatable implements JWTSubject
         'manager_id',
         'is_registration',
         'is_delete',
-        'contact_id',
         'updated_at',
     ];
 

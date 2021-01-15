@@ -12,6 +12,19 @@ class ManagerController extends Controller
     /**
      * @return JsonResponse
      */
+    public function index(Request $request) 
+    {
+        if ($request->user()->role === 'ROLE_ADMIN')
+        {
+            return response()->json(User::where([
+                'role' => 'ROLE_MANAGER',
+                'is_delete' => false
+            ])->get());
+        }
+    }
+    /**
+     * @return JsonResponse
+     */
     public function getUsers(Request $request)
     {
         if ($request->user()->role == 'ROLE_MANAGER' || $request->user()->role == 'ROLE_ADMIN') {

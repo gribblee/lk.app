@@ -56,6 +56,9 @@ Route::group(['prefix' => 'disput_status'], function () {
 /**
  * Start Ver1.0
  */
+
+Route::get('/managers', "ManagerController@index");
+
 Route::group([
     'prefix' => 'webmaster'
 ], function () {

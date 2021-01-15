@@ -122,7 +122,7 @@ export default Vue.extend({
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.$axios.post("/user/update", this.userForm).then(({ data}) => {
+          this.$axios.post("/user/update", this.userForm).then(({ data }) => {
             if (data.success) {
               this.$message.success(data.message);
             } else {

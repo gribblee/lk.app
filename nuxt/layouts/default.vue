@@ -268,9 +268,8 @@
                 type="link"
                 @click="
                   (e) => {
-                    $router.push('/setting');
+                    $router.push({ name: 'setting-requisite' });
                     $store.dispatch('payment/setVisiblePayRequisite', false);
-                    $store.dispatch('userData/setSettingForm', 2);
                   }
                 "
                 >Добавьте реквизиты</a-button

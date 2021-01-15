@@ -42,14 +42,6 @@
                 v-model="userData.phone"
               />
             </div>
-            <div :style="{ marginTop: '15px' }">
-              <span>Пароль: </span>
-              <a-input
-                :style="{ marginTop: ' 10px' }"
-                type="text"
-                v-model="userData.password"
-              />
-            </div>
             <div :style="{ marginTop: '15px' }" v-if="user.role == 'ROLE_ADMIN'">
               <span>Баланс: </span>
               <a-input
@@ -127,6 +119,11 @@
 <script>
 export default {
   middleware: 'roleManager',
+  head() {
+    return {
+      title: 'Просмотр пользователя'
+    }
+  },
   data() {
     return {
       userData: {
@@ -185,7 +182,6 @@ export default {
           if (data.success == true) {
             this.$message.success(data.message)
             this.defUser = data.user
-            this.defUser.password = this.userData.password
             delete this.defUser.updated_at
             delete this.defUser.created_at
           }

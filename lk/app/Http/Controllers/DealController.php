@@ -23,11 +23,15 @@ class DealController extends Controller
             ->with('direction')
             ->with('disput')
             ->with('bids.user')
-            ->when($request->user()->role == 'ROLE_ADMIN', function ($q)
+            ->when($request->user()->role == 'ROLE_USER', function ($q)
             use ($request) {
                 return $q->whereHas('bids', function ($query)
                 use ($request) {
                     return $query->where('bids.user_id', $request->user()->id);
+                });
+            })->when($request->user()->role == 'ROLE_MANAGER', function($q) use($request) {
+                return $q->whereHas('bids.user', function ($query) use($request) {
+                    return $query->where('manager_id', $request->user()->id);
                 });
             })->where('is_delete', false);
         return response()->json($Deals->paginate(10));

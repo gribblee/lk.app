@@ -64,7 +64,7 @@ class RequisiteController extends Controller
             ]));
             return response()->json([
                 'success' => true,
-                'msg' => 'Реквизиты обновлены'
+                'message' => 'Реквизиты обновлены'
             ]);
         }
         return response()->json([

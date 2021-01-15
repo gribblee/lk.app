@@ -169,6 +169,11 @@ const columns = [
 ]
 export default {
   middleware: 'roleAdmin',
+  head() {
+    return {
+      title: 'Пользователи'
+    }
+  },
   data() {
     return {
       data: [],
