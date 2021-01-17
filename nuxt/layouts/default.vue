@@ -396,7 +396,7 @@
 </template>
 <script>
 export default {
-  middleware: "auth",
+  middleware: ["auth", "demoMiddleware"],
   data() {
     return {
       menuSelectedKeys: [1],

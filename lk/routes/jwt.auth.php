@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Route;
 /**
  * Здесь Post
  */
-Route::post('/logout', 'AuthController@logout');
+Route::get('/logout', 'AuthController@logout');
 
 Route::group([
     'prefix' => 'demo'

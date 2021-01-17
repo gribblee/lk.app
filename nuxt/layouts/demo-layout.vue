@@ -5,15 +5,9 @@
       <div class="demo-left__container">
         <div>
           <div class="demo-left__title">{{ $demoTitle }}</div>
-          <div class="demo-left__description">
-            <p>
-              {{ $demoDescription }}
-            </p>
-          </div>
+          <div class="demo-left__description" v-html="$demoDescription"></div>
         </div>
-        <div class="demo-left__button">
-          <button>Пропустить</button>
-        </div>
+        <div class="demo-left__button"></div>
       </div>
     </div>
     <div class="demo-main">
@@ -32,6 +26,11 @@ export default {
   name: "demo-layout",
   data() {
     return {};
+  },
+  mounted() {
+    if (this.user.is_demo) {
+      this.$router.push("/");
+    }
   },
 };
 </script>

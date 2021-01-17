@@ -15,6 +15,7 @@ use App\Helpers\smsRuHelper;
 use Dirape\Token\Token;
 use App\Helpers\stdObject;
 use App\Helpers\BitrixApi;
+
 use Carbon\Carbon;
 use stdClass;
 
@@ -43,6 +44,7 @@ class AuthController extends Controller
         $this->auth = $auth;
         $this->bitrix24 = new BitrixApi('043rdb1o3rqtfvvy');
         $this->smsRu = new smsRuHelper(ENV('SMS_RU_TOKEN'));
+
     }
 
     /**

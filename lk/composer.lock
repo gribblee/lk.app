@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fae20ef3ba6f0ca80742d53da2c77f5e",
+    "content-hash": "9b8c2458b427e570c6ed9870b62c7efd",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -3056,6 +3056,51 @@
                 "stylesheet"
             ],
             "time": "2020-06-01T09:10:00+00:00"
+        },
+        {
+            "name": "sendpulse/rest-api",
+            "version": "1.0.22",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sendpulse/sendpulse-rest-api-php.git",
+                "reference": "fb9a6804fa6d3328067d4a7dbd86d46062757eeb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sendpulse/sendpulse-rest-api-php/zipball/fb9a6804fa6d3328067d4a7dbd86d46062757eeb",
+                "reference": "fb9a6804fa6d3328067d4a7dbd86d46062757eeb",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Sendpulse\\RestApi\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Maksym Ustymenko",
+                    "email": "m.ustymenko@sendpulse.com"
+                },
+                {
+                    "name": "Alexey Moroz",
+                    "email": "a.moroz@sendpulse.com"
+                }
+            ],
+            "description": "Sendpulse REST API client library",
+            "keywords": [
+                "api",
+                "rest",
+                "sendpulse"
+            ],
+            "time": "2020-12-15T15:25:41+00:00"
         },
         {
             "name": "spatie/macroable",

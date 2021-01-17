@@ -39,7 +39,9 @@
       :open="isRequisiteModal"
       title="Заполните реквезиты"
       okTitle="Сохранить"
+      cancelTitle="Отмена"
       @onOk="handleRSave"
+      @onCancel="handleRCancel"
     >
       <!-- Оплата по реквизитам -->
       <template #body>
@@ -271,6 +273,9 @@ export default {
         .catch((err) => {
           console.error(err);
         });
+    },
+    handleRCancel(e) {
+      this.isRequisiteModal = false;
     },
   },
 };

@@ -7,10 +7,21 @@
       </div>
       <div class="b-modal__action">
         <b-button :title="okTitle" @click="handleOk" />
+        <b-button :title="cancelTitle" @click="handleCancel" />
       </div>
     </div>
   </div>
 </template>
+<style lang="scss"scoped>
+.b-modal__action {
+  & > button {
+    margin-left: 20px;
+    &:first-child {
+      margin-left: 0;
+    }
+  } 
+}
+</style>
 <script>
 export default {
   name: "b-modal",
@@ -27,6 +38,10 @@ export default {
       type: String,
       default: "",
     },
+    cancelTitle: {
+      type: String,
+      default: "",
+    },
   },
   model: {},
 
@@ -36,6 +51,9 @@ export default {
   methods: {
     handleOk(e) {
       this.$emit("onOk", e);
+    },
+    handleCancel(e) {
+      this.$emit("onCancel", e);
     },
   },
 };
