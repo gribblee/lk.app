@@ -184,7 +184,13 @@ Route::group([
 
 Route::group(['prefix' => 'directory'], function () {
     Route::get('', "DirectoryController@index");
-    Route::post('direction/save', "DirectoryController@directionSave");
+    Route::group([
+        'prefix' => 'direction'
+    ], function () {
+        Route::put('create', "DirectoryController@directionCreate");
+        Route::post('{id}/update', "DirectoryController@directionUpdate");
+        Route::post('{id}/delete', "DirectoryController@directionDelete");
+    });
     Route::post('regions/save', "DirectoryController@regionsSave");
     Route::post('status/save', "DirectoryController@statusSave");
     Route::post('options_save', "DirectoryController@optionsSave");

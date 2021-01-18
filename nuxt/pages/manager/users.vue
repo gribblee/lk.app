@@ -36,7 +36,13 @@
         </a-form>
       </div>
       <div>
-        <a-table :columns="columns" :data-source="data" :loading="isLoading" :pagination="pagination" @change="handleTableChange">
+        <a-table
+          :columns="columns"
+          :data-source="data"
+          :loading="isLoading"
+          :pagination="pagination"
+          @change="handleTableChange"
+        >
           <template slot="name" slot-scope="text, record">
             <nuxt-link :to="{ name: 'users-id', params: { id: record.id } }">{{
               text
@@ -122,10 +128,10 @@ const columns = [
     scopedSlots: { customRender: "id" },
   },
   {
-      title: "Статус",
-      dataIndex: "status_lead",
-      key: "status_lead",
-      scopedSlots: { customRender: "status_lead" }
+    title: "Статус",
+    dataIndex: "status_lead",
+    key: "status_lead",
+    scopedSlots: { customRender: "status_lead" },
   },
   {
     title: "Имя",
@@ -150,10 +156,10 @@ const columns = [
     dataIndex: "balance",
     key: "balance",
     scopedSlots: { customRender: "balance" },
-    defaultSortOrder: 'descend',
-    sortDirections: ['descend', 'ascend'],
+    defaultSortOrder: "descend",
+    sortDirections: ["descend", "ascend"],
     onFilter: (value, record) => {},
-    sorter: (a, b) => {}
+    sorter: (a, b) => {},
   },
   {
     title: "Бонус",
@@ -162,9 +168,9 @@ const columns = [
     scopedSlots: { customRender: "bonus" },
   },
   {
-      title: 'Активность',
-      dataIndex: 'was_online',
-      key: 'was_online'
+    title: "Активность",
+    dataIndex: "was_online",
+    key: "was_online",
   },
   {
     title: "Кол-во. заявок",
@@ -173,17 +179,22 @@ const columns = [
     scopedSlots: { customRender: "bids_count" },
   },
   {
-      title: 'Регистрация',
-      dataIndex: "registration_at",
-      key: "registration_at",
-      scopedSlots: { customRender: "registration_at" },
-      defaultSortOrder: 'descend',
-      sortDirections: ['descend', 'ascend'],
-      onFilter: (value, record) => {},
-      sorter: (a, b) => {}
-  }
+    title: "Регистрация",
+    dataIndex: "registration_at",
+    key: "registration_at",
+    scopedSlots: { customRender: "registration_at" },
+    defaultSortOrder: "descend",
+    sortDirections: ["descend", "ascend"],
+    onFilter: (value, record) => {},
+    sorter: (a, b) => {},
+  },
 ];
 export default {
+  head() {
+    return {
+      title: "Мои клиенты",
+    };
+  },
   data() {
     return {
       pagination: {},
@@ -191,8 +202,8 @@ export default {
       innerColumns,
       data: [],
       isLoading: true,
-      order_by: 'DEF',
-      order_by_register: 'DEF',
+      order_by: "DEF",
+      order_by_register: "DEF",
       searchField: {
         name: null,
         email: null,
@@ -234,15 +245,18 @@ export default {
       const pager = { ...this.pagination };
       pager.current = pagination.current;
       this.pagination = pager;
-      if (typeof sorters.order != 'undefined' && sorters.field == 'balance') {
-          this.order_by = sorters.order == 'ascend' ? 'ASC' : 'DESC';
+      if (typeof sorters.order != "undefined" && sorters.field == "balance") {
+        this.order_by = sorters.order == "ascend" ? "ASC" : "DESC";
       } else {
-          this.order_by = 'DEF';
+        this.order_by = "DEF";
       }
-      if (typeof sorters.order != 'undefined' && sorters.field == 'created_at') {
-          this.order_by_register = sorters.order == 'ascend' ? 'ASC' : 'DESC';
+      if (
+        typeof sorters.order != "undefined" &&
+        sorters.field == "created_at"
+      ) {
+        this.order_by_register = sorters.order == "ascend" ? "ASC" : "DESC";
       } else {
-          this.order_by_register = 'DEF';
+        this.order_by_register = "DEF";
       }
       this.loadUsers({}, pager.current);
     },
