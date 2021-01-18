@@ -10,7 +10,7 @@
         <template
           v-if="
             (typeof item.children == 'undefined' ? '' : item.children).length >
-            0
+              0 && item.modeHidden.indexOf(user.role) < 0
           "
         >
           <a-sub-menu :key="item.name">
