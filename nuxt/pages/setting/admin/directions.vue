@@ -225,6 +225,11 @@
 import Vue from "vue";
 export default Vue.extend({
   name: "setting-admin-directions",
+  head() {
+    return {
+      title: 'Администрирование направлений'
+    }
+  },
   data() {
     return {
       dirEach: [],
