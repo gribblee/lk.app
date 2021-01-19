@@ -126,4 +126,97 @@ class DirectoryController extends Controller
             }
         }
     }
+
+    /**
+     * @return JsonResponse
+     */
+    public function regionCreate(Request $request)
+    {
+        if ($request->user()->role === 'ROLE_ADMIN') {
+            try {
+                $maxId = Region::max('id') + 1;
+                Region::create([
+                    'id' => $maxId,
+                    'name' => 'Название региона',
+                    'type' => 'Тип',
+                    'name_with_type' => 'Респ',
+                    'federal_district' => '23',
+                    'kladr_id' => '43',
+                    'fias_id' => '43',
+                ]);
+                return response()->json([
+                    'success' => true,
+                ]);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Ошибка',
+                ]);
+            }
+        }
+    }
+
+    /**
+     * @param $id
+     * @return JsonResponse
+     */
+    public function regionUpdate(Request $request, int $id)
+    {
+        if ($request->user()->role === 'ROLE_ADMIN') {
+            try {
+                $region = Region::findOrFail($id);
+                $updated = $request->only([
+                    'name',
+                    'type',
+                    'name_with_type',
+                    'federal_district',
+                    'kladr_id',
+                    'fias_id',
+                ]);
+                $region->update($updated);
+                return response()->json([
+                    'success' => true,
+                    'message' => "Регион \"{$region->name_with_type}\" обновлено"
+                ]);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Ошибка заполнения полей'
+                ]);
+            }
+        }
+    }
+
+    /**
+     * @param $id
+     * @return JsonResponse
+     */
+    public function regionDelete(Request $request, int $id)
+    {
+        if ($request->user()->role === 'ROLE_ADMIN') {
+            try {
+                $region = Region::findOrFail($id);
+
+                $region->delete();
+                return response()->json([
+                    'success' => true,
+                    'message' => "Регион \"{$region->name_with_type}\" удален"
+                ]);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'success' => false,
+                    'msg' => $e->getMessage(),
+                    'error' => 'Ошибка'
+                ]);
+            }
+        }
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    public function getRegions(Request $request)
+    {
+        return Region::orderByDesc('id')->paginate(12);
+    }
 }

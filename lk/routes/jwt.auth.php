@@ -191,7 +191,14 @@ Route::group(['prefix' => 'directory'], function () {
         Route::post('{id}/update', "DirectoryController@directionUpdate");
         Route::post('{id}/delete', "DirectoryController@directionDelete");
     });
-    Route::post('regions/save', "DirectoryController@regionsSave");
+    Route::group([
+        'prefix' => 'region'
+    ], function () {
+        Route::get('', "DirectoryController@getRegions");
+        Route::put('create', "DirectoryController@regionCreate");
+        Route::post('{id}/update', "DirectoryController@regionUpdate");
+        Route::post('{id}/delete', "DirectoryController@regionDelete");
+    });
     Route::post('status/save', "DirectoryController@statusSave");
     Route::post('options_save', "DirectoryController@optionsSave");
     //Поменять маршрут потом потом
