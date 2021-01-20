@@ -78,6 +78,11 @@ export default Vue.extend({
               title: "Регионы",
               url: "/setting/admin/regions",
             },
+            {
+              name: "setting-admin-sendpulse",
+              title: "SendPulse",
+              url: "/setting/admin/sendpulse",
+            },
           ],
         },
         {

@@ -4,6 +4,8 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use App\Helpers\SendPulse;
+use App\Models\Option;
 
 class Kernel extends ConsoleKernel
 {
@@ -25,6 +27,36 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // $schedule->command('inspire')->hourly();
+        $schedule->call(function () {
+            $sendPulse = new SendPulse;
+            $bookIdWasOnline = Option::getValue('bookIdWasOnline');
+
+            $users = \DB::table('users')
+                ->selectRaw("*")
+                ->whereRaw("(
+                        date_trunc('days', now()) 
+                        - date_trunc('days', was_online)
+                    ) > '6 days'::interval
+                    AND (
+                        date_trunc('days', now()) 
+                        - date_trunc('days', was_online)
+                    ) < '29 days'::interval")->get();
+            $usersBook = [];
+            foreach ($users as $user) {
+                $usersBook[] = [
+                    'email' => $user->email,
+                    'variables' => [
+                        'phone' => $user->authUser->phone,
+                        'name' => $user->authUser->name,
+                        'was_online' => $user->was_online
+                    ]
+                ];
+            }
+            $sendPulse->addEmails($bookIdWasOnline, $usersBook);
+        })
+            ->weekly()
+            ->mondays()
+            ->at('09:00');
     }
 
     /**
@@ -34,7 +66,7 @@ class Kernel extends ConsoleKernel
      */
     protected function commands()
     {
-        $this->load(__DIR__.'/Commands');
+        $this->load(__DIR__ . '/Commands');
 
         require base_path('routes/console.php');
     }

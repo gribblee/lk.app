@@ -12,7 +12,7 @@ class OptionController extends Controller
     /**
      * @return JsonResponse
      */
-    public function update(Request $request)
+    public function updateOrCreate(Request $request)
     {
         if ($request->user()->role == 'ROLE_ADMIN') {
             foreach ($request->formOptions as $key => $value) {

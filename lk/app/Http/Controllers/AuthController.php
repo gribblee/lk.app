@@ -11,10 +11,12 @@ use lluminate\Support\Collection;
 
 use App\Models\AuthSMSToken;
 use App\Models\User;
+use App\Models\Option;
 use App\Helpers\smsRuHelper;
 use Dirape\Token\Token;
 use App\Helpers\stdObject;
 use App\Helpers\BitrixApi;
+use App\Helpers\SendPulse;
 
 use Carbon\Carbon;
 use stdClass;
@@ -36,6 +38,7 @@ class AuthController extends Controller
     protected $errorMsg = '';
     protected $tokenUser;
     protected $authUser;
+    protected $bookId;
 
     protected $bitrix24;
 
@@ -44,7 +47,8 @@ class AuthController extends Controller
         $this->auth = $auth;
         $this->bitrix24 = new BitrixApi('043rdb1o3rqtfvvy');
         $this->smsRu = new smsRuHelper(ENV('SMS_RU_TOKEN'));
-
+        $this->sendPulse = new SendPulse;
+        $this->bookId = Option::getValue('bookIdRegister');
     }
 
     /**
@@ -76,6 +80,16 @@ class AuthController extends Controller
                             $this->tokenUser->save();
 
                             if ($this->authUser->is_registration == false) {
+
+                                $this->sendPulse->addEmails($this->bookId, [
+                                    [
+                                        'email' => $this->authUser->email,
+                                        'variables' => [
+                                            'phone' => $this->authUser->phone,
+                                            'name' => $this->authUser->name,
+                                        ]
+                                    ]
+                                ]);
                                 $this->authUser->is_registration = true;
                                 $this->authUser->save();
                             }

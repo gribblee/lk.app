@@ -200,9 +200,12 @@ Route::group(['prefix' => 'directory'], function () {
         Route::post('{id}/delete', "DirectoryController@regionDelete");
     });
     Route::post('status/save', "DirectoryController@statusSave");
-    Route::post('options_save', "DirectoryController@optionsSave");
-    //Поменять маршрут потом потом
-    Route::post('options_save', "OptionController@update");
+});
+
+Route::group([
+    'prefix' => 'option'
+], function () {
+    Route::post('save', "OptionController@updateOrCreate");
 });
 
 Route::group(['prefix' => 'insurance'], function () {

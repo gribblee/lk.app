@@ -12,6 +12,8 @@ use App\Models\HistoryPayment;
 use App\Models\PaymentCredit;
 use App\Models\Requisite;
 use App\Models\Notification;
+use App\Models\Option;
+use App\Helpers\SendPulse;
 
 use App\Helpers\Tinkoff;
 use App\Helpers\HelperPayment;
@@ -20,6 +22,17 @@ use PDF;
 
 class PaymentController extends Controller
 {
+    protected $bookIdBill;
+    protected $bookIdBalance;
+
+    function __construct()
+    {
+        $options = Option::getKeyValue();
+        
+        $this->sendPulse = new SendPulse;
+        $this->bookIdBill = $options['bookIdBill'];
+        $this->bookIdBalance = $options['bookIdBalance'];
+    }
 
     /**
      * @return JsonResponse
@@ -84,6 +97,19 @@ class PaymentController extends Controller
                     'after_balance' => $user->balance,
                     'before_bonus' => $user->bonus,
                     'after_bonus' => $user->bonus
+                ]);
+
+                $this->sendPulse->addEmails($this->bookIdBalance, [
+                    [
+                        'email' => $user->email,
+                        'variables' => [
+                            'phone' => $user->phone,
+                            'name' => $user->name,
+                            'balanceBefore' => $user->balance - $payment->paysum,
+                            'balanceAfter' => $user->balance,
+                            'paysum' => $payment->paysum
+                        ]
+                    ]
                 ]);
             } else {
                 $payment->status = HelperPayment::CD_STATUS_ERROR;
@@ -338,6 +364,16 @@ class PaymentController extends Controller
                     $message->attach(Storage::disk('public')->path($pdfPath));
                     $message->setBody('<h1>Здравствуйте</h1><br/><p>Вам выставлен счёт № ' . date("dmY", strtotime($paymentData->created_at)) . '-' . str_pad($paymentData->id . $paymentData->requisite_id, 6, '000000', STR_PAD_LEFT) . ' на сумму ' . $paymentData->paysum . ' ₽ в сервисе Leadz.Monster</p>', 'text/html');
                 });
+
+                $this->sendPulse->addEmails($this->bookIdBill, [
+                    [
+                        'email' => $this->user()->email,
+                        'variables' => [
+                            'phone' => $this->user()->phone,
+                            'name' => $this->user()->name,
+                        ]
+                    ]
+                ]);
 
                 return response()->json([
                     'success' => true,
