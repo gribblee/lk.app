@@ -99,16 +99,17 @@ export default Vue.extend({
   },
   mounted() {},
   methods: {
-    submitForm(formName) {
-      this.$refs[formName].validate((valid) => {
+    submitForm(formName : any) {
+      const app : any = this;
+      app.$refs[formName].validate((valid : any) => {
         if (valid) {
-          this.$axios
+          app.$axios
             .post("/option/save", { formOptions: this.userForm })
-            .then(({ data }) => {
+            .then(({ data } : any) => {
               if (data.success) {
-                this.$message.success(data.message);
+                app.$message.success(data.message);
               } else {
-                this.$message.error(data.error);
+                app.$message.error(data.error);
               }
             });
         } else {
