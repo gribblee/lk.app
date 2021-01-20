@@ -97,15 +97,31 @@ export default Vue.extend({
       },
     };
   },
-  mounted() {},
+  mounted() {
+    const app: any = this;
+    app.$axios.get("/directory").then(({ data }: any) => {
+      let options = data.options;
+      if (
+        typeof options.bookIdRegister != "undefined" &&
+        typeof options.bookIdBill != "undefined" &&
+        typeof options.bookIdBalance != "undefined" &&
+        typeof options.bookIdWasOnline != "undefined"
+      ) {
+        app.userForm.bookIdRegister = options.bookIdRegister;
+        app.userForm.bookIdBill = options.bookIdBill;
+        app.userForm.bookIdBalance = options.bookIdBill;
+        app.userForm.bookIdWasOnline = options.bookIdWasOnline;
+      }
+    });
+  },
   methods: {
-    submitForm(formName : any) {
-      const app : any = this;
-      app.$refs[formName].validate((valid : any) => {
+    submitForm(formName: any) {
+      const app: any = this;
+      app.$refs[formName].validate((valid: any) => {
         if (valid) {
           app.$axios
             .post("/option/save", { formOptions: this.userForm })
-            .then(({ data } : any) => {
+            .then(({ data }: any) => {
               if (data.success) {
                 app.$message.success(data.message);
               } else {
