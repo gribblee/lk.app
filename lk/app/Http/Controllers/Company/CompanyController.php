@@ -83,7 +83,7 @@ class CompanyController extends Controller
             'file' => 'required|mimes:jpeg|max:16384'
         ]);
         try {
-            if ($request->files()) {
+            if ($request->hasFile('file')) {
                 $uid = $request->user()->id . time();
                 $fileName = $request->file->getClientOriginalName();
                 $filePath = $request->file('file')->storeAs('company/' . $id, $fileName, 'public');
