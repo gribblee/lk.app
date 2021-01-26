@@ -17,6 +17,7 @@ use Dirape\Token\Token;
 use App\Helpers\stdObject;
 use App\Helpers\BitrixApi;
 use App\Helpers\SendPulse;
+use App\Helpers\Geo;
 
 use Carbon\Carbon;
 use stdClass;
@@ -41,6 +42,8 @@ class AuthController extends Controller
     protected $bookId;
 
     protected $bitrix24;
+    protected $geo;
+
 
     public function __construct(JWTAuth $auth)
     {
@@ -49,6 +52,7 @@ class AuthController extends Controller
         $this->smsRu = new smsRuHelper(ENV('SMS_RU_TOKEN'));
         $this->sendPulse = new SendPulse;
         $this->bookId = Option::getValue('bookIdRegister');
+        $this->geo = new Geo;
     }
 
     /**
@@ -153,6 +157,7 @@ class AuthController extends Controller
                     'cost' => $smsResponse->cost
                 ];
 
+                $this->geo->get($request);
                 $user = $this->createUser($request);
                 $smsToken->user_id = $user->id;
 
@@ -395,6 +400,7 @@ class AuthController extends Controller
             'role'  =>  'ROLE_USER',
             'balance' => 0.0,
             'bonus' => 0.0,
+            'region_id' => $this->geo->region->id,
             'manager_id' => $this->getRandManager()->id ?? null
         ]);
     }

@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\Route;
 /**
  * Маршруты только для авторизованых пользователей
  */
-
 /**
  * Здесь Post
  */
@@ -46,12 +45,28 @@ Route::group(['prefix' => 'disput_status'], function () {
     Route::post('delete', "DisputTypeController@delete");
 });
 
-
-
+Route::group([
+    'prefix' => 'company'
+], function () {
+    Route::put('/create', 'Company\CompanyController@create');
+    Route::post('{id}', 'Company\CompanyController@update');
+    Route::delete('{id}', 'Company\CompanyController@delete');
+    Route::post('{id}/upload', 'Company\CompanyController@upload');
+    Route::group([
+        'prefix' => '{companyId}/issues'
+    ], function() {
+        Route::put('create', 'Company\IssuesController@create');
+        Route::post('{id}', 'Company\IssuesController@update');
+        Route::delete('{id}', 'Company\IssuesController@delete');
+    });
+});
 /**
  * Здесь Get Запросы
  */
-
+Route::get('me/companies', "Company\CompanyController@meCompanies");
+Route::get('company/{id}', 'Company\CompanyController@show');
+Route::get('companies', "Company\CompanyController@index");
+Route::get('companies/{regionId}', "Company\CompanyController@companiesInRegion");
 
 /**
  * Start Ver1.0
@@ -157,6 +172,8 @@ Route::group([
     Route::post('update', 'UserController@update');
     Route::post('balance/history', 'UserController@history');
     Route::post('pay_bonus', "UserController@payBonus");
+
+    Route::post('update/region', 'UserController@updateRegion');
 });
 Route::group([
     'prefix' => 'manager'
@@ -181,6 +198,7 @@ Route::group([
     Route::post('{id}/delete', 'BidController@delete');
     Route::post('{id}/update_region', 'BidController@updateRegion');
 });
+
 
 Route::group(['prefix' => 'directory'], function () {
     Route::get('', "DirectoryController@index");

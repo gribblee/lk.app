@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Validator;
 
 use App\Models\User;
 use App\Models\Deal;
@@ -14,9 +15,12 @@ use App\Models\Notification;
 use App\Models\HistoryPayment;
 use App\Models\Bid;
 use App\Models\AppToken;
+use App\Models\Region;
+
 
 use App\Helpers\stdObject;
 use App\Models\Direction;
+use Exception;
 
 class UserController extends Controller
 {
@@ -243,7 +247,7 @@ class UserController extends Controller
     public function meUser(Request $request)
     {
         return response()->json([
-            'data' => User::with('manager')->find($request->user()->id)
+            'data' => User::with('region')->with('manager')->find($request->user()->id)
         ], 200);
     }
 
@@ -257,7 +261,7 @@ class UserController extends Controller
             'distributed_count' => 0,
             'notifications' => [],
             'balance' => 0.0,
-            'bonus' => 0.0
+            'bonus' => 0.0,
         ]);
 
         $Response->balance = $request->user()->balance;
@@ -335,6 +339,32 @@ class UserController extends Controller
                 ->orderByDesc('date_at')->get();
         }
         return response()->json($historyPayment);
+    }
+
+    /**
+     * @return JsonResponse
+     */
+
+    public function updateRegion(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'region_id' => ['required']
+            ]);
+            if (!$validator->fails()) {
+                User::where('id', $request->user()->id)->update([
+                    'region_id' => $request->region_id,
+                ]);
+                return response()->json([
+                    'message' => 'Регион пользователя обновлён',
+                    'region' => Region::find($request->region_id)
+                ]);
+            }
+        } catch (Exception $e) {
+            return response()->json([
+                'error' => 'Ошибка сервиса!'
+            ], 400);
+        }
     }
 
     /**

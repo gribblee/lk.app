@@ -44,6 +44,7 @@ class User extends Authenticatable implements JWTSubject
         'manager_id',
         'is_registration',
         'is_delete',
+        'region_id',
         'updated_at',
     ];
 
@@ -64,6 +65,11 @@ class User extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims()
     {
         return [];
+    }
+
+    public function region()
+    {
+        return $this->belongsTo(Region::class, 'region_id', 'id');
     }
     
     public function bids()

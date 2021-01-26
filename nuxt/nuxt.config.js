@@ -107,7 +107,7 @@ export default {
         token: {
           property: "token",
           required: true,
-          type: 'Bearer'
+          type: "Bearer"
         },
         endpoints: {
           login: {
@@ -136,6 +136,7 @@ export default {
       "@/plugins/auth",
       "@/plugins/directory",
       "@/plugins/user",
+      "@/plugins/vueClipboard",
 
       "@/plugins/mixins/directoryMixin",
       "@/plugins/mixins/userMixin",
@@ -150,7 +151,7 @@ export default {
    ** See https://axios.nuxtjs.org/options
    */
   axios: {
-    baseURL: 'https://lk.leadz.monster/api',//`${process.env.NODE_BASE_URL}`
+    baseURL: "https://lk.leadz.monster/api" //`${process.env.NODE_BASE_URL}`
   },
 
   // Build Configuration (https://go.nuxtjs.dev/config-build)

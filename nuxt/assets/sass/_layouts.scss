@@ -10,3 +10,15 @@
     margin-bottom: 10px;
     font-size: 14px;
 }
+
+.layout-top {
+    display: flex;
+    &__region {
+
+    }
+}
+
+.layout-region-modal {
+    max-height: 320px;
+    overflow: auto;
+}

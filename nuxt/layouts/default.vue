@@ -22,7 +22,11 @@
                 {{ item.name }}
               </span>
             </nuxt-link>
-            <a :href="item.url" :target="item.target" v-if="item.type == 'Link'">
+            <a
+              :href="item.url"
+              :target="item.target"
+              v-if="item.type == 'Link'"
+            >
               <a-icon :type="item.icon" />
               <span class="nav-text">{{ item.name }}</span>
             </a>
@@ -48,7 +52,12 @@
               >Сообщить о проблеме</a-button
             >
           </div>
-          <div>
+          <div class="layout-top">
+            <div class="layout-top__region">
+              <a class="ant-dropdown-link" @click.prevent="openRegionModal">
+                Ваш регион {{ regionName }} <a-icon type="down" />
+              </a>
+            </div>
             <span :style="{ padding: '0 10px' }">
               <a-tag color="green"
                 >Вы зашли как {{ $userUpdated.typeName }}</a-tag
@@ -392,6 +401,25 @@
         </a-modal>
       </a-layout-footer>
     </a-layout>
+    <a-modal
+      v-model="isRegionModal"
+      title="Выберите регион"
+      cancelText="Отмена"
+      okText="Выбрать"
+      @ok="handleRegionOk"
+    >
+      <div class="layout-region-modal">
+        <a-radio-group v-model="regionId">
+          <a-radio
+            v-for="(region, index) in regions"
+            :value="region.id"
+            :key="index"
+            :style="radioStyle"
+            >{{ region.name_with_type }}</a-radio
+          >
+        </a-radio-group>
+      </div>
+    </a-modal>
   </a-layout>
 </template>
 <script>
@@ -400,6 +428,15 @@ export default {
   data() {
     return {
       menuSelectedKeys: [1],
+      regionName: "",
+      regions: [],
+      regionId: 1,
+      isRegionModal: false,
+      radioStyle: {
+        display: "block",
+        height: "30px",
+        lineHeight: "30px",
+      },
       /**
        * START OF Ver1.0
        */
@@ -443,91 +480,135 @@ export default {
           icon: "appstore",
           url: "/",
           rolesHidden: [],
-          type: "Route"
+          type: "Route",
         },
         {
           name: "Клиенты",
           icon: "bulb",
           url: "/deals",
           rolesHidden: [],
-          type: "Route"
+          type: "Route",
+        },
+        {
+          name: "Мои компании",
+          icon: "home",
+          url: "/company",
+          rolesHidden: [],
+          type: "Route",
+        },
+        {
+          name: "Рейтинг компаний",
+          icon: "trophy",
+          url: "/companies",
+          rolesHidden: [],
+          type: "Route",
         },
         {
           name: "Не распределено",
           icon: "container",
           url: "/distributed",
-          rolesHidden: ["ROLE_USER", "ROLE_MANAGER", "ROLE_WEBMASTER", "ROLE_ACCOUNAT"],
-          type: "Route"
+          rolesHidden: [
+            "ROLE_USER",
+            "ROLE_MANAGER",
+            "ROLE_WEBMASTER",
+            "ROLE_ACCOUNAT",
+          ],
+          type: "Route",
         },
         {
           name: "Спорные",
           icon: "warning",
           url: "/disput",
-          rolesHidden: ["ROLE_USER", "ROLE_MANAGER", "ROLE_WEBMASTER", "ROLE_ACCOUNAT"],
-          type: "Route"
+          rolesHidden: [
+            "ROLE_USER",
+            "ROLE_MANAGER",
+            "ROLE_WEBMASTER",
+            "ROLE_ACCOUNAT",
+          ],
+          type: "Route",
         },
         {
           name: "Счета",
           icon: "pay-circle",
           url: "/payment/requisites",
-          rolesHidden: ["ROLE_USER", "ROLE_MANAGER", "ROLE_WEBMASTER", "ROLE_ACCOUNAT"],
-          type: "Route"
+          rolesHidden: [
+            "ROLE_USER",
+            "ROLE_MANAGER",
+            "ROLE_WEBMASTER",
+            "ROLE_ACCOUNAT",
+          ],
+          type: "Route",
         },
         {
           name: "Оплаты",
           icon: "history",
           url: "/payment/history",
-          rolesHidden: ["ROLE_USER", "ROLE_MANAGER", "ROLE_WEBMASTER", "ROLE_ACCOUNAT"],
-          type: "Route"
+          rolesHidden: [
+            "ROLE_USER",
+            "ROLE_MANAGER",
+            "ROLE_WEBMASTER",
+            "ROLE_ACCOUNAT",
+          ],
+          type: "Route",
         },
         {
           name: "История баланса",
           icon: "history",
           url: "/user/history",
           rolesHidden: [],
-          type: "Route"
+          type: "Route",
         },
         {
           name: "Страховка",
           icon: "file",
           url: "/insurance",
-          rolesHidden: ["ROLE_USER", "ROLE_MANAGER", "ROLE_WEBMASTER", "ROLE_ACCOUNAT"],
-          type: "Route"
+          rolesHidden: [
+            "ROLE_USER",
+            "ROLE_MANAGER",
+            "ROLE_WEBMASTER",
+            "ROLE_ACCOUNAT",
+          ],
+          type: "Route",
         },
         {
           name: "Мои клиенты",
           icon: "user",
           url: "/manager/users",
           rolesHidden: ["ROLE_USER", "ROLE_WEBMASTER", "ROLE_ACCOUNAT"],
-          type: "Route"
+          type: "Route",
         },
         {
           name: "Настройки",
           icon: "setting",
           url: "/setting",
           rolesHidden: [],
-          type: "Route"
+          type: "Route",
         },
         {
           name: "API приложения",
           icon: "api",
           url: "/webmaster",
           rolesHidden: ["ROLE_USER", "ROLE_MANAGER", "ROLE_ACCOUNAT"],
-          type: "Route"
+          type: "Route",
         },
         {
           name: "Статистика",
           icon: "pie-chart",
           url: "/statistics",
           rolesHidden: ["ROLE_USER", "ROLE_MANAGER", "ROLE_ACCOUNAT"],
-          type: "Route"
+          type: "Route",
         },
         {
           name: "Пользователи",
           icon: "team",
           url: "/users",
-          rolesHidden: ["ROLE_USER", "ROLE_WEBMASTER", "ROLE_MANAGER", "ROLE_ACCOUNAT"],
-          type: "Route"
+          rolesHidden: [
+            "ROLE_USER",
+            "ROLE_WEBMASTER",
+            "ROLE_MANAGER",
+            "ROLE_ACCOUNAT",
+          ],
+          type: "Route",
         },
         {
           name: "База знаний",
@@ -535,8 +616,8 @@ export default {
           url: "https://leadz.monster/knowledge-base",
           rolesHidden: [],
           target: "_blank",
-          type: "Link"
-        }
+          type: "Link",
+        },
       ],
     };
   },
@@ -551,8 +632,36 @@ export default {
   mounted() {
     this.isLoading = true;
     this.userType = this.user.category_id;
+    this.$axios
+      .get("/directory")
+      .then(({ data }) => {
+        this.regions = data.regions;
+      })
+      .catch((_err) => {
+        console.error(_err);
+      });
+    this.regionId = this.user.region.id;
+    this.regionName = this.user.region.name_with_type;
   },
   methods: {
+    openRegionModal(e) {
+      this.isRegionModal = true;
+    },
+    handleRegionOk(e) {
+      this.$axios
+        .post("/user/update/region", {
+          region_id: this.regionId,
+        })
+        .then(({ data }) => {
+          this.$message.success(data.message);
+          this.regionName = data.region.name_with_type;
+          this.$auth.fetchUser();
+          this.isRegionModal = false;
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    },
     /**
      * START Ver 1.0
      */
