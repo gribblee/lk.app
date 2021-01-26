@@ -98,6 +98,7 @@ class CompanyController extends Controller
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'Ошибка сервиса',
+                'error' => $e->getMessage()
             ], 500);
         }
     }
