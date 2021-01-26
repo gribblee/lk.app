@@ -240,12 +240,10 @@ export default Vue.extend({
           }
           each.avatar =
             "https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png";
-          if (each.files != null) {
+          if (each.files) {
             each.files = JSON.parse(each.files);
-            if (each.files) {
-              if (typeof each.files[0].url != "undefined") {
-                each.avatar = each.files[0].url;
-              }
+            if (typeof each.files[0].url != "undefined") {
+              each.avatar = each.files[0].url;
             }
           }
           return each;
@@ -263,12 +261,10 @@ export default Vue.extend({
             }
             each.avatar =
               "https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png";
-            if (each.files != null) {
+            if (each.files) {
               each.files = JSON.parse(each.files);
-              if (each.files) {
-                if (typeof each.files[0].url != "undefined") {
-                  each.avatar = each.files[0].url;
-                }
+              if (typeof each.files[0].url != "undefined") {
+                each.avatar = each.files[0].url;
               }
             }
             return each;
