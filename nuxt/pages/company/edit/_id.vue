@@ -89,6 +89,7 @@
                     :action="uploadURL"
                     list-type="picture-card"
                     :file-list="dataForm.files"
+                    :headers="{ Authorization: $auth.getToken('local') }"
                     @preview="handlePreview"
                     @change="handleChange"
                   >
