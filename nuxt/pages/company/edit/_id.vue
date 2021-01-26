@@ -370,7 +370,7 @@ export default Vue.extend({
     },
     uploadURL() {
       const app: any = this;
-      return `http://lk.leadz.monster/company/${app.$route.params.id}/upload`;
+      return `https://lk.leadz.monster/api/company/${app.$route.params.id}/upload`;
     },
   },
   head() {
