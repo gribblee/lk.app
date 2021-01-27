@@ -234,8 +234,10 @@
                 "
               >
                 <template v-if="Object(itsUser).hasOwnProperty('name')">
-                  <nuxt-link :to="{ path: `/user/${itsUser.id}` }">
-                    Просмотреть пользователя {{ itsUser.name }}</nuxt-link
+                  <span
+                     class="bid-user-id"><nuxt-link :to="{ path: `/users/${itsUser.id}` }">
+                      Просмотреть пользователя {{ itsUser.name }}</nuxt-link
+                    ></span
                   >
                 </template>
                 <a-button type="primary" size="large" @click="openItsUser">
@@ -410,6 +412,10 @@
   </a-layout-content>
 </template>
 <style scoped>
+.bid-user-id {
+  padding: 10px 0;
+}
+
 .bid-users-header {
 }
 
