@@ -384,10 +384,10 @@
       <div class="bid-users-list">
         <a-radio-group v-model="user_id" @change="onChangeUsers">
           <a-radio
-            :style="radioStyle"
-            :value="1"
             v-for="(item, index) in meUsers"
             :key="index"
+            :style="radioStyle"
+            :value="item.id"
             >{{ item.name }}</a-radio
           >
         </a-radio-group>
