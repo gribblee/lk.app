@@ -18,16 +18,16 @@
         </div>
       </a-layout-sider>
       <a-layout-content class="company-layout-content">
-        <div class="company-layout-content__username">{{ user.name }}</div>
+        <div class="company-layout-content__username">{{ contact.name }}</div>
         <div class="company-layout-content__contact">
           <template v-if="!isMobile">
             <a-tooltip placement="top" title="Копировать номер телефона">
               <a-button
                 class="company-layout-content__phone"
-                v-clipboard:copy="user.phone"
+                v-clipboard:copy="contact.phone"
                 v-clipboard:success="successClipboard"
                 size="large"
-                >{{ user.phone }} <a-icon type="copy"
+                >{{ contact.phone }} <a-icon type="copy"
               /></a-button>
             </a-tooltip>
             <a-tag
@@ -98,6 +98,10 @@ export default Vue.extend({
       rating: 0,
       description: "",
       isMobile: isMobile,
+      contact: {
+        name: '',
+        phone: '',
+      },
       avatar:
         "https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png",
       issues: [],
@@ -123,7 +127,7 @@ export default Vue.extend({
     },
     callPhone(e: Event) {
       const app: any = this;
-      window.open(`tel:${app.user.phone}`, "_blank");
+      window.open(`tel:${app.contact.phone}`, "_blank");
     },
   },
   head() {
@@ -141,6 +145,7 @@ export default Vue.extend({
         app.rating = Number((data.rating / 2000).toFixed(1));
         app.description = data.description;
         app.issues = data.issues;
+        app.contact = data.user;
         if (data.files) {
           data.files = JSON.parse(data.files);
           if (data.files != null) {

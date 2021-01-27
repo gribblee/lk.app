@@ -44,7 +44,7 @@
                 </template>
                 <template slot="actions">
                   <a-popconfirm
-                    title="Вы децйствительно хотите удалить компанию"
+                    title="Вы действительно хотите удалить компанию"
                     ok-text="Да"
                     cancel-text="Нет"
                     @confirm="confirmDelete(item.id, $event)"
