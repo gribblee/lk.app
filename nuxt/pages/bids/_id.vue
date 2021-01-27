@@ -413,7 +413,7 @@
 </template>
 <style scoped>
 .bid-user-id {
-  padding: 10px 0;
+  margin: 10px 0;
 }
 
 .bid-users-header {
