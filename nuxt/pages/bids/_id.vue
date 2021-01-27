@@ -233,6 +233,11 @@
                   user.role === 'ROLE_MANAGER' || user.role === 'ROLE_ADMIN'
                 "
               >
+                <template v-if="Object(itsUser).hasOwnProperty('name')">
+                  <nuxt-link :to="{ path: `/user/${itsUser.id}` }">
+                    Просмотреть пользователя {{ itsUser.name }}</nuxt-link
+                  >
+                </template>
                 <a-button type="primary" size="large" @click="openItsUser">
                   <template v-if="Object(itsUser).hasOwnProperty('name')">{{
                     itsUser.name
