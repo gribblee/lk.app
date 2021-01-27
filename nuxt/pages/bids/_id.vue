@@ -396,7 +396,7 @@
             v-model="usersPagination.current"
             :pageSize="usersPagination.pageSize"
             :total="usersPagination.total"
-            @change="usersPagination.onChange"
+            @change="onChangePagination"
             show-less-items
           />
         </div>
@@ -548,9 +548,6 @@ export default {
         current: 1,
         total: 1,
         pageSize: 10,
-        onChange(page) {
-          this.loadManagerUsers(page);
-        },
       },
       radioStyle: {
         display: "block",
@@ -579,6 +576,9 @@ export default {
   },
   mounted() {},
   methods: {
+    onChangePagination(page) {
+      this.loadManagerUsers(page);
+    },
     onChangeUsers(e) {},
     openItsUser(e) {
       this.loadManagerUsers(this.current);
