@@ -31,7 +31,14 @@ class BidController extends Controller
             'bids.is_launch as status',
             'bids.daily_limit as day_limit'
         )
-            ->where('user_id', $request->user()->id)
+            ->when($request->user()->role === 'ROLE_USER', function ($query) use ($request) {
+                return $query->where('user_id', $request->user()->id);
+            })
+            ->when($request->user()->role === 'ROLE_MANAGER', function ($query) use ($request) {
+                return $query->whereHas('user', function ($qw) use ($request) {
+                    return $qw->where('manager_id', $request->user()->id);
+                });
+            })
             ->where('is_delete', false)
             ->with('direction')
             ->withCount('deals');
@@ -96,9 +103,20 @@ class BidController extends Controller
         $bid = Bid::where('id', $id)
             ->where('is_delete', false)
             ->with('direction')
-            ->firstOrFail();
+            ->with('user')
+            ->when(
+                $request->user()->role === 'ROLE_USER',
+                function ($query) use ($request) {
+                    return $query->where('user_id', $request->user()->id);
+                }
+            )->when($request->user()->role === 'ROLE_MANAGER', function ($query) use ($request) {
+                return $query->whereHas('user', function ($qw) use ($request) {
+                    return $qw->where('manager_id', $request->user()->id)->orWhere('id', $request->user()->id);
+                });
+            })->firstOrFail();
         $bidRecommend = Bid::selectRaw('coalesce((FLOOR(MAX(bids.consumption) + (MAX(bids.consumption) * 0.05))), 0) AS max_rate')->where('is_launch', true)
             ->where('is_delete', false)
+            ->whereNotIn('id', [$id])
             ->when($bid->all_region == false, function ($q) use ($id, $bid, $request) {
                 $regionSort = [];
                 foreach ($bid->regions as $region) {
@@ -200,7 +218,7 @@ class BidController extends Controller
                 $bid->save();
                 $code = 1000;
             } elseif ($bid->user->balance >= $bid->consumption) {
-                $minRate = $bid->direction->cost_price + ($bid->direction->cost_price * ($bid->direction->extra / 100));// + ($bid->direction->cost_price * 0.05);
+                $minRate = $bid->direction->cost_price + ($bid->direction->cost_price * ($bid->direction->extra / 100)); // + ($bid->direction->cost_price * 0.05);
                 if ($bid->consumption < $minRate || ($bid->day_limit > 0 && $bid->day_limit < 5)) {
                     $bid->is_launch = false;
                     $isLaunch = false;
@@ -246,7 +264,7 @@ class BidController extends Controller
                     $user = User::findOrFail($request->user()->id);
                     $bid->insurance = $bid->insurance + $insurance->price;
                     $bid->update();
-                    
+
                     $user->balance = $user->balance - $insurance->price;
                     $user->update();
 
@@ -269,7 +287,16 @@ class BidController extends Controller
     public function update(Request $request, int $id)
     {
         //Здесь куча хуйни всё поправить
-        $bid = Bid::with('direction')->findOrFail($id);
+        $bid = Bid::with('direction')->when(
+            $request->user()->role === 'ROLE_USER',
+            function ($query) use ($request) {
+                return $query->where('user_id', $request->user()->id);
+            }
+        )->when($request->user()->role === 'ROLE_MANAGER', function ($query) use ($request) {
+            return $query->whereHas('user', function ($qw) use ($request) {
+                return $qw->where('manager_id', $request->user()->id)->orWhere('id', $request->user()->id);
+            });
+        })->findOrFail($id);
         $qOnly = $request->only([
             'regions',
             'direction_id',
@@ -287,11 +314,12 @@ class BidController extends Controller
         }
         $bid->update($qOnly);
 
-        $bidReturn = Bid::with('direction')->find($id);
+        $bidReturn = Bid::with('direction')->with('user')->find($id);
         $bidRecommend = Bid::selectRaw('coalesce((FLOOR(MAX(bids.consumption) + (MAX(bids.consumption) * 0.05))), 0) AS max_rate')
             ->where('is_launch', true)
             ->whereNotIn('id', [$bid->id])
             ->where('is_delete', false)
+            ->whereNotIn('id', [$bid->id])
             ->when($bid->all_region == false, function ($q) use ($id, $bid, $request) {
                 $regionSort = [];
                 foreach ($bid->regions as $region) {

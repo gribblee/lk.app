@@ -97,10 +97,10 @@
           </div>
         </a-col>
         <a-col :xs="22" :md="8" :lg="8">
-          <a-card title="Настройка вашей заявки">
+          <a-card title="Настройка получения клиентов">
             <div class="bid-form">
               <div class="bid-item">
-                <div class="bid-label">Направление:</div>
+                <div class="bid-label">Укажите какие клиенты нужны:</div>
                 <a-select
                   size="large"
                   placeholder="Выберите направление"
@@ -119,7 +119,7 @@
                 </a-select>
               </div>
               <div class="bid-item">
-                <div class="bid-label">Регионы:</div>
+                <div class="bid-label">Выберите регионы:</div>
                 <a-select
                   size="large"
                   placeholder="Выберите регионы"
@@ -158,7 +158,7 @@
                 </div>
               </div>
               <div class="bid-item">
-                <div class="bid-label">Количество заявок в день:</div>
+                <div class="bid-label">Сколько заявок в день вам нужно:</div>
                 <a-input-number
                   :min="0"
                   :max="1000"
@@ -176,7 +176,7 @@
               </div>
               <div class="bid-item">
                 <div class="bid-label">
-                  Сколько вы готовы платить за клиента:
+                  Сколько Вы готовы платить за клиента:
                 </div>
                 <a-input-number
                   v-model="computedVMConsumption"
@@ -226,6 +226,19 @@
                     :message="computedConsumption.message"
                   />
                 </div>
+              </div>
+              <div
+                class="bid-item"
+                v-if="
+                  user.role === 'ROLE_MANAGER' || user.role === 'ROLE_ADMIN'
+                "
+              >
+                <a-button type="primary" size="large" @click="openItsUser">
+                  <template v-if="Object(itsUser).hasOwnProperty('name')">{{
+                    itsUser.name
+                  }}</template>
+                  <template v-else>Выбрать пользователя</template>
+                </a-button>
               </div>
               <div class="bid-item" v-if="computedIsInsurances">
                 <div class="bid-label">Страховка</div>
@@ -283,7 +296,10 @@
                 </div>
               </div>
               <div class="bid-item">
-                <a-button size="large" :type="computedStatus.type" @click="handleLaunch"
+                <a-button
+                  size="large"
+                  :type="computedStatus.type"
+                  @click="handleLaunch"
                   >{{ computedStatus.button }}</a-button
                 >
               </div>
@@ -357,9 +373,49 @@
         </a-space>
       </template>
     </a-modal>
+    <a-modal
+      v-model="visibleItsUser"
+      title="Выбрать пользователя"
+      @ok="handleItsUser"
+      okText="Сохранить"
+      cancelText="Отменить"
+    >
+      <div class="bid-users-header"></div>
+      <div class="bid-users-list">
+        <a-radio-group v-model="user_id" @change="onChangeUsers">
+          <a-radio
+            :style="radioStyle"
+            :value="1"
+            v-for="(item, index) in meUsers"
+            :key="index"
+            >{{ item.name }}</a-radio
+          >
+        </a-radio-group>
+        <div class="bid-users-pagination">
+          <a-pagination
+            v-model="usersPagination.current"
+            :pageSize="usersPagination.pageSize"
+            :total="usersPagination.total"
+            @change="usersPagination.onChange"
+            show-less-items
+          />
+        </div>
+      </div>
+    </a-modal>
   </a-layout-content>
 </template>
 <style scoped>
+.bid-users-header {
+}
+
+.bid-users-list {
+  padding: 10px 0;
+}
+
+.bid-users-pagination {
+  margin-top: 15px;
+}
+
 .bid-form {
   display: flex;
   flex-direction: column;
@@ -484,6 +540,23 @@ export default {
       max_rate: 0,
       rate_fix: false,
       is_notification: false,
+      itsUser: {},
+      meUsers: [],
+      user_id: 0,
+      visibleItsUser: false,
+      usersPagination: {
+        current: 1,
+        total: 1,
+        pageSize: 10,
+        onChange(page) {
+          this.loadManagerUsers(page);
+        },
+      },
+      radioStyle: {
+        display: "block",
+        height: "30px",
+        lineHeight: "30px",
+      },
     };
   },
   created() {
@@ -506,6 +579,35 @@ export default {
   },
   mounted() {},
   methods: {
+    onChangeUsers(e) {},
+    openItsUser(e) {
+      this.loadManagerUsers(this.current);
+      this.visibleItsUser = true;
+    },
+    loadManagerUsers(page = 1) {
+      this.$axios
+        .post(`/manager/users?page=${page}`)
+        .then(({ data }) => {
+          this.meUsers = data.data;
+          this.usersPagination.total = data.total;
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    },
+    handleItsUser(e) {
+      this.$axios
+        .post(`/manager/bid/${this.id}/update`, {
+          user_id: this.user_id,
+        })
+        .then(({ data }) => {
+          this.itsUser = data;
+          this.visibleItsUser = false;
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    },
     //Обдщие методы
     setData(data) {
       this.id = data.id;
@@ -518,6 +620,8 @@ export default {
       this.consumption = Number(data.consumption);
       this.max_rate = Number(data.max_rate);
       this.is_notification = data.is_notification;
+      this.itsUser = data.user;
+      this.user_id = data.user_id;
     },
     //Методы событий
     handleUpdate(arg) {
@@ -588,13 +692,13 @@ export default {
             color: "green",
             text: "Запущено",
             type: "danger",
-            button: "Остановить"
+            button: "Остановить",
           }
         : {
             color: "red",
             text: "Остановлено",
             type: "primary",
-            button: "Запустить"
+            button: "Запустить",
           };
     },
     computedRecommend() {
@@ -661,7 +765,7 @@ export default {
       };
       const cost_price = Number(this.direction.cost_price);
       const extra = Number(this.direction.extra);
-      if (this.consumption < cost_price + (cost_price * (extra / 100))) {
+      if (this.consumption < cost_price + cost_price * (extra / 100)) {
         consumptionReturn.status = true;
         consumptionReturn.message =
           "При такой ставке Вы не будете получать заявки";

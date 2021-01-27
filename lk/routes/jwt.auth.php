@@ -179,6 +179,7 @@ Route::group([
     'prefix' => 'manager'
 ], function () {
     Route::post('users', "ManagerController@getUsers");
+    Route::post('bid/{bidId}/update', "ManagerController@updateBidUser");
 });
 Route::group([
     'prefix' => 'bids'
