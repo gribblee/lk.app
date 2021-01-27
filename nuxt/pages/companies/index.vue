@@ -242,9 +242,14 @@ export default Vue.extend({
             "https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png";
           if (each.files) {
             each.files = JSON.parse(each.files);
-            if (typeof each.files[0] != "undefined") {
-              if (typeof each.files[0].url != "undefined")
-                each.avatar = each.files[0].url;
+            if (each.files != null) {
+              if (typeof each.files[0] != "undefined") {
+                if (typeof each.files[0].url != "undefined") {
+                  each.avatar = each.files[0].url;
+                } else {
+                  each.avatar = each.files[0].thumbUrl;
+                }
+              }
             }
           }
           return each;
@@ -264,9 +269,13 @@ export default Vue.extend({
               "https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png";
             if (each.files) {
               each.files = JSON.parse(each.files);
-              if (typeof each.files[0] != "undefined") {
-                if (typeof each.files[0].url != "undefined") {
-                  each.avatar = each.files[0].url;
+              if (each.files != null) {
+                if (typeof each.files[0] != "undefined") {
+                  if (typeof each.files[0].url != "undefined") {
+                    each.avatar = each.files[0].url;
+                  } else {
+                    each.avatar = each.files[0].thumbUrl;
+                  }
                 }
               }
             }

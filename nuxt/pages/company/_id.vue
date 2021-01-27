@@ -141,14 +141,22 @@ export default Vue.extend({
         app.rating = Number((data.rating / 2000).toFixed(1));
         app.description = data.description;
         app.issues = data.issues;
-        if (typeof data.files != "undefined" && data.files != null) {
-          if (data.files.length > 0) {
-            app.files = data.files;
-            if (typeof data.files[0].url != "undefined") {
-              app.avatar = data.files[0].url;
+        if (data.files) {
+          data.files = JSON.parse(data.files);
+          if (data.files != null) {
+            if (typeof data.files != "undefined") {
+              if (data.files.length > 0) {
+                app.files = data.files;
+                if (typeof data.files[0].url != "undefined") {
+                  app.avatar = data.files[0].url;
+                } else {
+                  app.avatar = data.files[0].thumbUrl;
+                }
+              }
             }
           }
         }
+
         app.loading = false;
       })
       .catch((err: any) => {
