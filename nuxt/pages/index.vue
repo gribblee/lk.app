@@ -201,7 +201,7 @@
               </a-dropdown>
             </div>
           </div>
-          <div :style="{ marginTop: '20px'}">
+          <div :style="{ marginTop: '20px' }">
             <a-config-provider>
               <template #renderEmpty>
                 <div style="text-align: center; padding: 20px">

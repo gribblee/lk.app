@@ -12,4 +12,4 @@ Vue.use(VueYandexMetrika, {
         accurateTrackBounce:true,
         webvisor:true
     }
-})
+});

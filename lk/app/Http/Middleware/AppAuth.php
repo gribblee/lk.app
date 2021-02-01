@@ -48,7 +48,11 @@ class AppAuth
                 ) : $httpRegion = $httpResponse->region ?? 'Не определено';
                 $request->httpRegion = $httpResponse;
                 $request->http_region = $httpRegion;
-                $request->region = Region::where('kladr_id', str_pad($httpResponse->kladr ?? '0100000000', 13, '0', STR_PAD_RIGHT))->first();
+                if (isset($httpResponse->kladr)) {
+                    $request->region = Region::where('kladr_id', $httpResponse->kladr)->first();
+                } else {
+                    $request->region = [];
+                }
             } catch (ConnectionException $e) {
                 $request->http_region = [];
                 $request->region = [];

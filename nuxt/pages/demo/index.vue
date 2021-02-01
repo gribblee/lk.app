@@ -1,226 +1,131 @@
 <template>
-  <div class="demo-content">
-    <div class="demo-content__step">
-      <b-step :items="stepItems" :step="$demoStep" />
-    </div>
-    <div
-      class="demo-content__header"
-      :class="{ textAlignLeft: $demoStateId == 1 }"
-    >
-      <template v-if="$demoStateId == 0"
-        >Первое задание - Чего вы хотите?</template
-      >
-      <template v-if="$demoStateId == 1">Выберите подходящий тариф</template>
-    </div>
-    <div class="demo-content__body">
-      <div class="b-form b-form--demo" v-if="$demoStateId == 0">
-        <div class="b-form__body">
-          <div class="b-form__group">
-            <b-select
-              mode="multiple"
-              label="Вы хотите получать только по региону"
-              multiLabel="Выбранно несколько регионов"
-              newLabel="Хочу получать по всей России"
-              :isNewLabel="form.allRegion"
-              :options="regionOptions"
-              :selected="regionSelected"
-              @onSelected="handleRegions"
-            />
-            <button
-              class="demo-button-link"
-              @click="handleAllRegion"
-              v-if="form.allRegion == false"
+  <div class="demo-form">
+    <a-card title="Мастер настройки">
+      <a-form-model :rules="rulesForm" :model="form" ref="demoForm">
+        <a-form-model-item label="Выберите регионы" prop="regions">
+          <a-select
+            mode="multiple"
+            option-label-prop="label"
+            v-model="form.regions"
+            :disabled="form.allRegion"
+          >
+            <a-select-option
+              v-for="(region, index) in regions"
+              :key="index"
+              :label="region.name_with_type"
+              :value="region.id"
+              >{{ region.name_with_type }}</a-select-option
             >
-              Хочу получать по всей России
-            </button>
-          </div>
-          <div class="b-form__group">
-            <div class="b-checkbox__group">
-              <div class="b-checkbox__title">Чем вы занимаетесь?</div>
-              <div class="b-checkbox__items">
-                <b-checkbox
-                  v-for="(dir, index) in form.direction"
-                  :key="index"
-                  :label="dir.name"
-                  :id="index"
-                  @change="handleCheck"
-                />
-              </div>
-            </div>
-          </div>
-          <div class="b-form__group">
-            <b-radio-group
-              label="Что для вас важнее?"
-              :value="form.target"
-              :items="radioItems"
-              @change="updateTarget"
-            />
-          </div>
-          <div class="b-form__group" :class="{ isVisibility: !isMore }">
-            <b-button title="Перейти к завершению" @click="handleCreate" />
-          </div>
-        </div>
-      </div>
-      <b-form-tariff v-if="$demoStateId == 1" @onpay="handlePayment" />
-      <b-form-end :isShow="isPayment" @onEnd="handleEnd" />
-    </div>
-    <div class="b-form-end" v-if="isEnd">
-      <span>Перейдите на обычный интерфейс и ожидайте своих клиентов <a href="/">перейти</a></span>
-    </div>
+          </a-select>
+          <a
+            href="#"
+            @click.prevent="(e) => (form.allRegion = true)"
+            v-show="!form.allRegion"
+            >Хочу получать по всей России</a
+          >
+          <a
+            href="#"
+            @click.prevent="(e) => (form.allRegion = false)"
+            v-show="form.allRegion"
+            >Хочу выбрать регионы</a
+          >
+        </a-form-model-item>
+        <a-form-model-item label="Чем вы занимаетесь?" prop="directions">
+          <a-checkbox-group
+            v-model="form.directions"
+            name="checkboxgroup"
+            :options="directionOptions"
+          />
+        </a-form-model-item>
+        <a-form-model-item label="Что для вас важнее?" prop="strategyId">
+          <a-radio-group v-model="form.strategyId" button-style="solid">
+            <a-radio-button :value="1">Много клиентов</a-radio-button>
+            <a-radio-button :value="2">Мало затрат</a-radio-button>
+          </a-radio-group>
+        </a-form-model-item>
+      </a-form-model>
+      <a-form-model-item v-if="isNext">
+        <a-button type="danger" size="large" @click="submitForm('demoForm')"
+          >Перейти к Выбору тарифа</a-button
+        >
+      </a-form-model-item>
+    </a-card>
   </div>
 </template>
-<script>
-import bRadioGroup from "../../components/b-radio-group.vue";
-export default {
-  components: { bRadioGroup },
+<style scoped>
+.demo-form {
+  margin-top: 30px;
+}
+</style>
+<script lang="ts">
+import Vue from "vue";
+export default Vue.extend({
   name: "demo",
   layout: "demo-layout",
   head() {
     return {
-      title: "Создание заявки",
+      title: "Мастер настроек",
     };
   },
   data() {
     return {
-      isEnd: false,
-      isMore: false,
-      isPayment: false,
-      formPaysum: 0,
-      radioItems: [
-        {
-          id: 0,
-          title: "Больше клиентов",
-        },
-        {
-          id: 1,
-          title: "Минимум затрат",
-        },
-      ],
-      regionOptions: [],
-      regionSelected: [],
-      stepItems: [
-        {
-          title: "Начать",
-          description: "Мастер настроит за вас",
-        },
-        {
-          title: "Финиш",
-          description: "Завершение настройки",
-        },
-      ],
+      regions: [],
       form: {
-        regions: [],
         allRegion: false,
-        direction: [],
-        target: 0,
+        regions: [],
+        directions: [],
+        strategyId: 1,
       },
+      rulesForm: {
+        directions: [
+          {
+            type: "array",
+            required: true,
+            message: "Пожалуйста укажите хотя бы одно направление",
+            trigger: "change",
+          },
+        ],
+      },
+      directionOptions: [],
     };
   },
-  created() {
-    this.$store.dispatch("demoData/setTitle", "Первый этап");
-    this.$store.dispatch(
-      "demoData/setDescription",
-      "<p>Выберите подходящий Вам тариф</p><p>\“Попробовать\” - пополните счет на 5.000 р. и привлеките первого клиента!</p><p>\“Начать\” - пополните счет на 10.000 р. и получите БОНУС +1.000 р. на баланс!</p><p>\“Максимум\” - пополните счет сразу на 25.000 р. и получите БОНУС +5.000 р. на баланс!</p>Только при пополнении баланса СЕЙЧАС Вы получаете бонус!</p>"
-    );
-
-    this.$axios.get("/directory").then(({ data }) => {
-      this.regionOptions = data.regions.map((c) => {
-        return {
-          id: c.id,
-          title: c.name,
-        };
+  computed: {
+    isNext() {
+      const { form }: any = this;
+      return (
+        form.directions.length > 0 &&
+        (form.allRegion == true || form.regions.length > 0)
+      );
+    },
+  },
+  methods: {
+    submitForm(formName: string) {
+      const { $router, $refs, $axios, $store, form }: any = this;
+      $refs[formName].validate((valid: any) => {
+        if (valid) {
+          $store.state.localStorage.demoStepId = 2;
+          $store.state.localStorage.demoForm = form;
+          $router.push("/demo/tariff");
+        } else {
+          console.error("DEMO FORM NOT VALID");
+        }
       });
-      this.form.direction = data.directions.map((d) => {
-        d.checked = false;
-        return d;
+    },
+  },
+  beforeCreate() {
+    const app: any = this;
+    const { $store }: any = app;
+    $store.state.localStorage.demoSiderHeader = "Мастер настроек";
+    $store.state.localStorage.demoSiderDescription =
+      "<p>Вам нужно выбрать только по каким направлениям вы работаете. Регион и мастер настроек в автоматическом режиме подберёт нужные для вас параметры</p>";
+
+    app.$axios.get("/directory").then(({ data }: any) => {
+      app.regions = data.regions;
+      app.directionOptions = data.directions.map((direction: any) => {
+        return { label: direction.name, value: direction.id };
       });
     });
   },
-  mounted() {
-    if (localStorage.getItem("demo.isEnd")) {
-      this.isEnd = localStorage.getItem("demo.isEnd") == 1;
-    }
-    if (
-      localStorage.getItem("demo.step") &&
-      localStorage.getItem("demo.state.id") &&
-      localStorage.getItem("demo.payment")
-    ) {
-      this.$store.dispatch(
-        "demoData/setStateId",
-        parseInt(localStorage.getItem("demo.state.id"))
-      );
-      this.$store.dispatch(
-        "demoData/setStep",
-        parseInt(localStorage.getItem("demo.step"))
-      );
-      this.isPayment =
-        parseInt(localStorage.getItem("demo.payment")) == 1 ? true : false;
-    } else {
-      localStorage.setItem("demo.step", this.$demoStep);
-      localStorage.setItem("demo.state.id", this.$demoStateId);
-      localStorage.setItem("demo.payment", this.isPayment ? 1 : 0);
-    }
-  },
-  methods: {
-    handlePayment(v) {
-      this.isPayment = v.is;
-      localStorage.setItem("demo.form.tariff_id", v.id);
-      localStorage.setItem("demo.payment", this.isPayment ? 1 : 0);
-    },
-    checkMore() {
-      if (
-        (this.form.allRegion == true || this.form.regions.length > 0) &&
-        this.form.direction.filter((c) => {
-          return c.checked == true;
-        }).length > 0
-      ) {
-        this.isMore = true;
-      } else {
-        this.isMore = false;
-      }
-    },
-    handleAllRegion() {
-      this.form.allRegion = true;
-
-      this.checkMore();
-    },
-    handleRegions(value) {
-      this.form.allRegion = false;
-      this.form.regions = value;
-
-      this.checkMore();
-    },
-    handleCheck(value) {
-      this.form.direction[value.id].checked = value.checked;
-
-      this.checkMore();
-    },
-    updateTarget(value) {
-      this.form.target = value;
-    },
-    handleEnd(e) {
-      localStorage.setItem("demo.isEnd", 1);
-      this.isEnd = true;
-    },
-    handleCreate() {
-      this.form.regions = this.form.regions.map((r) => {
-        return this.regionOptions[r].id;
-      });
-      this.$store.dispatch("demoData/nextStateId");
-      this.$store.dispatch("demoData/nextStep");
-      localStorage.setItem("demo.form.bid", JSON.stringify(this.form));
-      // this.$axios
-      //   .post("/demo/create", this.form)
-      //   .then(({ data }) => {
-      //     if (data.success) {
-      //     } else {
-      //       this.$message.error(data.error);
-      //     }
-      //   })
-      //   .catch((err) => {
-      //     console.error(err);
-      //   });
-    },
-  },
-};
+  mounted() {},
+});
 </script>

@@ -383,6 +383,7 @@
   </a-layout-content>
 </template>
 <script>
+import moment from "moment";
 const columns = [
   {
     title: "ID",
@@ -529,8 +530,7 @@ export default {
   },
   methods: {
     getDate(date) {
-      const dt = new Date(date);
-      return `${dt.getDate()}-${dt.getMonth()}-${dt.getFullYear()} ${dt.getHours()}:${dt.getMinutes()}`;
+      return moment(date).format("DD-MM-YYYY hh:mm:ss", true);
     },
     handleTableChange(pagination, filters, sorters) {
       const pager = { ...this.pagination };

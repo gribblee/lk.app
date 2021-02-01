@@ -23,10 +23,10 @@
             <span v-else>{{ record.card }}</span>
           </template>
           <template slot="created_at" slot-scope="text">
-            {{ text }}
+            {{ getDate(text) }}
           </template>
           <template slot="updated_at" slot-scope="text">
-            {{ text }}
+            {{ getDate(text) }}
           </template>
         </a-table>
       </div>
@@ -81,6 +81,7 @@
   </a-layout-content>
 </template>
 <script>
+import moment from "moment";
 const columns = [
   {
     title: "ID",
@@ -228,6 +229,9 @@ export default {
     this.loadStory();
   },
   methods: {
+    getDate(date) {
+      return moment(date).format("DD-MM-YYYY hh:mm:ss", true);
+    },
     handleTableChange(pagination, filters, sorters) {
       const pager = { ...this.pagination };
       pager.current = pagination.current;

@@ -106,7 +106,6 @@ class DemoController extends Controller
         $this->Response->data = $requisiteData;
         return response()->json($this->Response, 200);
     }
-
     protected function paymentRequisite($user, int $requisiteId, int $paySum)
     {
         $requis = Requisite::where('user_id', $user->id)->find($requisiteId);
@@ -258,37 +257,35 @@ class DemoController extends Controller
     protected function createBid(Request $request)
     {
 
-        $qOnly = new stdObject($request->bid);
-        foreach ($qOnly->direction as $dir) {
-            if ($dir['checked']) {
-                $QDir = Direction::find($dir['id']);
+        $qOnly = new stdObject($request->only(['allRegion', 'regions', 'target', 'directions']));
+        foreach ($qOnly->directions as $dir) {
+            $QDir = Direction::find($dir);
 
-                $bData = new stdObject([
-                    'direction_id' => $QDir->id,
-                    'category_id' => $request->user()->category_id,
-                    'regions' => $qOnly->allRegion ? [] : Region::whereIn('id', $qOnly->regions)->get(),
-                    'user_id' => $request->user()->id,
-                    'consumption' => $QDir->cost_price + ($QDir->cost_price * ($QDir->extra / 100) + ($QDir->cost_price * 0.05)),
-                    'is_launch' => false,
-                    'is_notification' => false,
-                    'daily_limit' => 5,
-                    'is_delete' => false,
-                    'insurance' => 0
-                ]);
+            $bData = new stdObject([
+                'direction_id' => $QDir->id,
+                'category_id' => $request->user()->category_id,
+                'regions' => $qOnly->allRegion ? [] : Region::whereIn('id', $qOnly->regions)->get(),
+                'user_id' => $request->user()->id,
+                'consumption' => $QDir->cost_price + ($QDir->cost_price * ($QDir->extra / 100) + ($QDir->cost_price * 0.05)),
+                'is_launch' => false,
+                'is_notification' => false,
+                'daily_limit' => 5,
+                'is_delete' => false,
+                'insurance' => 0
+            ]);
 
-                if ($qOnly->target == 1) {
-                    $maxConsumption = Bid::maxConsumption();
-                    $bData->consumption = ceil($maxConsumption + ($maxConsumption * 0.05));
-                    $bData->daily_limit = 0;
-                }
-
-                $Bid = Bid::create($bData->toArray());
-                $DemoBid = DemoBid::create([
-                    'bid_id' => $Bid->id,
-                    'user_id' => $request->user()->id,
-                    'request' => json_encode($bData)
-                ]);
+            if ($qOnly->target == 1) {
+                $maxConsumption = Bid::maxConsumption();
+                $bData->consumption = ceil($maxConsumption + ($maxConsumption * 0.05));
+                $bData->daily_limit = 0;
             }
+
+            $Bid = Bid::create($bData->toArray());
+            $DemoBid = DemoBid::create([
+                'bid_id' => $Bid->id,
+                'user_id' => $request->user()->id,
+                'request' => json_encode($bData)
+            ]);
         }
     }
 

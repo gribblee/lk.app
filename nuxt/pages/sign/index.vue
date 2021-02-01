@@ -212,6 +212,7 @@ export default {
           })
           .then(({ data }) => {
             if (data.success == true) {
+              this.$metrika.reachGoal("client_register");
               this.$router.push("/");
             } else {
               this.isError = true;
