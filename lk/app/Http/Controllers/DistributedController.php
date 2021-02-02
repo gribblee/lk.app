@@ -68,7 +68,7 @@ class DistributedController extends Controller
                 })
                 ->where('direction_id', $deal->direction_id)
                 ->where('is_launch', true)
-                ->whereRaw('("regions")::jsonb @> ? or json_array_length(("regions")::json) = ?', [
+                ->whereRaw('(("regions")::jsonb @> ? or json_array_length(("regions")::json) = ?)', [
                     ['id' => $deal->region->id],
                     0
                 ])
