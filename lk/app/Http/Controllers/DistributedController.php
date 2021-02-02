@@ -63,13 +63,11 @@ class DistributedController extends Controller
                 ->with('user')
                 ->with('direction')
                 ->withCount('dealsToday')
-                ->where(function ($query) use ($deal) {
-                    return $query->whereHas('user', function ($q) {
-                        return $q->whereRaw('users.balance >= bids.consumption');
-                    })
-                        ->where('direction_id', $deal->direction_id)
-                        ->where('is_launch', true);
+                ->whereHas('user', function ($q) {
+                    return $q->whereRaw('users.balance >= bids.consumption');
                 })
+                ->where('direction_id', $deal->direction_id)
+                ->where('is_launch', true)
                 ->whereJsonContains('regions', [
                     'id' => $deal->region->id
                 ])->orWhere(function ($query) {
