@@ -79,10 +79,9 @@ class DistributedController extends Controller
                 //         return $query->whereJsonLength('regions', 0);
                 //     });
                 // })
-                ->orderByRaw('wgr DESC')
-                ->first();
+                ->orderByRaw('wgr DESC');
 
-            return response()->json($bid);
+            return response()->json($bid->toSql());
             if ($bid) {
                 $user = User::findOrFail($bid->user->id);
                 $user->balance = $user->balance - $bid->consumption;
