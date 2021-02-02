@@ -71,9 +71,7 @@ class DistributedController extends Controller
                 ->where(function ($query) use ($deal) {
                     return $query->whereJsonContains('regions', [
                         'id' => $deal->region->id
-                    ])->orWhere(function ($query) {
-                        return $query->whereJsonLength('regions', 0);
-                    });
+                    ])->whereJsonLength('regions', 0);
                 })
                 ->orderByRaw('wgr DESC')
                 ->first();
