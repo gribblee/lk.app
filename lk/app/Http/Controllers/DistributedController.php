@@ -64,7 +64,7 @@ class DistributedController extends Controller
                 ->with('direction')
                 ->withCount('dealsToday')
                 ->whereHas('user', function ($q) {
-                    return $q->whereRaw('balance >= bids.consumption');
+                    return $q->whereRaw('users.balance >= bids.consumption');
                 })
                 ->where('direction_id', $deal->direction_id)
                 ->where('is_launch', true)
