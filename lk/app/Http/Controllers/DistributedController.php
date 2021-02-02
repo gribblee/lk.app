@@ -63,16 +63,25 @@ class DistributedController extends Controller
                 ->with('user')
                 ->with('direction')
                 ->withCount('dealsToday')
-                ->whereHas('user', function ($q) {
-                    return $q->whereRaw('users.balance >= bids.consumption');
-                })
-                ->where('direction_id', $deal->direction_id)
-                ->where('is_launch', true)
                 ->where(function ($query) use ($deal) {
-                    return $query->whereJsonContains('regions', [
-                        'id' => $deal->region->id
-                    ]);
+                    return $query->whereHas('user', function ($q) {
+                        return $q->whereRaw('users.balance >= bids.consumption');
+                    })
+                        ->where('direction_id', $deal->direction_id)
+                        ->where('is_launch', true);
                 })
+                ->whereJsonContains('regions', [
+                    'id' => $deal->region->id
+                ])->orWhere(function ($query) {
+                    return $query->whereJsonLength('regions', 0);
+                })
+                // ->where(function ($query) use ($deal) {
+                //     return $query->whereJsonContains('regions', [
+                //         'id' => $deal->region->id
+                //     ])->orWhere(function ($query) {
+                //         return $query->whereJsonLength('regions', 0);
+                //     });
+                // })
                 ->orderByRaw('wgr DESC')
                 ->first();
             return response()->json($bid);
