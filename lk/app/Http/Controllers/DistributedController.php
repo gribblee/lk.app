@@ -81,7 +81,7 @@ class DistributedController extends Controller
                 ->orderByRaw('wgr DESC')
                 ->first();
 
-            return response($bid);
+            return response()->json($bid);
             if ($bid) {
                 $user = User::findOrFail($bid->user->id);
                 $user->balance = $user->balance - $bid->consumption;
