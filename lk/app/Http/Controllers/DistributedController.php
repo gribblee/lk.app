@@ -51,7 +51,7 @@ class DistributedController extends Controller
 
     public function status(Request $request, int $id)
     {
-        //if ($request->user()->role === 'ROLE_ADMIN' || $request->user()->role === 'ROLE_WEBMASTER') {
+        if ($request->user()->role === 'ROLE_ADMIN' || $request->user()->role === 'ROLE_WEBMASTER') {
             $deal = Deal::with('region')->findOrFail($id);
             $status = Status::firstStatus();
             $statusNo = Status::noDistributed();
@@ -109,7 +109,7 @@ class DistributedController extends Controller
                 'success' => false,
                 'error' => 'Статус не обновлён, заявка не распределена'
             ]);
-       // }
+        }
         return response('ДОСУТП ЗАПРЕШЁН', 403);
     }
 
