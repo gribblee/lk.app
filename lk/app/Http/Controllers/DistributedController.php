@@ -71,11 +71,12 @@ class DistributedController extends Controller
                 ->where(function ($query) use ($deal) {
                     return $query->whereJsonContains('regions', [
                         'id' => $deal->region->id
-                    ])->whereJsonLength('regions', 0);
+                    ])->orWhere(function ($query) {
+                        return $query->whereJsonLength('regions', 0);
+                    });
                 })
-                ->orderByRaw('wgr DESC')
-                ->first();
-            return response()->json($bid);
+                ->orderByRaw('wgr DESC');
+            return response()->json($bid->toSql());
             if ($bid) {
                 $user = User::findOrFail($bid->user->id);
                 $user->balance = $user->balance - $bid->consumption;
