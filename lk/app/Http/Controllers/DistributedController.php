@@ -68,15 +68,21 @@ class DistributedController extends Controller
                 })
                 ->where('direction_id', $deal->direction_id)
                 ->where('is_launch', true)
-                ->where(function ($query) use ($deal) {
-                    return $query->whereJsonContains('regions', [
-                        'id' => $deal->region->id
-                    ])->orWhere(function ($query) {
-                        return $query->whereJsonLength('regions', 0);
-                    });
-                })
-                ->orderByRaw('wgr DESC');
-            return response()->json($bid->toSql());
+                ->whereRaw('("regions")::jsonb @> ? or json_array_length(("regions")::json) = ?)', [
+                    ['id' => $deal->region->id],
+                    0
+                ])
+                // ->where(function ($query) use ($deal) {
+                //     return $query->whereJsonContains('regions', [
+                //         'id' => $deal->region->id
+                //     ])->orWhere(function ($query) {
+                //         return $query->whereJsonLength('regions', 0);
+                //     });
+                // })
+                ->orderByRaw('wgr DESC')
+                ->first();
+
+            return response()->json($bid);
             if ($bid) {
                 $user = User::findOrFail($bid->user->id);
                 $user->balance = $user->balance - $bid->consumption;
