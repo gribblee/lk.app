@@ -164,10 +164,15 @@
                 <template
                 v-if="user.role == 'ROLE_ADMIN' || user.role == 'ROLE_MANAGER'"
                 >
-                <nuxt-link
+                <template v-if="record.bids === null">
+                  Не распределён
+                </template>
+                <template v-else>
+                  <nuxt-link
                     :to="{ name: 'users-id', params: { id: record.bids.user.id } }"
                     >{{ record.bids.user.name }}</nuxt-link
                 >
+                </template>
                 </template>
             </template>
             <template slot="created_at" slot-scope="text, record">
