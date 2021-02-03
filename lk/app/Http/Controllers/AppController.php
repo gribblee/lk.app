@@ -51,8 +51,16 @@ class AppController extends Controller
             ->selectRaw('*, (
                 (FLOOR(RANDOM() * consumption))
             ) AS weight')
-            ->whereJsonContains('regions', $request->region)
-            ->where('direction_id', $request->appToken->direction_id)
+            ->where(function ($query) use ($request) {
+                $query->when(isset($request->region->id), function ($q) use ($request) {
+                    return $q->whereJsonContains('regions', [
+                        ['id' => $request->region->id]
+                    ])->orWhere(function ($query) {
+                        return $query->whereJsonLength('regions', 0);
+                    });
+                });
+            })
+            ->where('direction_id', $request->appToken->direction->id)
             ->whereRaw("(select count(*) from
                         deals where bids.id = (deals.bid_id)
                         and deals.created_at = date_trunc('day', current_date)
@@ -63,7 +71,7 @@ class AppController extends Controller
             ->where('is_launch', true)
             ->where('is_delete', false)
             ->orderByDesc('weight')->first();
-        
+
         $name = $request->has('name') ? $request->name : $request->Name;
         $phone = $request->has('phone') ? $request->phone : $request->Phone;
         $email = $request->has('email') ? $request->email : $request->Email;
