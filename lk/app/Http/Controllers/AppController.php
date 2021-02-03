@@ -52,12 +52,12 @@ class AppController extends Controller
                 (FLOOR(RANDOM() * consumption))
             ) AS weight')
             ->where(function ($query) use ($request) {
-                $query->when(isset($request->region->id), function ($q) use ($request) {
+                return $query->when(isset($request->region->id), function ($q) use ($request) {
                     return $q->whereJsonContains('regions', [
                         ['id' => $request->region->id]
-                    ])->orWhere(function ($query) {
-                        return $query->whereJsonLength('regions', 0);
-                    });
+                    ]);
+                })->orWhere(function ($query) {
+                    return $query->whereJsonLength('regions', 0);
                 });
             })
             ->where('direction_id', $request->appToken->direction->id)
