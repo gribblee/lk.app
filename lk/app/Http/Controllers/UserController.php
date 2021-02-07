@@ -163,10 +163,7 @@ class UserController extends Controller
                             ->where(function ($q) use ($region) {
                                 return $q->whereJsonContains('regions', [
                                     ['id' => $region['id']]
-                                ])
-                                    ->orWhere(function ($qw) {
-                                        return $qw->whereJsonLength('regions', 0);
-                                    });
+                                ]);
                             });
                     })->count();
                     $region['LEAD_COUNT'] = ceil($region['balance'] / $region['AVG_RATE']);
