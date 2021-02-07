@@ -204,7 +204,7 @@ class AppController extends Controller
         $this->bitrix24
             ->lead('default', $request->header('referer')
                 ?? $request->input('referer')
-                ?? 'http://lk.leadz.monster')
+                ?? 'https://lk.leadz.monster')
             ->utm($request->all())
             ->field('ADDRESS_CITY', $request->region->name ?? 'Не определно')
             ->field('UF_CRM_1602571646472', $Bid->direction->name)
