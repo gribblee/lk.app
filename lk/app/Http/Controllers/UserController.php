@@ -152,17 +152,17 @@ class UserController extends Controller
                 $rgC++;
             }
             // if (count($regions) > 0 || count($regions[0]) > 0) {
-            foreach ($regions as $region) {
+            foreach ($regions as $region_id => $region) {
                 if (count($region) > 0) {
                     $region['AVG_RATE'] = $region['AVG_RATE'] / $region['COUNT'];
-                    $region['USERS_COUNT'] = User::whereExists(function ($query) use ($region) {
+                    $region['USERS_COUNT'] = User::whereExists(function ($query) use ($region_id) {
                         return $query->select(\DB::raw(1))
                             ->from('bids')
                             ->whereRaw('bids.user_id = users.id')
                             ->where('bids.is_launch', true)
-                            ->where(function ($q) use ($region) {
+                            ->where(function ($q) use ($region_id) {
                                 return $q->whereJsonContains('regions', [
-                                    ['id' => $region['id']]
+                                    ['id' => $region_id]
                                 ]);
                             });
                     })->count();
