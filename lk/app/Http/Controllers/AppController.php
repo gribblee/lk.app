@@ -202,7 +202,7 @@ class AppController extends Controller
     protected function addBitrix(Request $request, Bid $Bid)
     {
         $this->bitrix24
-            ->lead('register', $request->header('referer')
+            ->lead('default', $request->header('referer')
                 ?? $request->input('referer')
                 ?? 'http://lk.leadz.monster')
             ->utm($request->all())
