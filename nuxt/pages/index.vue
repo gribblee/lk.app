@@ -202,6 +202,73 @@
             </div>
           </div>
           <div :style="{ marginTop: '20px' }">
+            <template
+              v-if="user.role == 'ROLE_MANAGER' || user.role == 'ROLE_ADMIN'"
+            >
+              <div :style="{ marginTop: '30px' }">
+                <a-row :gutter="[21, 21]">
+                  <a-col :span="2">
+                    <a-input placeholder="ID" v-model="search.id" />
+                  </a-col>
+                  <a-col :span="3">
+                    <a-input placeholder="Имя" v-model="search.name" />
+                  </a-col>
+                  <a-col :span="3">
+                    <a-input placeholder="Телефон" v-model="search.phone" />
+                  </a-col>
+                  <a-col :span="4">
+                    <a-input placeholder="Email" v-model="search.email" />
+                  </a-col>
+                  <a-col :span="4">
+                    <a-input
+                      placeholder="Имя или Email менеджера"
+                      v-model="search.manager"
+                    />
+                  </a-col>
+                  <a-col :span="3">
+                    <a-select
+                      placeholder="Роль"
+                      prop-label-prop="label"
+                      v-model="search.role"
+                      :style="{ width: '100%' }"
+                    >
+                      <a-select-option :key="0" value="" label="Не выбрано"
+                        >Не выбрано</a-select-option
+                      >
+                      <a-select-option
+                        :key="1"
+                        value="ROLE_USER"
+                        label="Пользователь"
+                        >Пользователь</a-select-option
+                      >
+                      <a-select-option
+                        :key="1"
+                        value="ROLE_MANAGER"
+                        label="Менеджер"
+                        >Менеджер</a-select-option
+                      >
+                      <a-select-option
+                        :key="1"
+                        value="ROLE_WEBMASTER"
+                        label="Вебмастер"
+                        >Вебмастер</a-select-option
+                      >
+                      <a-select-option
+                        :key="1"
+                        value="ROLE_ADMIN"
+                        label="Администратор"
+                        >Администратор</a-select-option
+                      >
+                    </a-select>
+                  </a-col>
+                  <a-col :span="3">
+                    <a-button type="primary" @click="handleSearch"
+                      >Искать <a-icon type="search"
+                    /></a-button>
+                  </a-col>
+                </a-row>
+              </div>
+            </template>
             <a-config-provider>
               <template #renderEmpty>
                 <div style="text-align: center; padding: 20px">
@@ -259,6 +326,11 @@
                 <span slot="spent_money" slot-scope="text, record">
                   {{ record.max_rate * record.deals_count }}
                 </span>
+                <template slot="user" slot-scope="text, record">
+                  <nuxt-link :to="{ path: `/users/${record.user.id}` }">
+                    {{ record.user.name }}
+                  </nuxt-link>
+                </template>
               </a-table>
             </a-config-provider>
           </div>
@@ -302,6 +374,12 @@ const columns = [
     dataIndex: "spent_money",
     key: "spent_money",
     scopedSlots: { customRender: "spent_money" },
+  },
+  {
+    title: "Клиент",
+    dataIndex: "user",
+    key: "user",
+    scopedSlots: { customRender: "user" },
   },
 ];
 
@@ -348,10 +426,24 @@ export default {
           console.log(selected, selectedRows, changeRows);
         },
       },
+      search: {
+        id: "",
+        name: "",
+        email: "",
+        phone: "",
+        email: "",
+        role: "",
+        manager: "",
+      },
       eventDisabled: true,
     };
   },
   created() {
+    if (this.user.role != "ROLE_MANAGER" && this.user.role != "ROLE_ADMIN") {
+      if (columns.length == 7) {
+        columns.splice(-1, 1);
+      }
+    }
     this.loadTable();
   },
   mounted() {
@@ -363,6 +455,12 @@ export default {
   methods: {
     handleOkTooltip() {},
     handleEndTooltip() {},
+    handleSearch() {
+      this.loadTable({
+        search: this.search,
+        is_search: true,
+      });
+    },
     loadTable(postData = {}) {
       this.isLoading = true;
       this.$axios

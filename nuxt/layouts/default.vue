@@ -7,7 +7,7 @@
       @breakpoint="onBreakpoint"
     >
       <div class="logo">
-        <img src="/logo.png" />
+        <img src="/logo.png" :style="{ width: 'auto', height: '32px'}" />
       </div>
       <a-menu
         theme="dark"
@@ -861,8 +861,8 @@ export default {
 </script>
 <style>
 #components-layout-responsive .logo {
+  text-align: center;
   height: 32px;
-  background: rgba(255, 255, 255, 0.2);
   margin: 16px;
 }
 

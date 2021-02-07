@@ -39,6 +39,7 @@ class BidController extends Controller
                     return $qw->where('manager_id', $request->user()->id);
                 });
             })
+            ->with('user')
             ->where('is_delete', false)
             ->with('direction')
             ->withCount('deals');
@@ -57,6 +58,29 @@ class BidController extends Controller
                     $bids->selectRaw('((SELECT COUNT(*) FROM deals WHERE deals.bid_id = bids.id) * bids.consumption) AS AVG_DEALS')->orderBy('AVG_DEALS', 'ASC')->where('is_launch', true);
                     break;
             }
+        }
+        if ($request->has('search') && $request->has('is_search')) {
+            $postData = [];
+            foreach ($request->search as $key => $val) {
+                if (!empty($val)) {
+                    if ($key != 'manager') {
+                        if ($key != 'id' && $key != 'role') {
+                            $postData[] = [$key, 'LIKE', "%{$val}%"];
+                        } else {
+                            $postData[] = [$key, '=', $val];
+                        }
+                    } else {
+                        $postData[] = ['manager_id', '=', User::where(function ($q) use ($key, $val) {
+                            return $q->where('name', 'LIKE', "%{$val}%")
+                                ->orWhere('email', 'LIKE', "%{$val}%");
+                        })->where('role', 'ROLE_MANAGER')->first()->id ?? 0];
+                    }
+                }
+            }
+
+            $bids->whereHas('user', function ($q) use ($request, $postData) {
+                return $q->where($postData);
+            });
         }
 
         $bidsData = $bids->where('category_id', $request->user()->category_id)->orderBy('bids.created_at', 'DESC')->paginate(10);
