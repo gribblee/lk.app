@@ -221,6 +221,12 @@ class UserController extends Controller
         }
 
         $LEAD_COUNT = ceil($bidUser->sum('user.balance') / $bidUser->count() / $bidUser->avg('consumption'));
+        $BIDS_USER_COUNT = User::whereExists('bids', function ($query) {
+            return $query->select(DB::raw(1))
+                ->from('bids')
+                ->whereRaw('bids.user_id = users.id')
+                ->where('bids.is_launch', true);
+        })->count();
         return [
             'DEALS_COUNT' => Deal::all()->count(),
             'API_APP_COUNT' => AppToken::all()->count(),
@@ -228,7 +234,7 @@ class UserController extends Controller
             'AVG_COST_PRICE' => $bidUser->avg('direction.cost_price'),
             'BUDGET_MIN_LEAD_GENERATE' => $LEAD_COUNT * 400,
             'DAY_LEAD_GENERATE' => ceil($dayLeadGenerate),
-            'BIDS_USER_COUNT' => $bidUser->count(),
+            'BIDS_USER_COUNT' => $BIDS_USER_COUNT,//$bidUser->count(),
             'MAX_BID_RATE' => $bidNoPause->max('consumption'),
             'AVG_RATE' => $bidNoPause->avg('consumption'),
             'BIDS_NO_PAUSE' => $bidNoPause->count(),
