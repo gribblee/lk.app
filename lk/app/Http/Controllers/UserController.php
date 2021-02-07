@@ -140,7 +140,7 @@ class UserController extends Controller
                             'LEAD_COUNT' => 0,
                             'USERS_COUNT' => 1,
                             'MAX_RATE' => $cl->consumption,
-                            'AVG_RATE' => $cl->consumption,
+                            'AVG_RATE' => $cl->consumption / count($cl),
                             'LAST_DEAL_CREATE' => '02-09-2020 12:33',
                             'LAST_DEAL_DISTRIBUTION' => '02-09-2020 12:33',
                             'balance' => $cl->user->balance,
