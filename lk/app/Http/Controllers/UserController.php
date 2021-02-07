@@ -246,7 +246,7 @@ class UserController extends Controller
             'DAY_LEAD_GENERATE' => ceil($dayLeadGenerate),
             'BIDS_USER_COUNT' => $BIDS_USER_COUNT, //$bidUser->count(),
             'MAX_BID_RATE' => $bidNoPause->max('consumption'),
-            'AVG_RATE' => $bidNoPause->avg('consumption'),
+            'AVG_RATE' => ceil($bidNoPause->avg('consumption')),
             'BIDS_NO_PAUSE' => $bidNoPause->count(),
             'BIDS_ON_PAUSE' => Bid::where([
                 'is_launch' => false,
