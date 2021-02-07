@@ -155,7 +155,20 @@ class UserController extends Controller
             foreach ($regions as $region) {
                 if (count($region) > 0) {
                     $region['AVG_RATE'] = $region['AVG_RATE'] / $region['COUNT'];
-                    $region['USERS_COUNT'] = count($bidCollect) / $region['COUNT'];
+                    $region['USERS_COUNT'] = User::whereExists(function ($query) use ($region) {
+                        return $query->select(\DB::raw(1))
+                            ->from('bids')
+                            ->whereRaw('bids.user_id = users.id')
+                            ->where('bids.is_launch', true)
+                            ->where(function ($q) use ($region) {
+                                return $q->whereJsonContains('regions', [
+                                    ['id' => $region['id']]
+                                ])
+                                    ->orWhere(function ($qw) {
+                                        return $qw->whereJsonLength('regions', 0);
+                                    });
+                            });
+                    })->count();
                     $region['LEAD_COUNT'] = ceil($region['balance'] / $region['AVG_RATE']);
                     $region['budget'] = $region['direction']->cost_price * $region['LEAD_COUNT'];
 
@@ -234,7 +247,7 @@ class UserController extends Controller
             'AVG_COST_PRICE' => $bidUser->avg('direction.cost_price'),
             'BUDGET_MIN_LEAD_GENERATE' => $LEAD_COUNT * 400,
             'DAY_LEAD_GENERATE' => ceil($dayLeadGenerate),
-            'BIDS_USER_COUNT' => $BIDS_USER_COUNT,//$bidUser->count(),
+            'BIDS_USER_COUNT' => $BIDS_USER_COUNT, //$bidUser->count(),
             'MAX_BID_RATE' => $bidNoPause->max('consumption'),
             'AVG_RATE' => $bidNoPause->avg('consumption'),
             'BIDS_NO_PAUSE' => $bidNoPause->count(),
