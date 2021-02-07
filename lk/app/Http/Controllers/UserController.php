@@ -221,7 +221,7 @@ class UserController extends Controller
         }
 
         $LEAD_COUNT = ceil($bidUser->sum('user.balance') / $bidUser->count() / $bidUser->avg('consumption'));
-        $BIDS_USER_COUNT = User::whereExists('bids', function ($query) {
+        $BIDS_USER_COUNT = User::whereExists(function ($query) {
             return $query->select(DB::raw(1))
                 ->from('bids')
                 ->whereRaw('bids.user_id = users.id')
