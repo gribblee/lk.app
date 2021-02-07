@@ -165,7 +165,7 @@ class UserController extends Controller
                                 ]);
                             });
                     })->count();
-                    $region['AVG_RATE'] = ceil($region['AVG_RATE'] / ($region['COUNT'] * 1.8));
+                    $region['AVG_RATE'] = ceil($region['AVG_RATE'] / ($region['COUNT']));
                     $region['LEAD_COUNT'] = ceil($region['balance'] / $region['AVG_RATE']);
                     $region['budget'] = $region['direction']->cost_price * $region['LEAD_COUNT'];
 
