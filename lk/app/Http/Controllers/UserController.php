@@ -230,13 +230,13 @@ class UserController extends Controller
             $LastNoDistribution = 'Нету';
         }
 
-        $LEAD_COUNT = ceil($bidUser->sum('user.balance') / $bidUser->count() / $bidUser->avg('consumption'));
         $BIDS_USER_COUNT = User::whereExists(function ($query) {
             return $query->select(\DB::raw(1))
                 ->from('bids')
                 ->whereRaw('bids.user_id = users.id')
                 ->where('bids.is_launch', true);
         })->count();
+        $LEAD_COUNT = ceil($bidUser->sum('user.balance') / $BIDS_USER_COUNT / $bidUser->avg('consumption'));
         return [
             'DEALS_COUNT' => Deal::all()->count(),
             'API_APP_COUNT' => AppToken::all()->count(),
