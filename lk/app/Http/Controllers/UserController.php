@@ -236,7 +236,7 @@ class UserController extends Controller
                 ->whereRaw('bids.user_id = users.id')
                 ->where('bids.is_launch', true);
         })->count();
-        $LEAD_COUNT = ceil($bidUser->sum('user.balance') / $BIDS_USER_COUNT / $bidUser->avg('consumption'));
+        $LEAD_COUNT = ceil($bidUser->sum('user.balance') / $bidUser->avg('consumption'));
         return [
             'DEALS_COUNT' => Deal::all()->count(),
             'API_APP_COUNT' => AppToken::all()->count(),
