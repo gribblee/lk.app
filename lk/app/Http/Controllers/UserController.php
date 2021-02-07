@@ -175,7 +175,7 @@ class UserController extends Controller
                         'LEAD_COUNT' => $region['LEAD_COUNT'],
                         'USERS_COUNT' => $region['USERS_COUNT'],
                         'MAX_RATE' => $region['MAX_RATE'],
-                        'AVG_RATE' => ($region['MAX_RATE'] / $region['USERS_COUNT']) / $region['AVG_RATE'],
+                        'AVG_RATE' => $region['AVG_RATE'] / $region['MAX_RATE'],
                         'LAST_DEAL_CREATE' => $region['LAST_DEAL_CREATE'],
                         'LAST_DEAL_DISTRIBUTION' => $region['LAST_DEAL_DISTRIBUTION'],
                         'balance' => $region['balance'],
