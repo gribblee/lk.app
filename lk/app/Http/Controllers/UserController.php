@@ -194,7 +194,7 @@ class UserController extends Controller
         $bidUser = Bid::with('user')
             ->groupByRaw('bids.user_id, bids.id')
             ->get();
-        $dayLeadGenerate = (($bidUser->avg('user.balance') / $bidUser->avg('consumption')) * ($bidUser->sum('daily_limit') || 1));
+        $dayLeadGenerate = (($bidUser->avg('user.balance') / $bidUser->avg('consumption')) * ($bidUser->avg('daily_limit') || 1));
         $LastDealDistributionData = Deal::orderByDesc('updated_at')->first();
         $LastDealCreateData = Deal::orderByDesc('created_at')->first();
         $LastNoDistributionData = Deal::where('is_delete', false)
