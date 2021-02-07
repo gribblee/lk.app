@@ -154,7 +154,7 @@ class UserController extends Controller
             // if (count($regions) > 0 || count($regions[0]) > 0) {
             foreach ($regions as $region_id => $region) {
                 if (count($region) > 0) {
-                    $region['AVG_RATE'] = $region['AVG_RATE'] / $region['COUNT'];
+                    $region['AVG_RATE'] = $region['AVG_RATE'] / ($region['COUNT'] / $region['USERS_COUNT']);
                     $region['USERS_COUNT'] = User::whereExists(function ($query) use ($region_id) {
                         return $query->select(\DB::raw(1))
                             ->from('bids')
@@ -175,7 +175,7 @@ class UserController extends Controller
                         'LEAD_COUNT' => $region['LEAD_COUNT'],
                         'USERS_COUNT' => $region['USERS_COUNT'],
                         'MAX_RATE' => $region['MAX_RATE'],
-                        'AVG_RATE' => ceil($region['AVG_RATE'] / $region['USERS_COUNT']),
+                        'AVG_RATE' => $region['AVG_RATE'],
                         'LAST_DEAL_CREATE' => $region['LAST_DEAL_CREATE'],
                         'LAST_DEAL_DISTRIBUTION' => $region['LAST_DEAL_DISTRIBUTION'],
                         'balance' => $region['balance'],
