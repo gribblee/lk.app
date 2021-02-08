@@ -478,7 +478,7 @@ export default {
           this.userBalance = data.balance;
           this.statistic = data.statistic;
           this.isLoading = false;
-          this.pagination.total = data.total;
+          this.pagination.total = data.bids.total;
         })
         .catch((_err) => {
           console.error(_err);
