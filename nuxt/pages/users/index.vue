@@ -53,33 +53,65 @@
           </div>
           <div :style="{ marginTop: '30px' }">
             <a-row :gutter="[21, 21]">
-                <a-col :span="2">
-                    <a-input placeholder="ID" v-model="search.id" />
-                </a-col>
-                <a-col :span="3">
-                    <a-input placeholder="Имя" v-model="search.name" />
-                </a-col>
-                <a-col :span="3">
-                    <a-input placeholder="Телефон" v-model="search.phone" />
-                </a-col>
-                <a-col :span="4">
-                    <a-input placeholder="Email" v-model="search.email" />
-                </a-col>
-                <a-col :span="4">
-                    <a-input placeholder="Имя или Email менеджера" v-model="search.manager" />
-                </a-col>
-                <a-col :span="3">
-                    <a-select placeholder="Роль" prop-label-prop="label" v-model="search.role" :style="{ width: '100%' }">
-                        <a-select-option :key="0" value="" label="Не выбрано">Не выбрано</a-select-option>
-                        <a-select-option :key="1" value="ROLE_USER" label="Пользователь">Пользователь</a-select-option>
-                        <a-select-option :key="1" value="ROLE_MANAGER" label="Менеджер">Менеджер</a-select-option>
-                        <a-select-option :key="1" value="ROLE_WEBMASTER" label="Вебмастер">Вебмастер</a-select-option>
-                        <a-select-option :key="1" value="ROLE_ADMIN" label="Администратор">Администратор</a-select-option>
-                    </a-select>
-                </a-col>
-                <a-col :span="3">
-                    <a-button type="primary" @click="handleSearch">Искать <a-icon type="search" /></a-button>
-                </a-col>
+              <a-col :span="2">
+                <a-input placeholder="ID" v-model="search.id" />
+              </a-col>
+              <a-col :span="3">
+                <a-input placeholder="Имя" v-model="search.name" />
+              </a-col>
+              <a-col :span="3">
+                <a-input placeholder="Телефон" v-model="search.phone" />
+              </a-col>
+              <a-col :span="4">
+                <a-input placeholder="Email" v-model="search.email" />
+              </a-col>
+              <a-col :span="4">
+                <a-input
+                  placeholder="Имя или Email менеджера"
+                  v-model="search.manager"
+                />
+              </a-col>
+              <a-col :span="3">
+                <a-select
+                  placeholder="Роль"
+                  prop-label-prop="label"
+                  v-model="search.role"
+                  :style="{ width: '100%' }"
+                >
+                  <a-select-option :key="0" value="" label="Не выбрано"
+                    >Не выбрано</a-select-option
+                  >
+                  <a-select-option
+                    :key="1"
+                    value="ROLE_USER"
+                    label="Пользователь"
+                    >Пользователь</a-select-option
+                  >
+                  <a-select-option
+                    :key="1"
+                    value="ROLE_MANAGER"
+                    label="Менеджер"
+                    >Менеджер</a-select-option
+                  >
+                  <a-select-option
+                    :key="1"
+                    value="ROLE_WEBMASTER"
+                    label="Вебмастер"
+                    >Вебмастер</a-select-option
+                  >
+                  <a-select-option
+                    :key="1"
+                    value="ROLE_ADMIN"
+                    label="Администратор"
+                    >Администратор</a-select-option
+                  >
+                </a-select>
+              </a-col>
+              <a-col :span="3">
+                <a-button type="primary" @click="handleSearch"
+                  >Искать <a-icon type="search"
+                /></a-button>
+              </a-col>
             </a-row>
           </div>
           <div :style="{ margin: '20px -24px 0 -24px' }">
@@ -103,10 +135,22 @@
               </span>
               <span slot="manager" slot-scope="text, record">
                 <template v-if="record.manager != null">
-                  <nuxt-link :to="{ name: 'users-id', params: { id: record.manager.id } }">{{ record.manager.name }}</nuxt-link>
+                  <nuxt-link
+                    :to="{
+                      name: 'users-id',
+                      params: { id: record.manager.id },
+                    }"
+                    >{{ record.manager.name }}</nuxt-link
+                  >
                 </template>
                 <template v-else>Без менеджера</template>
               </span>
+              <template slot="was_online" slot-scope="text">
+                {{ dateFormat(text) }}
+              </template>
+              <template slot="created_at" slot-scope="text">
+                {{ dateFormat(text) }}
+              </template>
             </a-table>
           </div>
         </div>
@@ -115,64 +159,73 @@
   </a-layout-content>
 </template>
 <script>
+import moment from "moment";
+
 const columns = [
   {
-    title: 'ID',
-    dataIndex: 'id',
-    key: 'id',
+    title: "ID",
+    dataIndex: "id",
+    key: "id",
   },
   {
-    title: 'Имя',
-    dataIndex: 'name',
-    key: 'name',
-    scopedSlots: { customRender: 'name' },
+    title: "Имя",
+    dataIndex: "name",
+    key: "name",
+    scopedSlots: { customRender: "name" },
   },
   {
-    title: 'Телефон',
-    dataIndex: 'phone',
-    key: 'phone',
-    scopedSlots: { customRender: 'phone' },
+    title: "Телефон",
+    dataIndex: "phone",
+    key: "phone",
+    scopedSlots: { customRender: "phone" },
   },
   {
-    title: 'E-mail',
-    dataIndex: 'email',
-    key: 'email',
+    title: "E-mail",
+    dataIndex: "email",
+    key: "email",
   },
   {
-    title: 'Роль',
-    dataIndex: 'role',
-    key: 'role',
-    scopedSlots: { customRender: 'role' },
+    title: "Роль",
+    dataIndex: "role",
+    key: "role",
+    scopedSlots: { customRender: "role" },
   },
   {
-    title: 'Баланс',
-    dataIndex: 'balance',
-    key: 'balance',
-    scopedSlots: { customRender: 'balance' },
+    title: "Баланс",
+    dataIndex: "balance",
+    key: "balance",
+    scopedSlots: { customRender: "balance" },
   },
   {
-    title: 'Количество заявок',
-    dataIndex: 'bids_count',
-    key: 'bids_count',
+    title: "Количество заявок",
+    dataIndex: "bids_count",
+    key: "bids_count",
   },
   {
-      title: 'Активность',
-      dataIndex: 'date_online',
-      key: 'date_online'
+    title: "Активность",
+    dataIndex: "was_online",
+    key: "was_online",
+    scopedSlots: { customRender: "was_online" },
   },
   {
-    title: 'Менеджер',
-    dataIndex: 'manager',
-    key: 'manager',
-    scopedSlots: { customRender: 'manager' },
+    title: "Дата регистрации",
+    dataIndex: "created_at",
+    key: "created_at",
+    scopedSlots: { customRender: "created_at" },
   },
-]
+  {
+    title: "Менеджер",
+    dataIndex: "manager",
+    key: "manager",
+    scopedSlots: { customRender: "manager" },
+  },
+];
 export default {
-  middleware: 'roleAdmin',
+  middleware: "roleAdmin",
   head() {
     return {
-      title: 'Пользователи'
-    }
+      title: "Пользователи",
+    };
   },
   data() {
     return {
@@ -183,44 +236,47 @@ export default {
       pagination: {},
       loading: false,
       search: {
-          id: '',
-          name: '',
-          email: '',
-          phone: '',
-          email: '',
-          role: '',
-          manager: '',
+        id: "",
+        name: "",
+        email: "",
+        phone: "",
+        email: "",
+        role: "",
+        manager: "",
       },
       titleRole: {
-        ROLE_ADMIN: 'Администратор',
-        ROLE_WEBMASTER: 'Вебмастер',
-        ROLE_USER: 'Пользователь',
-        ROLE_MANAGER: 'Менеджер',
-        ROLE_ACCCOUNTANT: 'Бухгалтер'
+        ROLE_ADMIN: "Администратор",
+        ROLE_WEBMASTER: "Вебмастер",
+        ROLE_USER: "Пользователь",
+        ROLE_MANAGER: "Менеджер",
+        ROLE_ACCCOUNTANT: "Бухгалтер",
       },
       rowSelection: {
         onChange: (selectedRowKeys, selectedRows) => {
           console.log(
             `selectedRowKeys:${selectedRowKeys}`,
-            'selectedRows: ',
+            "selectedRows: ",
             selectedRows
-          )
-          this.eventDisabled = selectedRows.length === 0
-          this.selectedRows = selectedRows
+          );
+          this.eventDisabled = selectedRows.length === 0;
+          this.selectedRows = selectedRows;
         },
         onSelect: (record, selected, selectedRows) => {
-          console.log(record, selected, selectedRows)
+          console.log(record, selected, selectedRows);
         },
         onSelectAll: (selected, selectedRows, changeRows) => {
-          console.log(selected, selectedRows, changeRows)
+          console.log(selected, selectedRows, changeRows);
         },
       },
-    }
+    };
   },
   created() {
-    this.loadUsers()
+    this.loadUsers();
   },
   methods: {
+    dateFormat(date) {
+      return moment(date).format("DD-MM-YYYY hh:mm:ss", true);
+    },
     handleTableChange(pagination, filters, sorters) {
       const pager = { ...this.pagination };
       pager.current = pagination.current;
@@ -229,64 +285,64 @@ export default {
     },
     addUser() {
       this.$axios
-        .post('/user/add')
+        .post("/user/add")
         .then(({ data }) => {
           if (data.success === true) {
-            this.$router.push(`/users/${data.user_id}`)
+            this.$router.push(`/users/${data.user_id}`);
           } else {
-            this.$message.error(data.error)
+            this.$message.error(data.error);
           }
         })
         .catch((err) => {
-          console.error(err)
-        })
+          console.error(err);
+        });
     },
     handleMenuClick(_e) {
       switch (_e.key) {
         case 1:
           this.loadUsers({
             is_delete: true,
-          })
-          break
+          });
+          break;
         case 2:
           this.loadUsers({
             is_delete: false,
-          })
-          break
+          });
+          break;
       }
     },
     handleActionClick(_e) {
       if (_e.key == 1) {
         this.$axios
-          .post('/user/delete', {
+          .post("/user/delete", {
             ids: this.selectedRows,
           })
           .then(({ data }) => {
             if (data.success == true) {
               this.loadUsers({
                 is_delete: false,
-              })
+              });
             }
-          })
+          });
       }
-            if (_e.key == 2) {
+      if (_e.key == 2) {
         this.$axios
-          .post('/user/active', {
+          .post("/user/active", {
             ids: this.selectedRows,
           })
           .then(({ data }) => {
             if (data.success == true) {
               this.loadUsers({
                 is_delete: false,
-              })
+              });
             }
-          })
+          });
       }
     },
     handleSearch(e) {
-        this.loadUsers({
-            search: this.search
-        });
+      this.loadUsers({
+        search: this.search,
+      });
     },
     loadUsers(postData = {}, currentPage = 1) {
       this.loading = true;
@@ -300,9 +356,9 @@ export default {
           this.loading = false;
         })
         .catch((_err) => {
-          console.error(_err)
-        })
+          console.error(_err);
+        });
     },
   },
-}
+};
 </script>
