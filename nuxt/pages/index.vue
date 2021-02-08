@@ -466,8 +466,8 @@ export default {
         is_search: true,
       });
     },
-    handleTableChange(page) {
-      this.pagination.current = page;
+    handleTableChange(pagination, filters, sorter) {
+      this.pagination.current = pagination.current;
       this.loadTable();
     },
     loadTable(postData = {}) {
