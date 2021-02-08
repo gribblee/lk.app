@@ -281,6 +281,7 @@
                 :data-source="data"
                 :row-selection="rowSelection"
                 :loading="isLoading"
+                :pagination="pagination"
                 @change="handleTableChange"
               >
                 <template slot="day_limit" slot-scope="text, record">
