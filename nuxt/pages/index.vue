@@ -281,6 +281,7 @@
                 :data-source="data"
                 :row-selection="rowSelection"
                 :loading="isLoading"
+                @change="handleTableChange"
               >
                 <template slot="day_limit" slot-scope="text, record">
                   <template v-if="record.day_limit <= 0"
@@ -401,7 +402,10 @@ export default {
       welcomeTooltip: true,
       helpTooltip: "0",
       data: [],
-      pagination: {},
+      pagination: {
+        current: 1,
+        total: 0,
+      },
       columns,
       isLoading: true,
       directionPPtext: "Все направления",
@@ -461,15 +465,20 @@ export default {
         is_search: true,
       });
     },
+    handleTableChange(page) {
+      this.pagination.current = page;
+      this.loadTable();
+    },
     loadTable(postData = {}) {
       this.isLoading = true;
       this.$axios
-        .post("/bids", postData)
+        .post(`/bids?page=${this.pagination.current}`, postData)
         .then(({ data }) => {
           this.data = data.bids.data;
           this.userBalance = data.balance;
           this.statistic = data.statistic;
           this.isLoading = false;
+          this.pagination.total = data.total;
         })
         .catch((_err) => {
           console.error(_err);
