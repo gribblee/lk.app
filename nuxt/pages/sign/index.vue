@@ -1,101 +1,121 @@
 <template>
-  <div class="form-sign">
-    <div class="form">
-      <div class="form__type" :class="classAuth">
-        <button class="form__type-auth" @click="handleAction('reg', $event)">
-          Регистрация
-        </button>
-        <button class="form__type-reg" @click="handleAction('auth', $event)">
-          Войти
-        </button>
-      </div>
-      <div class="forms">
-        <div class="forms__slider" :class="classSlider">
-          <div class="form__reg">
-            <div class="form-area">
-              <b-textfield
-                label="Имя"
-                class="textfield-group"
-                v-model="formReg.name"
-              />
-              <div class="form-error">
-                <span
-                  v-for="(errName, index) in errorsData.name"
-                  :key="index"
-                  >{{ errName }}</span
+  <div class="form-signInUp">
+    <a-card title="Вход в панель">
+      <a-spin :spinning="isLoading" :delay="delayTime">
+        <a-icon slot="indicator" type="loading" style="font-size: 24px" spin />
+        <a-tabs default-active-key="1">
+          <a-tab-pane key="1">
+            <span slot="tab">
+              <a-icon type="login" />
+              Авторизация
+            </span>
+            <a-form-model
+              :model="formSignIn"
+              :rules="rules.signIn"
+              ref="formSignIn"
+            >
+              <a-form-model-item
+                label="Код из СМС"
+                prop="code"
+                v-if="signIsCode"
+              >
+                <a-input
+                  v-model="formSignIn.code"
+                  placeholder="Код из смс"
+                  v-mask="maskCode"
+                />
+              </a-form-model-item>
+              <a-form-model-item
+                label="Телефон"
+                prop="phone"
+                v-if="!signIsCode"
+              >
+                <a-input
+                  v-model="formSignIn.phone"
+                  placeholder="Телефон"
+                  v-mask="maskPhone"
+                />
+              </a-form-model-item>
+            </a-form-model>
+            <a-form-model-item>
+              <a-alert :message="errorMsg" type="error" v-show="isError" />
+            </a-form-model-item>
+            <a-form-model-item>
+              <a-button type="primary" @click="handleSignIn">
+                <template v-if="!signIsCode">Далее</template>
+                <template v-if="signIsCode">Войти</template>
+              </a-button>
+              <a-button type="link" @click="() => (signIsCode = !signIsCode)">
+                <template v-if="!signIsCode">У меня уже есть код</template>
+                <template v-if="signIsCode">Вернуться</template></a-button
+              >
+            </a-form-model-item>
+          </a-tab-pane>
+          <a-tab-pane key="2">
+            <span slot="tab">
+              <a-icon type="profile" />
+              Регистрация
+            </span>
+            <a-form-model
+              :model="formSignUp"
+              :rules="rules.signUp"
+              ref="formSignUp"
+            >
+              <template v-if="!signUpIsCode">
+                <a-form-model-item label="Имя" prop="name">
+                  <a-input v-model="formSignUp.name" placeholder="Имя" />
+                </a-form-model-item>
+                <a-form-model-item label="Email" prop="email">
+                  <a-input v-model="formSignUp.email" placeholder="Email" />
+                </a-form-model-item>
+                <a-form-model-item
+                  label="Телефон"
+                  prop="phone"
+                  v-mask="maskPhone"
                 >
-              </div>
-              <b-textfield
-                label="Email"
-                class="textfield-group"
-                v-model="formReg.email"
-              />
-              <div class="form-error">
-                <span
-                  v-for="(errEmail, index) in errorsData.email"
-                  :key="index"
-                  >{{ errEmail }}</span
+                  <a-input v-model="formSignUp.phone" placeholder="Телефон" />
+                </a-form-model-item>
+                <a-form-model-item prop="isOfferta">
+                  <a-checkbox v-model="formSignUp.isOfferta"
+                    >Я согласен с
+                    <a href="https://docs.google.com/document/d/1jQdxmXkYby1lG2IJ_wJdp8xzkdIhMsIswxI2OSAgr9o/edit" target="_blank"
+                      >правилами пользования платформой</a
+                    ></a-checkbox
+                  >
+                </a-form-model-item>
+              </template>
+              <a-form-model-item
+                label="Код из СМС"
+                prop="code"
+                v-if="signUpIsCode"
+              >
+                <a-input
+                  v-model="formSignUp.code"
+                  placeholder="Код из смс"
+                  v-mask="maskCode"
+                />
+              </a-form-model-item>
+              <a-form-model-item>
+                <a-alert type="error" :message="errorMsg" banner v-show="isError" />
+              </a-form-model-item>
+              <a-form-model-item>
+                <a-button type="primary" @click="handleSignUp">
+                  <template v-if="!signUpIsCode">Далее</template>
+                  <template v-if="signUpIsCode">Войти</template>
+                </a-button>
+                <a-button
+                  type="link"
+                  @click="() => (signUpIsCode = !signUpIsCode)"
                 >
-              </div>
-              <b-textfield
-                label="Номер телефона без 8"
-                v-model="formReg.phone"
-                class="textfield-group"
-                type="phone"
-              />
-              <div class="form-error">
-                <span
-                  v-for="(errPhone, index) in errorsData.phone"
-                  :key="index"
-                  >{{ errPhone }}</span
+                  <template v-if="!signUpIsCode">У меня уже есть код</template>
+                  <template v-if="signUpIsCode">Вернуться</template></a-button
                 >
-              </div>
-              <div class="form-submit">
-                <b-button title="Далее" @click="handleSubmit" />
-              </div>
-            </div>
-          </div>
-          <div class="form__auth">
-            <div class="form-area">
-              <b-textfield
-                label="Номер телефона без 8"
-                v-model="formAuth.phone"
-                class="textfield-group"
-                type="phone"
-              />
-              <div class="form-error">
-                <span
-                  v-for="(errPhone, index) in errorsData.phone"
-                  :key="index"
-                  >{{ errPhone }}</span
-                >
-              </div>
-              <div class="form-error" v-if="isError">{{ errorMsg }}</div>
-              <div class="form-submit">
-                <b-button title="Далее" @click="handleSubmit" />
-              </div>
-            </div>
-          </div>
-          <div class="form__code">
-            <div class="form-area">
-              <b-textfield
-                label="Код из смс"
-                v-model="formToken.passphrase"
-                class="textfield-group"
-                type="code"
-              />
-              <div class="form-error" v-if="isError">{{ errorMsg }}</div>
-              <div class="form-submit">
-                <b-button title="Получить клиентов" @click="handleCodeSubmit" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <span :style="{ marginTop: '25px' }">
-        <b-button type="link" :title="hasCodeTitle" @click="handleHasCode" />
-      </span>
-    </div>
+              </a-form-model-item>
+            </a-form-model>
+          </a-tab-pane>
+        </a-tabs>
+      </a-spin>
+    </a-card>
   </div>
 </template>
 <script>
@@ -113,94 +133,143 @@ export default {
   },
   data() {
     return {
-      hasCodeTitle: "У меня уже есть код",
-      backState: {
-        typeAuth: "",
-        classSlider: "",
+      isLoading: false,
+      signIsCode: false,
+      signUpIsCode: false,
+      delayTime: 500,
+      rules: {
+        signIn: {
+          phone: {
+            required: true,
+            message: "Поле телефон обязательно",
+          },
+          code: {
+            required: true,
+            message: "Поле с кодом обязательно",
+          },
+        },
+        signUp: {
+          name: [
+            {
+              required: true,
+              message: "Поле имя обязательно",
+            },
+          ],
+          email: [
+            {
+              required: true,
+              message: "Поле Email обязательно",
+            },
+          ],
+          phone: [
+            {
+              required: true,
+              message: "Поле телефон обязательно",
+            },
+          ],
+          isOfferta: [
+            {
+              required: true,
+              message: "Для регистрации вы должны согласиться с условиями",
+            },
+          ],
+          code: [
+            {
+              required: true,
+              message: "Поле с кодом обязательно",
+            },
+          ],
+        },
       },
+      formSignUp: {
+        email: "",
+        name: "",
+        phone: "",
+        code: "",
+      },
+      formSignIn: {
+        phone: "",
+        code: "",
+      },
+      maskPhone: "+7 (###) ###-##-##",
+      maskCode: "###-###",
       isError: false,
       errorMsg: "",
       errorsData: {},
-      typeAuth: "reg",
-      classAuth: "form__type--l",
-      classSlider: "forms__slider--1",
-      formReg: {
-        name: "",
-        email: "",
-        phone: "",
-      },
-      formAuth: {
-        phone: "",
-      },
-      formToken: {
-        passphrase: "",
-      },
     };
   },
   created() {},
   mounted() {},
   methods: {
-    handleAction(type, e) {
-      this.resetBackState();
-      this.typeAuth = type;
-      if (type == "auth") {
-        this.classAuth = "form__type--r";
-        this.classSlider = "forms__slider--2";
-      } else {
-        this.classAuth = "form__type--l";
-        this.classSlider = "forms__slider--1";
-      }
+    handleSignUp() {
+      this.$refs.formSignUp.validate((valid) => {
+        if (valid) {
+          if (!this.signUpIsCode) {
+            this.isLoading = true;
+            const { name, email, phone } = this.formSignUp;
+            this.$axios
+              .post("/register", {
+                name: name,
+                email: email,
+                phone: phone,
+              })
+              .then(({ data }) => {
+                if (data.success == true) {
+                  localStorage.setItem("auth.validation", data.token);
+                } else {
+                  this.isError = true;
+                  this.errorsData = data.errors;
+                }
+                this.signUpIsCode = true;
+                this.isLoading = false;
+              })
+              .catch((err) => {
+                console.error(err);
+              });
+          } else {
+            this.handleCodeSubmit(this.formSignUp);
+          }
+        }
+      });
     },
-    handleSubmit(e) {
-      if (this.typeAuth == "reg") {
-        /**
-         * Регистрация
-         */
-        this.$axios
-          .post("/register", this.formReg)
-          .then(({ data }) => {
-            if (data.success == true) {
-              this.typeAuth = "code";
-              this.classSlider = "form__slider--3";
-              localStorage.setItem("auth.validation", data.token);
-              this.typeAuth = "code";
-              this.classSlider = "forms__slider--3";
-            } else {
-              this.isError = true;
-              this.errorsData = data.errors;
-            }
-          })
-          .catch((err) => {
-            console.error(err);
-          });
-      } else {
-        /**
-         * Авторизация
-         */
-        this.$axios
-          .post("/login", this.formAuth)
-          .then(({ data }) => {
-            if (data.success == true) {
-              this.typeAuth = "code";
-              this.classSlider = "form__slider--3";
-              localStorage.setItem("auth.validation", data.token);
-              this.errorsData = data.errors;
-              this.typeAuth = "code";
-              this.classSlider = "forms__slider--3";
-            } else {
-              this.isError = true;
-              this.errorsData = data.errors;
-            }
-          })
-          .catch((err) => {
-            console.error(err);
-          });
-      }
+    handleSignIn() {
+      this.$refs.formSignIn.validate((valid) => {
+        if (valid) {
+          this.isLoading = true;
+          if (!this.signIsCode) {
+            const { phone } = this.formSignIn;
+            this.$axios
+              .post("/login", {
+                phone: phone,
+              })
+              .then(({ data }) => {
+                if (data.success == true) {
+                  this.signIsCode = true;
+                  localStorage.setItem("auth.validation", data.token);
+                  this.errorsData = data.errors;
+                } else {
+                  this.isError = true;
+                  this.errorsData = data.errors;
+                }
+                this.isLoading = false;
+              })
+              .catch((err) => {
+                console.error(err);
+              });
+          } else {
+            this.handleCodeSubmit(this.formSignIn);
+          }
+        } else {
+          console.log("error submit!!");
+          return false;
+        }
+      });
     },
-    handleCodeSubmit(e) {
+    handleCodeSubmit(form) {
       /**
        * Верификация кода
        */
+      this.isLoading = true;
       if (localStorage.getItem("auth.validation")) {
         this.$axios.setHeader(
           "Authorize-Validation",
@@ -208,7 +277,9 @@ export default {
         );
         this.$auth
           .login({
-            data: this.formToken,
+            data: {
+              passphrase: form.code,
+            },
           })
           .then(({ data }) => {
             if (data.success == true) {
@@ -218,30 +289,13 @@ export default {
               this.isError = true;
               this.errorMsg = data.error;
             }
+            this.isLoading = false;
           })
           .catch((err) => {
             console.error(err);
+            this.isLoading = false;
           });
       }
-    },
-    handleHasCode(e) {
-      if (this.typeAuth != "code") {
-        this.backState.typeAuth = this.typeAuth;
-        this.backState.classSlider = this.classSlider;
-        this.hasCodeTitle = "Вернуться";
-
-        this.typeAuth = "code";
-        this.classSlider = "forms__slider--3";
-      } else {
-        this.typeAuth = this.backState.typeAuth;
-        this.classSlider = this.backState.classSlider;
-        this.resetBackState();
-      }
-    },
-
-    resetBackState() {
-      this.hasCodeTitle = "У меня уже есть код";
-      this.backState = {};
     },
   },
 };
