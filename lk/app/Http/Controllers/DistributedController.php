@@ -65,11 +65,11 @@ class DistributedController extends Controller
                 (FLOOR(RANDOM() * consumption))
             ) AS weight')
             ->where('direction_id', $deal->direction_id)
-            ->where(function ($qAnd) use ($request) {
-                return $qAnd->where(function ($query) use ($request) {
-                    return $query->when(isset($request->region->id), function ($q) use ($request) {
+            ->where(function ($qAnd) use ($deal) {
+                return $qAnd->where(function ($query) use ($deal) {
+                    return $query->when(isset($deal->region->id), function ($q) use ($deal) {
                         return $q->whereJsonContains('regions', [
-                            ['id' => $request->region->id]
+                            ['id' => $deal->region->id]
                         ]);
                     })->orWhere(function ($query) {
                         return $query->whereJsonLength('regions', 0);
@@ -87,6 +87,7 @@ class DistributedController extends Controller
             ->where('is_launch', true)
             ->where('is_delete', false)
             ->orderByDesc('weight')->first();
+            
             if ($bid) {
                 $user = User::findOrFail($bid->user->id);
                 $user->balance = $user->balance - $bid->consumption;
