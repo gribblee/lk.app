@@ -60,34 +60,34 @@ class DistributedController extends Controller
              * BEGIN CAAP
              */
             $bid = Bid::with('user')
-            ->with('direction')
-            ->selectRaw('*, (
+                ->with('direction')
+                ->selectRaw('*, (
                 (FLOOR(RANDOM() * consumption))
             ) AS weight')
-            ->where('direction_id', $deal->direction_id)
-            ->where(function ($qAnd) use ($deal) {
-                return $qAnd->where(function ($query) use ($deal) {
-                    return $query->when($deal->region->id, function ($q) use ($deal) {
-                        return $q->whereJsonContains('regions', [
-                            ['id' => $deal->region->id]
-                        ]);
-                    })->orWhere(function ($query) {
-                        return $query->whereJsonLength('regions', 0);
-                    });
-                })->whereRaw("(select count(*) from
+                ->where('direction_id', $deal->direction_id)
+                ->where(function ($qAnd) use ($deal) {
+                    return $qAnd->where(function ($query) use ($deal) {
+                        return $query->when($deal->region->id, function ($q) use ($deal) {
+                            return $q->whereJsonContains('regions', [
+                                ['id' => $deal->region->id]
+                            ]);
+                        })->orWhere(function ($query) {
+                            return $query->whereJsonLength('regions', 0);
+                        });
+                    })->whereRaw("(select count(*) from
                             deals where bids.id = (deals.bid_id)
                             and deals.created_at = date_trunc('day', current_date)
                         ) < bids.daily_limit OR bids.daily_limit = 0");
-            })
-            ->whereExists(function ($query) {
-                return $query->select(\DB::raw(1))
-                    ->from('users')
-                    ->whereRaw('bids.consumption <= users.balance');
-            })
-            ->where('is_launch', true)
-            ->where('is_delete', false)
-            ->orderByDesc('weight')->first();
-            
+                })
+                ->whereExists(function ($query) {
+                    return $query->select(\DB::raw(1))
+                        ->from('users')
+                        ->whereRaw('bids.consumption <= users.balance');
+                })
+                ->where('is_launch', true)
+                ->where('is_delete', false)
+                ->orderByDesc('weight')->first();
+
             if ($bid) {
                 $user = User::findOrFail($bid->user->id);
                 $user->balance = $user->balance - $bid->consumption;
@@ -110,16 +110,17 @@ class DistributedController extends Controller
                     'success' => true,
                     'msg' => 'Статус обновлён, заявка распределена'
                 ]);
+            } else {
+                /**
+                 * END CAAP
+                 */
+                $deal->status_id = $statusNo->id;
+                $deal->save();
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Статус не обновлён, заявка не распределена'
+                ]);
             }
-            /**
-             * END CAAP
-             */
-            $deal->status_id = $statusNo->id;
-            $deal->save();
-            return response()->json([
-                'success' => false,
-                'error' => 'Статус не обновлён, заявка не распределена'
-            ]);
         }
         return response('ДОСУТП ЗАПРЕШЁН', 403);
     }
