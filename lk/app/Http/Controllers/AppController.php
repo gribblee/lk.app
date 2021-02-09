@@ -44,29 +44,31 @@ class AppController extends Controller
      */
     public function push(Request $request, string $hash)
     {
-
-        $Deal = new Deal;
+        $AppToken = AppToken::where('hash', $hash)->first();
         $Bid = Bid::with('user')
             ->with('direction')
             ->selectRaw('*, (
                 (FLOOR(RANDOM() * consumption))
             ) AS weight')
-            ->where(function ($query) use ($request) {
-                return $query->when(isset($request->region->id), function ($q) use ($request) {
-                    return $q->whereJsonContains('regions', [
-                        ['id' => $request->region->id]
-                    ]);
-                })->orWhere(function ($query) {
-                    return $query->whereJsonLength('regions', 0);
-                });
+            ->where('direction_id', $AppToken->direction_id)
+            ->where(function ($qAnd) use ($request) {
+                return $qAnd->where(function ($query) use ($request) {
+                    return $query->when(isset($request->region->id), function ($q) use ($request) {
+                        return $q->whereJsonContains('regions', [
+                            ['id' => $request->region->id]
+                        ]);
+                    })->orWhere(function ($query) {
+                        return $query->whereJsonLength('regions', 0);
+                    });
+                })->whereRaw("(select count(*) from
+                            deals where bids.id = (deals.bid_id)
+                            and deals.created_at = date_trunc('day', current_date)
+                        ) < bids.daily_limit OR bids.daily_limit = 0");
             })
-            ->where('direction_id', $request->appToken->direction->id)
-            ->whereRaw("(select count(*) from
-                        deals where bids.id = (deals.bid_id)
-                        and deals.created_at = date_trunc('day', current_date)
-                    ) < bids.daily_limit OR bids.daily_limit = 0")
-            ->whereHas('user', function ($query) {
-                return $query->whereRaw('bids.consumption <= users.balance');
+            ->whereExists(function ($query) {
+                return $query->select(\DB::raw(1))
+                    ->from('users')
+                    ->whereRaw('bids.consumption <= users.balance');
             })
             ->where('is_launch', true)
             ->where('is_delete', false)
@@ -75,29 +77,28 @@ class AppController extends Controller
         $name = $request->has('name') ? $request->name : $request->Name;
         $phone = $request->has('phone') ? $request->phone : $request->Phone;
         $email = $request->has('email') ? $request->email : $request->Email;
-
+          
+        $Deal = new Deal;
         $Deal->name = $name ?? '';
         $Deal->email = $email ?? '';
         $Deal->phone = $phone ?? '';
         $Deal->region_id = $request->region->id ?? null;
-        $Deal->direction_id = $Bid->direction->id
-            ?? $request->appToken->direction_id
-            ?? null;
+        $Deal->direction_id = $AppToken->direction_id;
         $Deal->utm = json_encode(
             $this->getUTM($request->all())
         );
         $Deal->request = json_encode([
             'request' => $request->all(),
-            'api_info' => $request->appToken,
+            'api_info' => $AppToken,
             'region' => $request->region ?? [],
             'http_region' => $request->http_region ?? []
         ]);
-        $Deal->token_id = $request->appToken->id;
+        $Deal->token_id = $AppToken->id;
         $Deal->is_view = false;
         $Deal->is_manager_view = false;
         $Deal->is_delete = false;
-
-        if ($Bid && $request->region != null) {
+  
+        if ($Bid) {
 
             $optionBonus = Option::where('name', 'bill_bonus')->first()->bill_bonus ?? 1;
             $bonus = (($optionBonus / 100) * $Bid->consumption);
@@ -163,6 +164,7 @@ class AppController extends Controller
 
             $this->Response->success = true;
             $this->Response->status = 101;
+            $this->Response->data = $Deal;
         } else {
             $Deal->bid_id = null;
             $Deal->status_id = Status::noDistributed()->id;
@@ -170,8 +172,8 @@ class AppController extends Controller
             $this->Response->status = 102;
         }
 
-        $request->appToken->update([
-            'count_deals' => $request->appToken->count_deals + 1
+        $AppToken->update([
+            'count_deals' => $AppToken->count_deals + 1
         ]);
 
         $Deal->save();
