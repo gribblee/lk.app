@@ -76,7 +76,7 @@ class PaymentController extends Controller
     public function payment(Request $request)
     {
         if ($request->has('OrderId')) {
-            $payment = Payment::whereNot('status', HelperPayment::CD_STATUS_CREATE)->find($request->OrderId);
+            $payment = Payment::where('status', HelperPayment::CD_STATUS_CREATE)->find($request->OrderId);
             $payment->payment_id = $request->PaymentId;
             $payment->card = $request->Pan;
             $payment->updated_at = date("d-m-Y H:i:s");
