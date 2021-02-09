@@ -69,10 +69,12 @@ class DistributedController extends Controller
                 ->where('direction_id', $deal->direction_id)
                 ->where('is_launch', true)
                 ->where(function ($query) use ($deal) {
-                    return $query->whereJsonContains('regions', [
-                        ['id' => $deal->region->id]
-                    ])->orWhere(function ($query) {
-                        return $query->whereJsonLength('regions', 0);
+                    $query->when($deal->region, function ($qWhen) use($deal) {
+                        return $qWhen->whereJsonContains('regions', [
+                            ['id' => $deal->region->id]
+                        ])->orWhere(function ($query) {
+                            return $query->whereJsonLength('regions', 0);
+                        });
                     });
                 })
                 ->orderByRaw('wgr DESC')
