@@ -67,7 +67,7 @@ class DistributedController extends Controller
             ->where('direction_id', $deal->direction_id)
             ->where(function ($qAnd) use ($deal) {
                 return $qAnd->where(function ($query) use ($deal) {
-                    return $query->when(isset($deal->region->id), function ($q) use ($deal) {
+                    return $query->when($deal->region->id, function ($q) use ($deal) {
                         return $q->whereJsonContains('regions', [
                             ['id' => $deal->region->id]
                         ]);
