@@ -82,7 +82,7 @@ class DistributedController extends Controller
                 ->whereExists(function ($query) {
                     return $query->select(\DB::raw(1))
                         ->from('users')
-                        ->whereRaw('bids.consumption <= users.balance');
+                        ->whereRaw('users.id = bids.user_id AND bids.consumption <= users.balance');
                 })
                 ->where('is_launch', true)
                 ->where('is_delete', false)
