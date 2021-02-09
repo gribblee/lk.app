@@ -59,26 +59,34 @@ class DistributedController extends Controller
              * После этого заявку нужно отправить на распределение
              * BEGIN CAAP
              */
-            $bid = Bid::selectRaw('*, (( FLOOR( RANDOM() * consumption ) ) ) AS wgr')
-                ->with('user')
-                ->with('direction')
-                ->withCount('dealsToday')
-                ->whereHas('user', function ($q) {
-                    return $q->whereRaw('users.balance >= bids.consumption');
-                })
-                ->where('direction_id', $deal->direction_id)
-                ->where('is_launch', true)
-                ->where(function ($query) use ($deal) {
-                    $query->when($deal->region, function ($qWhen) use ($deal) {
-                        return $qWhen->whereJsonContains('regions', [
-                            ['id' => $deal->region->id]
+            $bid = Bid::with('user')
+            ->with('direction')
+            ->selectRaw('*, (
+                (FLOOR(RANDOM() * consumption))
+            ) AS weight')
+            ->where('direction_id', $deal->direction_id)
+            ->where(function ($qAnd) use ($request) {
+                return $qAnd->where(function ($query) use ($request) {
+                    return $query->when(isset($request->region->id), function ($q) use ($request) {
+                        return $q->whereJsonContains('regions', [
+                            ['id' => $request->region->id]
                         ]);
                     })->orWhere(function ($query) {
                         return $query->whereJsonLength('regions', 0);
                     });
-                })
-                ->orderByRaw('wgr DESC')
-                ->first();
+                })->whereRaw("(select count(*) from
+                            deals where bids.id = (deals.bid_id)
+                            and deals.created_at = date_trunc('day', current_date)
+                        ) < bids.daily_limit OR bids.daily_limit = 0");
+            })
+            ->whereExists(function ($query) {
+                return $query->select(\DB::raw(1))
+                    ->from('users')
+                    ->whereRaw('bids.consumption <= users.balance');
+            })
+            ->where('is_launch', true)
+            ->where('is_delete', false)
+            ->orderByDesc('weight')->first();
             if ($bid) {
                 $user = User::findOrFail($bid->user->id);
                 $user->balance = $user->balance - $bid->consumption;
