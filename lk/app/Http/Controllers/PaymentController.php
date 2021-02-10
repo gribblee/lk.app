@@ -80,7 +80,6 @@ class PaymentController extends Controller
             $payment->payment_id = $request->PaymentId;
             $payment->card = $request->Pan;
             $payment->updated_at = date("d-m-Y H:i:s");
-            \Illuminate\Support\Facades\Log::info(json_decode($request->all()));
             if ($request->Status == 'CONFIRMED' && $request->Success == true) {
                 $user = User::find($payment->user_id);
                 $user->balance = $user->balance + $payment->paysum;
