@@ -22,6 +22,7 @@ class HelperPayment extends Helper
     const CD_STATUS_CANCEL = 203;
     const CD_STATUS_ERROR = 204;
     const CD_STATUS_PAID = 205;
+    const CD_STATUS_AUTHORIZE = 206;
 
     /**
      * Общие статусы
