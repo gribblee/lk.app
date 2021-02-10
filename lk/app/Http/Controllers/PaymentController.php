@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 use App\Models\Payment;
 use App\Models\User;
@@ -80,6 +81,7 @@ class PaymentController extends Controller
                 'status' => HelperPayment::CD_STATUS_CREATE,
                 'id' => $request->OrderId
             ])->first();
+            Log::info(json_encode($request->all()));
             $payment->payment_id = $request->PaymentId;
             $payment->card = $request->Pan;
             $payment->updated_at = date("d-m-Y H:i:s");
