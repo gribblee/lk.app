@@ -3,7 +3,13 @@
     <a-page-header title="Оплаты" @back="() => $router.go(-1)" />
     <div :style="{ background: '#fff' }">
       <div :style="{ padding: '20px 0 0 0' }">
-        <a-table :columns="columns" :data-source="data" :loading="isLoading" :pagination="pagination" @change="handleTableChange">
+        <a-table
+          :columns="columns"
+          :data-source="data"
+          :loading="isLoading"
+          :pagination="pagination"
+          @change="handleTableChange"
+        >
           <template slot="status" slot-scope="text">
             <a-tag :color="tagLabel[text].color">
               {{ tagLabel[text].title }}
@@ -168,6 +174,10 @@ export default {
         },
         201: {
           title: "Не оплачено",
+          color: "pink",
+        },
+        204: {
+          title: "Ошибка",
           color: "red",
         },
         205: {
