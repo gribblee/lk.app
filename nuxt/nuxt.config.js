@@ -123,7 +123,7 @@ export default {
    ** See https://axios.nuxtjs.org/options
    */
   axios: {
-    baseURL: "https://lk.leadz.monster/api" //`${process.env.NODE_BASE_URL}`
+    baseURL: "https://lk.leadz.monster/api", //`${process.env.NODE_BASE_URL}`
   },
 
   // Build Configuration (https://go.nuxtjs.dev/config-build)
