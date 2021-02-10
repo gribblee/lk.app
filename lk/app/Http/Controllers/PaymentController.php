@@ -82,8 +82,6 @@ class PaymentController extends Controller
             $payment->card = $request->Pan;
             $payment->updated_at = date("d-m-Y H:i:s");
 
-            Log::info(json_encode($request->all()));
-            
             if ($request->Status == 'AUTHORIZED' && $request->Success == true) {
                 $payment->status = HelperPayment::CD_STATUS_AUTHORIZE;
             } else {
