@@ -180,6 +180,10 @@ export default {
           title: "Ошибка",
           color: "red",
         },
+        206: {
+          title: "Авторизация",
+          color: "volcano",
+        },
         205: {
           title: "Оплачено",
           color: "green",
