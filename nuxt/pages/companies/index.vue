@@ -1,11 +1,11 @@
 <template>
   <a-layout-content>
     <a-page-header
-      title="Топ компаний"
+      title="Топ компаний(В Разработке)"
       sub-title="Эти профессионалы могут Вам помочь"
       @back="() => $router.go(-1)"
     ></a-page-header>
-    <a-layout class="setting-layout-sider-2">
+    <a-layout class="setting-layout-sider-2 company-break">
       <a-layout-content class="setting-layout-content">
         <a-row :gutter="[16, 16]" type="flex" justify="space-around">
           <a-col :xs="24" :md="24" :lg="24">
@@ -183,6 +183,31 @@
     </a-layout>
   </a-layout-content>
 </template>
+<style scoped>
+.company-break {
+  position: relative;
+  overflow: hidden;
+}
+.company-break > * {
+  display: none;
+}
+.company-break::before {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  content: "Не переживайте раздел находится в разработке, и очень скоро будет доступен";
+  text-align: center;
+  font-size: 36px;
+  vertical-align: middle;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #fff;
+  z-index: 999;
+}
+</style>
 <script lang="ts">
 import Vue from "vue";
 import { isMobile } from "mobile-device-detect";

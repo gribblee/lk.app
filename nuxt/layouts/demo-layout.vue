@@ -10,7 +10,11 @@
       ></div>
     </b-demo-sider>
     <a-layout>
-      <a-layout-header class="b-demo-layout-header"> Logo </a-layout-header>
+      <a-layout-header class="b-demo-layout-header">
+        <div class="logo">
+          <img src="/logo_start.png" :style="{ width: 'auto', height: '32px' }" />
+        </div>
+      </a-layout-header>
       <a-layout-content class="demo-content">
         <div class="demo-content__step">
           <a-steps :current="$store.state.localStorage.demoStepId">
@@ -60,6 +64,16 @@
 .b-demo-sider-description {
   font-size: 15px;
   margin-top: 30px;
+}
+.logo {
+  text-align: center;
+  height: 32px;
+  margin: 16px;
+}
+
+.logo img {
+  max-width: 100%;
+  height: auto;
 }
 
 @media screen and (max-width: 764px) {

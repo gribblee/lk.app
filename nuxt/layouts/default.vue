@@ -77,6 +77,7 @@
                   <a-dropdown-button
                     @click="handleBalanceClick"
                     :trigger="['click']"
+                    type="primary"
                   >
                     <span>
                       <a-icon type="wallet" />
@@ -154,16 +155,6 @@
         </div>
       </a-layout-header>
       <div :style="{ margin: '20px 0' }">
-        <div>
-          <a
-            class="ant-btn ant-btn-primary"
-            :style="{ marginLeft: '30px' }"
-            href="https://xn----8sbcchje1c6bcri0a4g.xn--p1ai/klienti-pod-kliuch"
-            target="_blank"
-          >
-            <span>Заработать от 150 000 рублей за 3 мес.</span>
-          </a>
-        </div>
         <b-tinkoff-offer />
       </div>
       <a-layout-content>
@@ -483,7 +474,7 @@ export default {
           type: "Route",
         },
         {
-          name: "Клиенты",
+          name: "Заявки",
           icon: "bulb",
           url: "/deals",
           rolesHidden: [],
@@ -516,7 +507,7 @@ export default {
           type: "Route",
         },
         {
-          name: "Спорные",
+          name: "Спорные заявки",
           icon: "warning",
           url: "/disput",
           rolesHidden: [
