@@ -24,7 +24,7 @@ class DistributedController extends Controller
                     $q->where('type', 1004);
                 })->where('deals.is_delete', false)
                 ->orderBy('deals.created_at', 'DESC')
-                ->paginate(10);
+                ->paginate(15);
             return response()->json([
                 'success' => true,
                 'distributed' => $distributed
@@ -69,7 +69,7 @@ class DistributedController extends Controller
                     return $qAnd->where(function ($query) use ($deal) {
                         return $query->when(isset($deal->region->id), function ($q) use ($deal) {
                             return $q->whereJsonContains('regions', [
-                                'id' => $deal->region->id
+                                ['id' => $deal->region->id]
                             ]);
                         })->orWhere(function ($query) {
                             return $query->whereJsonLength('regions', 0);
