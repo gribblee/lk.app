@@ -23,7 +23,9 @@ class WebmasterController extends Controller
             || $request->user()->role === 'ROLE_ADMIN'
         ) {
             return response()->json(
-                AppToken::with('direction')->where('user_id', $request->user()->id)->get(),
+                AppToken::with('direction')->when($request->role == 'ROLE_WEBMASTER', function($q) use($request) {
+                    return $q->where('user_id', $request->user()->id);
+                })->get(),
                 200
             );
         }
