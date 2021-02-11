@@ -35,9 +35,9 @@ class DealController extends Controller
                 });
             })->orderBy('created_at', ($request->has('order_by') ?
                 ($request->order_by == 'DEF'
-                    ? 'ASC'
+                    ? 'DESC'
                     : $request->order_by)
-                : 'ASC'))->where('is_delete', false);
+                : 'DESC'))->where('is_delete', false);
         return response()->json($Deals->paginate(10));
     }
 
