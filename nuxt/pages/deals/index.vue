@@ -265,10 +265,18 @@
         </a-row>
         <a-row>
           <a-col :span="12">
+            <template v-if="dealData.region">
             <b-description-item
               title="Регион"
               :content="dealData.region.name_with_type"
             />
+            </template>
+            <template v-else>
+              <b-description-item
+              title="Регион"
+              content="Регион не определён"
+            />
+            </template>
           </a-col>
           <a-col :span="12">
             <b-description-item
