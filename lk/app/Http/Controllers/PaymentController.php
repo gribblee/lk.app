@@ -83,12 +83,7 @@ class PaymentController extends Controller
                 ->find($request->OrderId);
 
             Log::info(json_encode($request->all()), ['stack']);
-
-            if ($request->Status == 'AUTHORIZED' && $request->Success == true) {
-                if ($payment->status == HelperPayment::CD_STATUS_CREATE) {
-                    $payment->update(['status' => HelperPayment::CD_STATUS_AUTHORIZE]);
-                }
-            }
+            
             if ($request->Status == 'CONFIRMED' && $request->Success == true) {
                 $user = User::find($payment->user_id);
                 $user->balance = $user->balance + $payment->paysum;
