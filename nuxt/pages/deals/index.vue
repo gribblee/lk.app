@@ -99,86 +99,102 @@
       </div>
       <div :style="{ margin: '20px -24px 0 -24px' }">
         <a-config-provider>
-            <template #renderEmpty>
-              <div style="text-align: center; padding: 20px">
-                <a-icon type="container" style="font-size: 32px" />
-                <p>Нет данных</p>
-              </div>
-            </template>
-            <a-table
+          <template #renderEmpty>
+            <div style="text-align: center; padding: 20px">
+              <a-icon type="container" style="font-size: 32px" />
+              <p>Нет данных</p>
+            </div>
+          </template>
+          <a-table
             :columns="columns"
             :data-source="data"
             :loading="dealsIsLoading"
             :pagination="pagination"
             @change="handleTableChange"
-            >
+          >
             <a
-                @click.prevent="showDrawer(record.deal_id, record, $event)"
-                href="javascript:;"
-                slot="name"
-                slot-scope="text, record"
-                :to="{ path: `/deals/${record.deal_id}` }"
-                >{{ record.name }}</a
+              @click.prevent="showDrawer(record.deal_id, record, $event)"
+              href="javascript:;"
+              slot="name"
+              slot-scope="text, record"
+              :to="{ path: `/deals/${record.deal_id}` }"
+              >{{ record.name }}</a
             >
             <span slot="status_name" slot-scope="text, record">
-                <a-dropdown :trigger="['click']" v-if="user.role != 'ROLE_MANAGER'">
+              <a-dropdown
+                :trigger="['click']"
+                v-if="user.role != 'ROLE_MANAGER'"
+              >
                 <a class="ant-dropdown-link" @click="(e) => e.preventDefault()">
-                    {{ record.status.name }}
+                  {{ record.status.name }}
                 </a>
-                <a-menu slot="overlay" @click="handleItemStatus(record, $event)">
-                    <a-menu-item
+                <a-menu
+                  slot="overlay"
+                  @click="handleItemStatus(record, $event)"
+                >
+                  <a-menu-item
                     v-for="(item, index) in $directory.status"
                     :key="index"
                     :value="item"
                     v-if="
-                        (item.type === 1003 &&
+                      (item.type === 1003 &&
                         record.disput_count === 0 &&
                         record.is_insurance == 1) ||
-                        (item.type !== 1003 && item.type !== 1004)
+                      (item.type !== 1003 && item.type !== 1004)
                     "
                     >{{ item.name }}</a-menu-item
-                    >
+                  >
                 </a-menu>
-                </a-dropdown>
-                <span v-else>
+              </a-dropdown>
+              <span v-else>
                 {{ record.status.name }}
-                </span>
+              </span>
             </span>
-            <span slot="region" slot-scope="text, record">{{
-                record.region && record.region.name_with_type
-            }}</span>
+            <span slot="region" slot-scope="text, record">
+              <template v-if="record.region">
+                {{ record.region && record.region.name_with_type }}
+              </template>
+              <template v-else> Регион не определён </template>
+            </span>
             <span slot="direction" slot-scope="text, record">{{
-                record.direction.name
+              record.direction.name
             }}</span>
             <span slot="is_view" slot-scope="text, record">
-                <a-tag v-if="record.is_view == false" color="volcano">Новое</a-tag>
-                <a-tag v-if="record.is_view == true" color="green"
+              <a-tag v-if="record.is_view == false" color="volcano"
+                >Новое</a-tag
+              >
+              <a-tag v-if="record.is_view == true" color="green"
                 >Просмотрено</a-tag
-                >
-                <a-tag v-if="record.disput_count > 0" color="geekblue"
+              >
+              <a-tag v-if="record.disput_count > 0" color="geekblue"
                 >Спор закрыт</a-tag
-                >
-                <a-tag v-if="record.is_insurance" color="blue">По страховке</a-tag>
+              >
+              <a-tag v-if="record.is_insurance" color="blue"
+                >По страховке</a-tag
+              >
             </span>
             <template slot="bids" slot-scope="text, record">
-                <template
+              <template
                 v-if="user.role == 'ROLE_ADMIN' || user.role == 'ROLE_MANAGER'"
-                >
+              >
                 <template v-if="record.bids === null">
                   Не распределён
                 </template>
                 <template v-else>
                   <nuxt-link
-                    :to="{ name: 'users-id', params: { id: record.bids.user.id } }"
+                    :to="{
+                      name: 'users-id',
+                      params: { id: record.bids.user.id },
+                    }"
                     >{{ record.bids.user.name }}</nuxt-link
-                >
+                  >
                 </template>
-                </template>
+              </template>
             </template>
             <template slot="created_at" slot-scope="text, record">
-                {{ getDate(record.created_at) }}
+              {{ getDate(record.created_at) }}
             </template>
-            </a-table>
+          </a-table>
         </a-config-provider>
       </div>
     </div>
@@ -266,7 +282,10 @@
             <b-description-item title="Телефон" :content="dealData.phone" />
           </a-col>
           <a-col :span="12">
-            <b-description-item title="Стоимость" :content="`${dealData.amount} ₽`" />
+            <b-description-item
+              title="Стоимость"
+              :content="`${dealData.amount} ₽`"
+            />
           </a-col>
         </a-row>
         <tempalte
@@ -361,7 +380,10 @@
         </a-radio-group>
       </div>
       <div :style="{ marginTop: '20px' }">
-        <span>Прикрепите запись звонков(если возможно). Без записи звонков заявка может быть признана качественной.</span>
+        <span
+          >Прикрепите запись звонков(если возможно). Без записи звонков заявка
+          может быть признана качественной.</span
+        >
       </div>
       <div
         :style="{
@@ -436,14 +458,14 @@ const columns = [
     key: "email",
   },
   {
-      title: 'Дата поступления',
-      dataIdnex: 'created_at',
-      key: 'created_at',
-      scopedSlots: { customRender: 'created_at' },
-      defaultSortOrder: 'descend',
-      sortDirections: ['descend', 'ascend'],
-      onFilter: (value, record) => {},
-      sorter: (a, b) => {}
+    title: "Дата поступления",
+    dataIdnex: "created_at",
+    key: "created_at",
+    scopedSlots: { customRender: "created_at" },
+    defaultSortOrder: "descend",
+    sortDirections: ["descend", "ascend"],
+    onFilter: (value, record) => {},
+    sorter: (a, b) => {},
   },
   {
     title: "На кого распределён",
@@ -456,8 +478,8 @@ const columns = [
 export default {
   head() {
     return {
-      title: 'Поступившие заявки'
-    }
+      title: "Поступившие заявки",
+    };
   },
   data() {
     return {
@@ -473,7 +495,7 @@ export default {
       disputType: 1,
       disputTypeData: [],
       pagination: {},
-      order_by: 'DEF',
+      order_by: "DEF",
       searchField: {
         name: null,
         status_id: null,
@@ -541,10 +563,10 @@ export default {
       const pager = { ...this.pagination };
       pager.current = pagination.current;
       this.pagination = pager;
-      if (typeof sorters.order != 'undefined') {
-        this.order_by = sorters.order == 'ascend' ? 'ASC' : 'DESC';
+      if (typeof sorters.order != "undefined") {
+        this.order_by = sorters.order == "ascend" ? "ASC" : "DESC";
       } else {
-        this.order_by = 'DEF';
+        this.order_by = "DEF";
       }
       this.loadTable({}, pager.current);
     },
