@@ -84,11 +84,11 @@ class PaymentController extends Controller
             $payment->payment_id = $request->PaymentId;
             $payment->card = $request->Pan;
             $payment->updated_at = date("d-m-Y H:i:s");
-            
-            Log::info(json_encode($request->all()), ['stack']);
 
+            Log::info(json_encode($request->all()), ['stack']);
+            
             if ($request->Status == 'AUTHORIZED' && $request->Success == true) {
-                $payment->status = HelperPayment::CD_STATUS_AUTHORIZE;
+                $payment->update(['status' => HelperPayment::CD_STATUS_AUTHORIZE]);
             }
             if ($request->Status == 'CONFIRMED' && $request->Success == true) {
                 $user = User::find($payment->user_id);
@@ -96,7 +96,6 @@ class PaymentController extends Controller
                 $user->save();
 
                 $payment->after_balance = $user->balance;
-                $payment->status = HelperPayment::CD_STATUS_PAID;
                 HistoryPayment::create([
                     'user_id' => $user->id,
                     'type_transaction' => '10',
@@ -107,6 +106,8 @@ class PaymentController extends Controller
                     'before_bonus' => $user->bonus,
                     'after_bonus' => $user->bonus
                 ]);
+
+                $payment->update(['status' => HelperPayment::CD_STATUS_PAID]);
 
                 $this->sendPulse->addEmails($this->bookIdBalance, [
                     [
@@ -121,9 +122,8 @@ class PaymentController extends Controller
                     ]
                 ]);
             } else {
-                $payment->status = HelperPayment::CD_STATUS_ERROR;
+                $payment->update(['status' => HelperPayment::CD_STATUS_ERROR]);
             }
-            $payment->save();
             return response('OK');
         }
     }
