@@ -86,7 +86,7 @@ class PaymentController extends Controller
 
             if ($request->Status == 'AUTHORIZED' && $request->Success == true) {
                 if ($payment->status == HelperPayment::CD_STATUS_CREATE) {
-                    $payment->status = HelperPayment::CD_STATUS_AUTHORIZE]);
+                    $payment->status = HelperPayment::CD_STATUS_AUTHORIZE;
                 }
             }
             if ($request->Status == 'CONFIRMED' && $request->Success == true) {
