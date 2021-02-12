@@ -20,6 +20,7 @@ use App\Helpers\Tinkoff;
 use App\Helpers\HelperPayment;
 
 use PDF;
+use PHPUnit\TextUI\Help;
 
 class PaymentController extends Controller
 {
@@ -77,7 +78,7 @@ class PaymentController extends Controller
     public function payment(Request $request)
     {
         if ($request->has('OrderId')) {
-            $payment = Payment::find($request->OrderId);
+            $payment = Payment::where('status', HelperPayment::CD_STATUS_CREATE)->orWhere('status', HelperPayment::CD_STATUS_AUTHORIZE)->find($request->OrderId);
             $payment->payment_id = $request->PaymentId;
             $payment->card = $request->Pan;
             $payment->updated_at = date("d-m-Y H:i:s");
