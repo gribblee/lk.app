@@ -402,9 +402,9 @@ class AuthController extends Controller
             'bonus' => 0.0,
             'region_id' => $this->geo->region->id,
             'manager_id' => $this->getRandManager()->id ?? null,
-            'created_at' => Carbon::now()->format("DD-m-Y H:i:s"),
-            'updated_at' => Carbon::now()->format("DD-m-Y H:i:s"),
-            'was_online' => Carbon::now()->format("DD-m-Y H:i:s")
+            'created_at' => Carbon::now()->format("d-m-Y H:i:s"),
+            'updated_at' => Carbon::now()->format("d-m-Y H:i:s"),
+            'was_online' => Carbon::now()->format("d-m-Y H:i:s")
         ]);
     }
 }
