@@ -78,47 +78,48 @@ class PaymentController extends Controller
     public function payment(Request $request)
     {
         if ($request->has('OrderId')) {
-            $payment = Payment::where('status', HelperPayment::CD_STATUS_CREATE)->orWhere('status', HelperPayment::CD_STATUS_AUTHORIZE)->find($request->OrderId);
+            $payment = Payment::where('status', HelperPayment::CD_STATUS_CREATE)
+                ->orWhere('status', HelperPayment::CD_STATUS_AUTHORIZE)
+                ->find($request->OrderId);
             $payment->payment_id = $request->PaymentId;
             $payment->card = $request->Pan;
             $payment->updated_at = date("d-m-Y H:i:s");
 
             if ($request->Status == 'AUTHORIZED' && $request->Success == true) {
                 $payment->status = HelperPayment::CD_STATUS_AUTHORIZE;
-            } else {
-                if ($request->Status == 'CONFIRMED' && $request->Success == true) {
-                    $user = User::find($payment->user_id);
-                    $user->balance = $user->balance + $payment->paysum;
-                    $user->save();
+            }
+            if ($request->Status == 'CONFIRMED' && $request->Success == true) {
+                $user = User::find($payment->user_id);
+                $user->balance = $user->balance + $payment->paysum;
+                $user->save();
 
-                    $payment->after_balance = $user->balance;
-                    $payment->status = HelperPayment::CD_STATUS_PAID;
-                    HistoryPayment::create([
-                        'user_id' => $user->id,
-                        'type_transaction' => '10',
-                        'paysum' => $payment->paysum,
-                        'paybonus' => 0,
-                        'before_balance' => $user->balance - $payment->paysum,
-                        'after_balance' => $user->balance,
-                        'before_bonus' => $user->bonus,
-                        'after_bonus' => $user->bonus
-                    ]);
+                $payment->after_balance = $user->balance;
+                $payment->status = HelperPayment::CD_STATUS_PAID;
+                HistoryPayment::create([
+                    'user_id' => $user->id,
+                    'type_transaction' => '10',
+                    'paysum' => $payment->paysum,
+                    'paybonus' => 0,
+                    'before_balance' => $user->balance - $payment->paysum,
+                    'after_balance' => $user->balance,
+                    'before_bonus' => $user->bonus,
+                    'after_bonus' => $user->bonus
+                ]);
 
-                    $this->sendPulse->addEmails($this->bookIdBalance, [
-                        [
-                            'email' => $user->email,
-                            'variables' => [
-                                'phone' => $user->phone,
-                                'name' => $user->name,
-                                'balanceBefore' => $user->balance - $payment->paysum,
-                                'balanceAfter' => $user->balance,
-                                'paysum' => $payment->paysum
-                            ]
+                $this->sendPulse->addEmails($this->bookIdBalance, [
+                    [
+                        'email' => $user->email,
+                        'variables' => [
+                            'phone' => $user->phone,
+                            'name' => $user->name,
+                            'balanceBefore' => $user->balance - $payment->paysum,
+                            'balanceAfter' => $user->balance,
+                            'paysum' => $payment->paysum
                         ]
-                    ]);
-                } else {
-                    $payment->status = HelperPayment::CD_STATUS_ERROR;
-                }
+                    ]
+                ]);
+            } else {
+                $payment->status = HelperPayment::CD_STATUS_ERROR;
             }
             $payment->save();
             return response('OK');
