@@ -96,9 +96,9 @@ class PaymentController extends Controller
                 HistoryPayment::create([
                     'user_id' => $user->id,
                     'type_transaction' => '10',
-                    'paysum' => $payment->paysum,
+                    'paysum' => ($request->Amount / 100),
                     'paybonus' => 0,
-                    'before_balance' => $user->balance - $payment->paysum,
+                    'before_balance' => $user->balance - ($request->Amount / 100),
                     'after_balance' => $user->balance,
                     'before_bonus' => $user->bonus,
                     'after_bonus' => $user->bonus
@@ -114,9 +114,9 @@ class PaymentController extends Controller
                         'variables' => [
                             'phone' => $user->phone,
                             'name' => $user->name,
-                            'balanceBefore' => $user->balance - $payment->paysum,
+                            'balanceBefore' => $user->balance - ($request->Amount / 100),
                             'balanceAfter' => $user->balance,
-                            'paysum' => $payment->paysum
+                            'paysum' => ($request->Amount / 100)
                         ]
                     ]
                 ]);
