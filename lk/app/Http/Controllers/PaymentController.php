@@ -81,12 +81,9 @@ class PaymentController extends Controller
             $payment = Payment::where('status', HelperPayment::CD_STATUS_CREATE)
                 ->orWhere('status', HelperPayment::CD_STATUS_AUTHORIZE)
                 ->find($request->OrderId);
-            $payment->payment_id = $request->PaymentId;
-            $payment->card = $request->Pan;
-            $payment->updated_at = date("d-m-Y H:i:s");
 
             Log::info(json_encode($request->all()), ['stack']);
-            
+
             if ($request->Status == 'AUTHORIZED' && $request->Success == true) {
                 $payment->update(['status' => HelperPayment::CD_STATUS_AUTHORIZE]);
             }
@@ -107,7 +104,11 @@ class PaymentController extends Controller
                     'after_bonus' => $user->bonus
                 ]);
 
-                $payment->update(['status' => HelperPayment::CD_STATUS_PAID]);
+                $payment->update([
+                    'status' => HelperPayment::CD_STATUS_PAID,
+                    'payment_id' => $request->PaymentId,
+                    'card' => $request->Pan
+                ]);
 
                 $this->sendPulse->addEmails($this->bookIdBalance, [
                     [
