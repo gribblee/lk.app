@@ -78,9 +78,7 @@ class PaymentController extends Controller
     public function payment(Request $request)
     {
         if ($request->has('OrderId')) {
-            $payment = Payment::where('status', HelperPayment::CD_STATUS_CREATE)
-                ->orWhere('status', HelperPayment::CD_STATUS_AUTHORIZE)
-                ->find($request->OrderId);
+            $payment = Payment::find($request->OrderId);
 
             Log::info(json_encode($request->all()), ['stack']);
 
