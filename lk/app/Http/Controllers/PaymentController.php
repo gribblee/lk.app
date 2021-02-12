@@ -86,7 +86,7 @@ class PaymentController extends Controller
 
             if ($request->Status == 'AUTHORIZED' && $request->Success == true) {
                 if ($payment->status == HelperPayment::CD_STATUS_CREATE) {
-                    $payment->update(['status' => HelperPayment::CD_STATUS_AUTHORIZE]);
+                    $payment->status = HelperPayment::CD_STATUS_AUTHORIZE]);
                 }
             }
             if ($request->Status == 'CONFIRMED' && $request->Success == true) {
@@ -106,11 +106,9 @@ class PaymentController extends Controller
                     'after_bonus' => $user->bonus
                 ]);
 
-                $payment->update([
-                    'status' => HelperPayment::CD_STATUS_PAID,
-                    'payment_id' => $request->PaymentId,
-                    'card' => $request->Pan
-                ]);
+                $payment->status = HelperPayment::CD_STATUS_PAID;
+                $payment->payment_id = $request->PaymentId;
+                $payment->card = $request->Pan;
 
                 $this->sendPulse->addEmails($this->bookIdBalance, [
                     [
