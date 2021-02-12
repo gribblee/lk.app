@@ -565,7 +565,7 @@ export default {
   },
   methods: {
     getDate(date) {
-      return moment(date).format("DD-MM-YYYY hh:mm:ss", true);
+      return moment(date).format("DD-MM-YYYY HH:mm:ss", true);
     },
     handleTableChange(pagination, filters, sorters) {
       const pager = { ...this.pagination };
