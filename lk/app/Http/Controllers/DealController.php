@@ -24,7 +24,7 @@ class DealController extends Controller
             ->with('disput')
             ->with('bids.user')
             ->whereHas('direction', function($q) use($request) {
-                return $q->whereJsonContains('directions.cartegories', $request->user()->category_id);
+                return $q->whereJsonContains('cartegories', $request->user()->category_id);
             })
             ->when($request->user()->role == 'ROLE_USER', function ($q)
             use ($request) {
