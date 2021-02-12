@@ -91,7 +91,7 @@ class PaymentController extends Controller
             }
             if ($request->Status == 'CONFIRMED' && $request->Success == true) {
                 $user = User::find($payment->user_id);
-                $user->balance = $user->balance + $payment->paysum;
+                $user->balance = $user->balance + ($request->Amount / 100);
                 $user->save();
 
                 $payment->after_balance = $user->balance;
