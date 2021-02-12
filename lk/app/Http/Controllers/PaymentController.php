@@ -123,8 +123,9 @@ class PaymentController extends Controller
                     ]
                 ]);
             } else {
-                $payment->update(['status' => HelperPayment::CD_STATUS_ERROR]);
+                $payment->status = HelperPayment::CD_STATUS_ERROR;
             }
+            $payment->save();
             return response('OK');
         }
     }
