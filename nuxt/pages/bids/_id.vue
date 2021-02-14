@@ -650,9 +650,6 @@ export default {
           break;
         case "regions":
           postData.regions = this.regions;
-          postData.regionsRate = this.regions.map((m) => {
-            return m.id;
-          });
           break;
       }
       this.$axios.post(`/bid/${this.id}/update`, postData).then(({ data }) => {

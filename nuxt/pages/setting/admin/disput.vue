@@ -11,7 +11,7 @@
         <a-row :gutter="[16, 16]" type="flex">
           <a-col :xs="24" :md="22" :lg="22">
             <a-button type="primary" @click="handleCreate">
-              Добавить категорию
+              Добавить статус
               <a-icon type="plus" />
             </a-button>
           </a-col>
