@@ -71,9 +71,9 @@ class DistributedController extends Controller
                             return $q->whereJsonContains('regions', [
                                 ['id' => $deal->region->id]
                             ]);
-                        })->orWhere(function ($query) {
-                            return $query->whereJsonLength('regions', 0);
-                        });
+                        });//->orWhere(function ($query) {
+                        //    return $query->whereJsonLength('regions', 0);
+                        //});
                     })->whereRaw("(select count(*) from
                             deals where bids.id = (deals.bid_id)
                             and deals.created_at = date_trunc('day', current_date)
