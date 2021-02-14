@@ -24,7 +24,8 @@ class CategoryController extends Controller
     {
         if ($request->user()->role == 'ROLE_ADMIN') {
             Category::create([
-                'name' => ''
+                'name' => '',
+                'description' => ''
             ]);
             return response()->json([
                 'success' => true
@@ -34,12 +35,13 @@ class CategoryController extends Controller
     }
 
     /**
+     * @param $id
      * @return JsonResponse
      */
-    public function update(Request $request)
+    public function update(Request $request, int $id)
     {
         if ($request->user()->role == 'ROLE_ADMIN' && $request->has('name') && $request->has('description')) {
-            Category::where('id', $request->id)->update([
+            Category::where('id', $id)->update([
                 'name' => $request->name ?? '',
                 'description' => $request->description ?? ''
             ]);
@@ -51,12 +53,13 @@ class CategoryController extends Controller
     }
 
     /**
+     * @param $id
      * @return JsonResponse
      */
-    public function delete(Request $request)
+    public function delete(Request $request, int $id)
     {
-        if ($request->user()->role == 'ROLE_ADMIN' && $request->has('id')) {
-            Category::where('id', $request->id)->delete();
+        if ($request->user()->role == 'ROLE_ADMIN') {
+            Category::where('id', $id)->delete();
             return response()->json([
                 'success' => true
             ]);

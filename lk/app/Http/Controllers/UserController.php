@@ -286,7 +286,7 @@ class UserController extends Controller
         $Response->type_name = Category::find($request->user()->category_id)->name;
         $Response->notifications = Notification::nonView($request->user()->id)->get();
         User::where('id', $request->user()->id)->update([
-            'was_online' => Carbon::now()->format("d-m-Y H:i:s")
+            'was_online' => Carbon::now()//->format("d-m-Y H:i:s")
         ]);
         Notification::updatedAllView($request->user()->id, true);
 

@@ -53,12 +53,10 @@ class AppController extends Controller
             ->where('direction_id', $AppToken->direction_id)
             ->where(function ($qAnd) use ($request) {
                 return $qAnd->where(function ($query) use ($request) {
-                    return $query->when(isset($request->region->id), function ($q) use ($request) {
+                    $query->when(isset($request->region->id), function ($q) use ($request) {
                         return $q->whereJsonContains('regions', [
                             ['id' => $request->region->id]
                         ]);
-                    })->orWhere(function ($query) {
-                        return $query->whereJsonLength('regions', 0);
                     });
                 })->whereRaw("(select count(*) from
                             deals where bids.id = (deals.bid_id)
@@ -77,7 +75,7 @@ class AppController extends Controller
         $name = $request->has('name') ? $request->name : $request->Name;
         $phone = $request->has('phone') ? $request->phone : $request->Phone;
         $email = $request->has('email') ? $request->email : $request->Email;
-          
+
         $Deal = new Deal;
         $Deal->name = $name ?? '';
         $Deal->email = $email ?? '';
@@ -97,7 +95,7 @@ class AppController extends Controller
         $Deal->is_view = false;
         $Deal->is_manager_view = false;
         $Deal->is_delete = false;
-  
+
         if ($Bid) {
 
             $optionBonus = Option::where('name', 'bill_bonus')->first()->bill_bonus ?? 1;

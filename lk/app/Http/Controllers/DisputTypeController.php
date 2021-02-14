@@ -16,7 +16,7 @@ class DisputTypeController extends Controller
     public function index(Request $request)
     {
         if ($request->user()->role == 'ROLE_ADMIN') {
-            return response()->json(DisputType::all());
+            return response()->json(DisputType::orderByDesc('order_by')->get());
         }
 
         return response('Доступ запрещён!', 403);
@@ -40,14 +40,17 @@ class DisputTypeController extends Controller
     }
 
     /**
+     * @param $id
      * @return JsonResponse
      */
-    public function update(Request $request)
+    public function update(Request $request, int $id)
     {
         if ($request->user()->role == 'ROLE_ADMIN') {
-            if ($request->has('name') && $request->has('id')) {
-                DisputType::find($request->id)->update([
-                    'name' => $request->name
+            if ($request->has('name')) {
+                DisputType::find($id)->update([
+                    'name' => $request->name,
+                    'disput_type_id' => $request->disput_type_id,
+                    'order_by' => $request->order_by
                 ]);
                 return response()->json([
                     'success' => true,
@@ -64,13 +67,14 @@ class DisputTypeController extends Controller
     }
 
     /**
+     * @param $id
      * @return JsonResponse
      */
-    public function delete(Request $request)
+    public function delete(Request $request, int $id)
     {
         if ($request->user()->role == 'ROLE_ADMIN') {
             if ($request->has('id')) {
-                Disput::where('disput_type_id', $request->id)->update(['disput_type_id' => 5]);
+                Disput::where('disput_type_id', $id)->update(['disput_type_id' => 5]);
                 DisputType::find($request->id)->delete();
                 return response()->json([
                     'succes' => true

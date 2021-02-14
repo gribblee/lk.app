@@ -33,16 +33,16 @@ Route::group([
 });
 
 Route::group(['prefix' => 'category'], function () {
-    Route::post('create', "CategoryController@create");
-    Route::post('update', "CategoryController@update");
-    Route::post('delete', "CategoryController@delete");
+    Route::put('create', "CategoryController@create");
+    Route::post('{id}/update', "CategoryController@update");
+    Route::delete('{id}/delete', "CategoryController@delete");
 });
 
 Route::group(['prefix' => 'disput_status'], function () {
     Route::get('', "DisputTypeController@index");
-    Route::post('create', "DisputTypeController@create");
-    Route::post('update', "DisputTypeController@update");
-    Route::post('delete', "DisputTypeController@delete");
+    Route::put('create', "DisputTypeController@create");
+    Route::post('{id}/update', "DisputTypeController@update");
+    Route::delete('{id}/delete', "DisputTypeController@delete");
 });
 
 Route::group([
