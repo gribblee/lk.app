@@ -74,10 +74,10 @@ class DistributedController extends Controller
                         });//->orWhere(function ($query) {
                         //    return $query->whereJsonLength('regions', 0);
                         //});
-                    })->whereRaw("(select count(*) from
-                            deals where bids.id = (deals.bid_id)
-                            and deals.created_at = date_trunc('day', current_date)
-                        ) < bids.daily_limit OR bids.daily_limit = 0");
+                    });//->whereRaw("(select count(*) from
+                    //        deals where bids.id = (deals.bid_id)
+                    //        and deals.created_at = date_trunc('day', current_date)
+                    //    ) < bids.daily_limit OR bids.daily_limit = 0");
                 })
                 ->whereExists(function ($query) {
                     return $query->select(\DB::raw(1))
