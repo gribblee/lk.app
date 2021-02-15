@@ -58,7 +58,7 @@ class AppController extends Controller
                             ['id' => $request->region->id]
                         ]);
                     });
-                });//->whereRaw("(select count(*) from
+                }); //->whereRaw("(select count(*) from
                 //           deals where bids.id = (deals.bid_id)
                 //            and deals.created_at = date_trunc('day', current_date)
                 //        ) < bids.daily_limit OR bids.daily_limit = 0");
@@ -95,16 +95,18 @@ class AppController extends Controller
         $Deal->is_view = false;
         $Deal->is_manager_view = false;
         $Deal->is_delete = false;
-        
+
         $isRegion = false;
 
-        foreach ($Bid->regions as $region) 
-        {
-            if ($region['id'] == $Deal->region_id) {
-                $isRegion = true;
-                break;
+        if ($Bid) {
+            foreach ($Bid->regions as $region) {
+                if ($region['id'] == $Deal->region_id) {
+                    $isRegion = true;
+                    break;
+                }
             }
         }
+
 
         if ($Bid && $isRegion) {
 
