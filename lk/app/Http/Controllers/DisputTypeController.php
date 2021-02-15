@@ -73,13 +73,11 @@ class DisputTypeController extends Controller
     public function delete(Request $request, int $id)
     {
         if ($request->user()->role == 'ROLE_ADMIN') {
-            if ($request->has('id')) {
-                Disput::where('disput_type_id', $id)->update(['disput_type_id' => 5]);
-                DisputType::find($request->id)->delete();
-                return response()->json([
-                    'succes' => true
-                ]);
-            }
+            Disput::where('disput_type_id', $id)->update(['disput_type_id' => 5]);
+            DisputType::find($request->id)->delete();
+            return response()->json([
+                'succes' => true
+            ]);
         }
 
         return response('Доступ запрещён!', 403);

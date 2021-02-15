@@ -190,9 +190,9 @@ class BidController extends Controller
         foreach ($bidsColumns as $bca) {
             $bidsDirection[] = $bca->direction_id;
         }
-        $direction = Direction::whereNotIn('id', $bidsDirection)->where('categories', 'LIKE', "%{$request->user()->type}%")->get();
+        $direction = Direction::where('categories', 'LIKE', "%{$request->user()->type}%")->first();
         if (count($direction) > 0) {
-            $drt = $direction[mt_rand(0, count($direction) - 1)];
+            $drt = $direction;
 
             $bid = Bid::create([
                 'direction_id' => $drt->id,
