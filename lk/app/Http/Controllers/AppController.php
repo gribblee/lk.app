@@ -95,8 +95,18 @@ class AppController extends Controller
         $Deal->is_view = false;
         $Deal->is_manager_view = false;
         $Deal->is_delete = false;
+        
+        $isRegion = false;
 
-        if ($Bid) {
+        foreach ($Bid->regions as $region) 
+        {
+            if ($region['id'] == $Deal->region_id) {
+                $isRegion = true;
+                break;
+            }
+        }
+
+        if ($Bid && $isRegion) {
 
             $optionBonus = Option::where('name', 'bill_bonus')->first()->bill_bonus ?? 1;
             $bonus = (($optionBonus / 100) * $Bid->consumption);
