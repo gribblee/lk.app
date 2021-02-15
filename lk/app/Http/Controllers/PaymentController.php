@@ -376,10 +376,10 @@ class PaymentController extends Controller
 
                 $this->sendPulse->addEmails($this->bookIdBill, [
                     [
-                        'email' => $this->user()->email,
+                        'email' => $request->user()->email,
                         'variables' => [
-                            'phone' => $this->user()->phone,
-                            'name' => $this->user()->name,
+                            'phone' => $request->user()->phone,
+                            'name' => $request->user()->name,
                         ]
                     ]
                 ]);

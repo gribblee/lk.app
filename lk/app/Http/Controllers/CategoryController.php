@@ -43,7 +43,8 @@ class CategoryController extends Controller
         if ($request->user()->role == 'ROLE_ADMIN' && $request->has('name') && $request->has('description')) {
             Category::where('id', $id)->update([
                 'name' => $request->name ?? '',
-                'description' => $request->description ?? ''
+                'description' => $request->description ?? '',
+                'source_id' => $request->source_id ?? 0
             ]);
             return response()->json([
                 'success' => true
