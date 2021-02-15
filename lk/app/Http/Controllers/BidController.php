@@ -190,7 +190,7 @@ class BidController extends Controller
         foreach ($bidsColumns as $bca) {
             $bidsDirection[] = $bca->direction_id;
         }
-        $direction = Direction::where('categories', 'LIKE', "%{$request->user()->type}%")->first();
+        $direction = Direction::whereJsonContains('categories', $request->user()->category_id)->first();
         if ($direction) {
             $drt = $direction;
 
