@@ -96,79 +96,82 @@ class AppController extends Controller
         $Deal->is_manager_view = false;
         $Deal->is_delete = false;
 
-        if ($Bid) {
+        $Deal->bid_id = null;
+        $Deal->status_id = Status::noDistributed()->id;
 
-            $optionBonus = Option::where('name', 'bill_bonus')->first()->bill_bonus ?? 1;
-            $bonus = (($optionBonus / 100) * $Bid->consumption);
+        // if ($Bid) {
 
-            $paymentStory = new stdObject([
-                'user_id' => $Bid->user->id,
-                'type_transaction' => '12',
-                'paysum' => 0,
-                'paybonus' => 0,
-                'before_balance' => 0,
-                'after_balance' => 0,
-                'before_bonus' => 0,
-                'after_bonus' => 0
-            ]);
+        //     $optionBonus = Option::where('name', 'bill_bonus')->first()->bill_bonus ?? 1;
+        //     $bonus = (($optionBonus / 100) * $Bid->consumption);
 
-            if (
-                $Bid->user->with_bonus
-                && $Bid->user->bonus >= $bonus
-            ) {
-                $paymentStory->before_balance = $Bid->user->balance;
-                $paymentStory->before_bonus = $Bid->user->bonus;
+        //     $paymentStory = new stdObject([
+        //         'user_id' => $Bid->user->id,
+        //         'type_transaction' => '12',
+        //         'paysum' => 0,
+        //         'paybonus' => 0,
+        //         'before_balance' => 0,
+        //         'after_balance' => 0,
+        //         'before_bonus' => 0,
+        //         'after_bonus' => 0
+        //     ]);
 
-                $Bid->user->balance = $Bid->user->balance - ($Bid->consumption - $bonus);
-                $Bid->user->bonus = $Bid->user->bonus - $bonus;
+        //     if (
+        //         $Bid->user->with_bonus
+        //         && $Bid->user->bonus >= $bonus
+        //     ) {
+        //         $paymentStory->before_balance = $Bid->user->balance;
+        //         $paymentStory->before_bonus = $Bid->user->bonus;
 
-                $paymentStory->paysum = ($Bid->consumption - $bonus);
-                $paymentStory->paybonus = $bonus;
-                $paymentStory->after_balance = $Bid->user->balance;
-                $paymentStory->after_bonus = $Bid->user->bonus;
-            } else {
-                $paymentStory->before_balance = $Bid->user->balance;
-                $Bid->user->balance = $Bid->user->balance - $Bid->consumption;
-                $paymentStory->after_balance = $Bid->user->balance;
-                $paymentStory->paysum = $Bid->consumption;
-            }
+        //         $Bid->user->balance = $Bid->user->balance - ($Bid->consumption - $bonus);
+        //         $Bid->user->bonus = $Bid->user->bonus - $bonus;
 
-            if ($Bid->insurance > 0) { //Если заявка по страховке
-                $Bid->insurance = $Bid->insurance - 1;
-                $Deal->is_insurance = true;
-            }
+        //         $paymentStory->paysum = ($Bid->consumption - $bonus);
+        //         $paymentStory->paybonus = $bonus;
+        //         $paymentStory->after_balance = $Bid->user->balance;
+        //         $paymentStory->after_bonus = $Bid->user->bonus;
+        //     } else {
+        //         $paymentStory->before_balance = $Bid->user->balance;
+        //         $Bid->user->balance = $Bid->user->balance - $Bid->consumption;
+        //         $paymentStory->after_balance = $Bid->user->balance;
+        //         $paymentStory->paysum = $Bid->consumption;
+        //     }
 
-            if ($Bid->user->balance < $Bid->consumption) {
-                $Bid->is_launch = false;
-            }
+        //     if ($Bid->insurance > 0) { //Если заявка по страховке
+        //         $Bid->insurance = $Bid->insurance - 1;
+        //         $Deal->is_insurance = true;
+        //     }
 
-            if (
-                $Bid->user->contact_id != null
-                && $Bid->user->contact_id != 0
-            ) {
-                $this->addBitrix($request, $Bid);
-            }
+        //     if ($Bid->user->balance < $Bid->consumption) {
+        //         $Bid->is_launch = false;
+        //     }
 
-            HistoryPayment::create($paymentStory->toArray());
+        //     if (
+        //         $Bid->user->contact_id != null
+        //         && $Bid->user->contact_id != 0
+        //     ) {
+        //         $this->addBitrix($request, $Bid);
+        //     }
 
-            $Deal->bid_id = $Bid->id;
-            $Deal->amount = $Bid->consumption;
-            $Deal->status_id = Status::firstStatus()->id;
+        //     HistoryPayment::create($paymentStory->toArray());
 
-            $this->sendMail($Bid->user);
+        //     $Deal->bid_id = $Bid->id;
+        //     $Deal->amount = $Bid->consumption;
+        //     $Deal->status_id = Status::firstStatus()->id;
 
-            $Bid->user->save();
-            $Bid->save();
+        //     $this->sendMail($Bid->user);
 
-            $this->Response->success = true;
-            $this->Response->status = 101;
-            $this->Response->data = $Deal;
-        } else {
-            $Deal->bid_id = null;
-            $Deal->status_id = Status::noDistributed()->id;
-            $this->Response->success = true;
-            $this->Response->status = 102;
-        }
+        //     $Bid->user->save();
+        //     $Bid->save();
+
+        //     $this->Response->success = true;
+        //     $this->Response->status = 101;
+        //     $this->Response->data = $Deal;
+        // } else {
+        //     $Deal->bid_id = null;
+        //     $Deal->status_id = Status::noDistributed()->id;
+        //     $this->Response->success = true;
+        //     $this->Response->status = 102;
+        // }
 
         $AppToken->update([
             'count_deals' => $AppToken->count_deals + 1
