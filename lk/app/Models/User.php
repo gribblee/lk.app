@@ -29,6 +29,7 @@ class User extends Authenticatable implements JWTSubject
         'bonus',
         'with_bonus',
         'role',
+        'is_demo',
         'is_registration',
         'was_online',
     ];
@@ -71,7 +72,7 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->belongsTo(Region::class, 'region_id', 'id');
     }
-    
+
     public function bids()
     {
         return $this->hasMany(Bid::class, 'user_id', 'id');

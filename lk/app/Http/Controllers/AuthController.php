@@ -398,6 +398,7 @@ class AuthController extends Controller
             'email' => $request->email,
             'phone' => $request->phone,
             'role'  =>  'ROLE_USER',
+            'is_demo' => true,
             'balance' => 0.0,
             'bonus' => 0.0,
             'region_id' => $this->geo->region->id,
