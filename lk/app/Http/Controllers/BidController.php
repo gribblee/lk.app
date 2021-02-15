@@ -191,7 +191,7 @@ class BidController extends Controller
             $bidsDirection[] = $bca->direction_id;
         }
         $direction = Direction::where('categories', 'LIKE', "%{$request->user()->type}%")->first();
-        if (count($direction) > 0) {
+        if ($direction) {
             $drt = $direction;
 
             $bid = Bid::create([
