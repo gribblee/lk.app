@@ -58,7 +58,7 @@ class AppController extends Controller
                             ['id' => $request->region->id]
                         ]);
                     });
-                })//->whereRaw("(select count(*) from
+                });//->whereRaw("(select count(*) from
                 //           deals where bids.id = (deals.bid_id)
                 //            and deals.created_at = date_trunc('day', current_date)
                 //        ) < bids.daily_limit OR bids.daily_limit = 0");
