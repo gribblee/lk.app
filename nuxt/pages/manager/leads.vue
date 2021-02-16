@@ -45,7 +45,7 @@
     </a-layout>
   </a-layout-content>
 </template>
-<script lang="ts">
+<script>
 import moment from "moment";
 import Vue from "vue";
 
@@ -72,7 +72,7 @@ export default Vue.extend({
     dateFormat(date) {
       return moment(date).format("DD-MM-YYYY HH:mm:ss", true);
     },
-    onChange(pageNumber: number) {
+    onChange(pageNumber) {
       this.pagination.current = pageNumber;
       this.getLeads();
     },
@@ -80,20 +80,20 @@ export default Vue.extend({
       const { $axios, pagination } = this;
       $axios
         .get(`/manager/leads?page=${pagination.current}`)
-        .then(({ data }: any) => {
+        .then(({ data }) => {
           this.newLeads = data.data;
         })
-        .catch((err: any) => {
+        .catch((err) => {
           this.$message.error(err.response.message);
         });
     },
-    takeLead(userId: number, e: Event) {
+    takeLead(userId, e) {
       this.$axios
         .post(`/manager/lead/${userId}/take`)
-        .then(({ data }: any) => {
+        .then(({ data }) => {
           this.$message.success(data.message);
         })
-        .catch((err: any) => {
+        .catch((err) => {
           this.$message.error(err.response.message);
         })
         .finally(() => {
