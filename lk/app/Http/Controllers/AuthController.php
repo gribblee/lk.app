@@ -229,7 +229,8 @@ class AuthController extends Controller
                 $phone = preg_replace('![^0-9]+!', '', $request->phone);
 
                 if ($this->hasUser([
-                    'phone' => $request->phone
+                    'phone' => $request->phone,
+                    'is_block' => false
                 ])) {
                     $smsData->to = $phone;
                     $smsData->text = $smsToken->passphrase;
@@ -402,7 +403,7 @@ class AuthController extends Controller
             'balance' => 0.0,
             'bonus' => 0.0,
             'region_id' => $this->geo->region->id,
-            'manager_id' => null,//$this->getRandManager()->id ?? null,
+            'manager_id' => null, //$this->getRandManager()->id ?? null,
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
             'was_online' => Carbon::now()
