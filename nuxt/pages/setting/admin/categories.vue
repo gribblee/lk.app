@@ -56,6 +56,18 @@
                           autocomplete="off"
                         />
                       </a-form-model-item>
+                      <!-- Source ID -->
+                      <a-form-model-item
+                        has-feedback
+                        label="ID источник(Bitrix)"
+                        prop="name"
+                      >
+                        <a-input-number
+                          v-model="item.source_id"
+                          autocomplete="off"
+                          class="input-full"
+                        />
+                      </a-form-model-item>
                       <!-- Описание -->
                       <a-form-model-item
                         has-feedback
@@ -93,6 +105,11 @@
     </a-layout>
   </a-layout-content>
 </template>
+<style scoped>
+.input-full {
+  width: 100%;
+}
+</style>
 <script lang="ts">
 import Vue from "vue";
 export default Vue.extend({
@@ -113,6 +130,11 @@ export default Vue.extend({
           },
         ],
         description: [
+          {
+            required: false,
+          },
+        ],
+        source_id: [
           {
             required: false,
           },

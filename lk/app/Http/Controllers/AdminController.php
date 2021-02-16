@@ -201,4 +201,40 @@ class AdminController extends Controller
         }
         return response('Доступ запрещён!', 403);
     }
+
+    /**
+     * @return JsonResponse
+     */
+    public function blockedUser(Request $request)
+    {
+        if ($request->user()->role == 'ROLE_ADMIN' && $request->has('ids')) {
+            $ids = [];
+            foreach ($request->ids as $user) {
+                $ids[] = $user['id'];
+            }
+            User::whereIn('id', $ids)->update(['is_block' => true]);
+            return response()->json([
+                'success' => true
+            ]);
+        }
+        return response('Доступ запрещён!', 403);
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    public function unblockedUser(Request $request)
+    {
+        if ($request->user()->role == 'ROLE_ADMIN' && $request->has('ids')) {
+            $ids = [];
+            foreach ($request->ids as $user) {
+                $ids[] = $user['id'];
+            }
+            User::whereIn('id', $ids)->update(['is_block' => false]);
+            return response()->json([
+                'success' => true
+            ]);
+        }
+        return response('Доступ запрещён!', 403);
+    }
 }

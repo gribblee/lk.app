@@ -23,6 +23,44 @@ class ManagerController extends Controller
             ])->get());
         }
     }
+
+
+    /**
+     * @return JsonResponse
+     */
+    public function getLeads(Request $request)
+    {
+        if ($request->user()->role == 'ROLE_ADMIN' || $request->user()->role == 'ROLE_MANAGER') {
+            try {
+                return User::with(['category', 'region'])->where('manager_id', null)->paginate(10);
+            } catch (Exception $e) {
+                return response()->json([
+                    'message' => "Ошибка!"
+                ], 500);
+            }
+        }
+    }
+
+    /**
+     * @param $userId
+     * @return JsonResponse
+     */
+    public function takeLead(Request $request, int $userId)
+    {
+        if ($request->user()->role == 'ROLE_ADMIN' || $request->user()->role == 'ROLE_MANAGER') {
+            try {
+                $lead = User::where('manager_id', null)->findOrFail($userId);
+                $lead->update([
+                    'manager_id' => $request->user()->id
+                ]);
+            } catch (Exception $e) {
+                return response()->json([
+                    'message' => 'Не найдено'
+                ], 404);
+            }
+        }
+    }
+
     /**
      * @return JsonResponse
      */

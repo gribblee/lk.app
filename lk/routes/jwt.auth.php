@@ -30,6 +30,9 @@ Route::group([
     Route::post('updates', "AdminController@updateUser");
     Route::post('delete', "AdminController@deleteUser");
     Route::post('active', "AdminController@deleteActive");
+
+    Route::post('blocked', "AdminController@blockedUser");
+    Route::post('unblocked', "AdminController@unblockedUser");
 });
 
 Route::group(['prefix' => 'category'], function () {
@@ -180,6 +183,8 @@ Route::group([
 ], function () {
     Route::post('users', "ManagerController@getUsers");
     Route::post('bid/{bidId}/update', "ManagerController@updateBidUser");
+    Route::get('leads', 'ManagerController@getLeads');
+    Route::post('lead/{userId}/take', 'ManagerController@takeLead');
 });
 Route::group([
     'prefix' => 'bids'

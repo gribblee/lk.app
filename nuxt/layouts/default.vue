@@ -7,7 +7,7 @@
       @breakpoint="onBreakpoint"
     >
       <div class="logo">
-        <img src="/logo.png" :style="{ width: 'auto', height: '32px'}" />
+        <img src="/logo.png" :style="{ width: 'auto', height: '32px' }" />
       </div>
       <a-menu
         theme="dark"
@@ -559,6 +559,13 @@ export default {
             "ROLE_WEBMASTER",
             "ROLE_ACCOUNAT",
           ],
+          type: "Route",
+        },
+        {
+          name: "Новые пользователи",
+          icon: "team",
+          url: "/manager/leads",
+          rolesHidden: ["ROLE_USER", "ROLE_WEBMASTER", "ROLE_ACCOUNAT"],
           type: "Route",
         },
         {

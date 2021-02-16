@@ -329,9 +329,11 @@
                   {{ record.max_rate * record.deals_count }}
                 </span>
                 <template slot="user" slot-scope="text, record">
-                  <nuxt-link :to="{ path: `/users/${record.user.id}` }">
-                    {{ record.user.name }}
-                  </nuxt-link>
+                  <template v-if="record.user">
+                    <nuxt-link :to="{ path: `/users/${record.user.id}` }">
+                      {{ record.user.name }}
+                    </nuxt-link>
+                  </template>
                 </template>
               </a-table>
             </a-config-provider>

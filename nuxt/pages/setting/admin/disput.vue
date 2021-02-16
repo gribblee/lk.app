@@ -157,7 +157,7 @@ export default Vue.extend({
   methods: {
     handleCreate(e: any) {
       const app: any = this;
-      app.$axios.put("/disput_statuscreate").then(({ data }: any) => {
+      app.$axios.put("/disput_status/create").then(({ data }: any) => {
         if (data.success) {
           this.disputStatuses();
         } else {

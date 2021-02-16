@@ -99,7 +99,7 @@
               >
                 <a-select-option :key="0">Без менеджера</a-select-option>
                 <a-select-option
-                  v-for="(manager, index) in managers"
+                  v-for="manager in managers"
                   :key="manager.id"
                   :value="manager.id"
                   :label="manager.name"

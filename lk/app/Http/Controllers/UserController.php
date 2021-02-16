@@ -35,6 +35,11 @@ class UserController extends Controller
         } else {
             $users->where('is_delete', false);
         }
+        if ($request->has('is_block')) {
+            $users->where('is_block', $request->is_block);
+        } else {
+            $users->where('is_block', false);
+        }
         if ($request->has('search')) {
             $search = (object)$request->search;
             if (empty($search->id) == false) {
@@ -291,7 +296,7 @@ class UserController extends Controller
         $Response->type_name = Category::find($request->user()->category_id)->name;
         $Response->notifications = Notification::nonView($request->user()->id)->get();
         User::where('id', $request->user()->id)->update([
-            'was_online' => Carbon::now()//->format("d-m-Y H:i:s")
+            'was_online' => Carbon::now() //->format("d-m-Y H:i:s")
         ]);
         Notification::updatedAllView($request->user()->id, true);
 

@@ -32,6 +32,7 @@ class User extends Authenticatable implements JWTSubject
         'is_demo',
         'is_registration',
         'was_online',
+        'is_block'
     ];
 
     /**
@@ -80,6 +81,11 @@ class User extends Authenticatable implements JWTSubject
     public function notification()
     {
         return $this->hasMany(Notification::class, 'user_id', 'id');
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class, 'category_id', 'id');
     }
 
     public function manager()
