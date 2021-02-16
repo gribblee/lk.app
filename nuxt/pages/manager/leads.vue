@@ -88,8 +88,7 @@ export default Vue.extend({
         });
     },
     takeLead(userId: number, e: Event) {
-      const { $axios } = this;
-      $axios
+      this.$axios
         .post(`/manager/lead/${userId}/take`)
         .then(({ data }: any) => {
           this.$message.success(data.message);
