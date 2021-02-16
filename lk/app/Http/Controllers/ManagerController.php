@@ -32,7 +32,10 @@ class ManagerController extends Controller
     {
         if ($request->user()->role == 'ROLE_ADMIN' || $request->user()->role == 'ROLE_MANAGER') {
             try {
-                return User::with(['category', 'region'])->where('manager_id', null)->paginate(10);
+                return User::with(['category', 'region'])->where([
+                    'manager_id' => null,
+                    'role' => 'ROLE_ADMIN'
+                ])->orderByDesc('created_at')->paginate(10);
             } catch (Exception $e) {
                 return response()->json([
                     'message' => "Ошибка!"
