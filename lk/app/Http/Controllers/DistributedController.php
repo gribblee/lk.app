@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
 
 use App\Models\Deal;
@@ -9,9 +10,18 @@ use App\Models\User;
 use App\Models\Status;
 use App\Models\Bid;
 
+use App\Helpers\BitrixApi;
+
+use Exception;
+
 class DistributedController extends Controller
 {
     //
+
+    function __construct()
+    {
+        $this->bitrix24 = new BitrixApi('h58v8sy0z4ltt2zh');
+    }
 
     public function index(Request $request)
     {
@@ -74,7 +84,7 @@ class DistributedController extends Controller
                         })->orWhere(function ($query) {
                             return $query->whereJsonLength('regions', 0);
                         });
-                    });//->whereRaw("(select count(*) from
+                    }); //->whereRaw("(select count(*) from
                     //        deals where bids.id = (deals.bid_id)
                     //        and deals.created_at = date_trunc('day', current_date)
                     //    ) < bids.daily_limit OR bids.daily_limit = 0");
@@ -106,6 +116,15 @@ class DistributedController extends Controller
                 $deal->amount = $bid->consumption;
                 $deal->save();
 
+                if (
+                    $bid->user->contact_id != null
+                    && $bid->user->contact_id != 0
+                ) {
+                    $this->addBitrix($request, $bid);
+                }
+
+                $this->sendMail($bid->user);
+
                 return response()->json([
                     'success' => true,
                     'msg' => 'Статус обновлён, заявка распределена'
@@ -123,6 +142,44 @@ class DistributedController extends Controller
             }
         }
         return response('ДОСУТП ЗАПРЕШЁН', 403);
+    }
+
+    protected function sendMail(User $user)
+    {
+        /**
+         * Отправка на почту 
+         */
+        try {
+            Mail::send([], [], function ($message) use ($user) {
+                $userMail = $user->email;
+                $message->from('system@b2l.online', 'Leadz.Monster');
+                $message->subject('Вам поступила заявка');
+                if ($user->email_notification) {
+                    $userMail = $user->email_notification;
+                }
+                $message->to($userMail)->cc($userMail);
+                $message->setBody('<p>Вам поступила новая заявка <a href="http://lk.leadz.monster/deals">посмотреть</a></p>', 'text/html');
+            });
+        } catch (Exception $e) {
+        }
+    }
+
+    protected function addBitrix(Request $request, Bid $Bid)
+    {
+        $this->bitrix24
+            ->lead('default', $request->header('referer')
+                ?? $request->input('referer')
+                ?? 'https://lk.leadz.monster')
+            ->utm($request->all())
+            ->field('ADDRESS_CITY', $request->region->name ?? 'Не определно')
+            ->field('UF_CRM_1602571646472', $Bid->direction->name)
+            ->field('OPPORTUNITY', $Bid->consumption)
+            ->field('CURRENCY_ID', 'RUB')
+            ->field('EMAIL', $request->email, 'WORK')
+            ->field('PHONE', $request->phone, 'WORK')
+            ->field('NAME', $request->name ?? 'Без имени')
+            ->field('ASSIGNED_BY_ID', $Bid->user->contact_id)
+            ->add();
     }
 
     public function update(Request $request, int $id)
