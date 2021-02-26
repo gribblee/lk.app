@@ -55,7 +55,7 @@ class RunOnController extends Controller
             'status' => 'ENTERED',
             'message' => 'Заявка поступила'
         ]);
-        try {
+        //try {
             $AppToken = AppToken::where('hash', $hash)->firstOrFail();
 
             $region = $this->definitionRegion($request); //Определение региона
@@ -100,12 +100,12 @@ class RunOnController extends Controller
                 }
             }
             return response()->json($Response->toArray());
-        } catch (Exception $e) {
-            Log::notice("Notice: {$e->getMessage()}");
-            return response()->json([
-                'message' => 'OK',
-            ], 200);
-        }
+        // } catch (Exception $e) {
+        //     Log::notice("Notice: {$e->getMessage()}");
+        //     return response()->json([
+        //         'message' => 'OK',
+        //     ], 200);
+        // }
     }
 
     protected function userPayment(User $user, $claim)
