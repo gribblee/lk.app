@@ -88,6 +88,11 @@ class DirectoryController extends Controller
                     'categories'
                 ]);
                 $direction->update($updated);
+                $directionAmount = $direction->cost_price + ($direction->cost_price * ($direction->extra / 100));
+                Bid::where([
+                    ['direction_id', '=', $id],
+                    ['consumption', '<', $directionAmount]
+                ])->update(['consumption' => $directionAmount]);
                 return response()->json([
                     'success' => true,
                     'message' => "Направление \"{$direction->name}\" обновлено"
