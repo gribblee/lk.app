@@ -52,9 +52,7 @@ class RunOn
                 // $item->weight = (($item->consumption / $max_r) * ($min_r / $max_r)) * ($item->deals_today_count + $sqrt);
                 return $item;
             }
-        })->sortBy([
-            ['weight', 'desc']
-        ])->first();
+        })->sortByDesc('weight')->first();
         return $claim;
     }
 }
