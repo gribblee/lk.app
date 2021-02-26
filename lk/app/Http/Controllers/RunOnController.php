@@ -66,7 +66,8 @@ class RunOnController extends Controller
             Log::info("Region: " . json_encode($region) . "\r\n");
 
             if (!$claims->isEmpty()) {
-                $claim = $this->RunOn->claimsMatch(collect($claims), $region); //Поиск совпадения
+                Log::info("Claims is not Empty");
+                $claim = $this->RunOn->claimsMatch($claims, $region); //Поиск совпадения
                 if ($claim) { //Вторая проверка
                     $user = User::where(['role' => 'ROLE_USER', 'is_delete' => false])->find($claim->user_id);
                     if ($user) { //Заявка не должна попадать менеджеру или администратору
