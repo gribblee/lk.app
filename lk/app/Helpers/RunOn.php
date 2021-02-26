@@ -16,7 +16,7 @@ class RunOn
     {
     }
 
-    public function claimsMatch(SuperCollection $claims, $region)
+    public function claimsMatch($claims, $region)
     {
         $userKeyed = $claims->mapWithKeys(function ($item) {
             return [$item['user_id']];
