@@ -187,11 +187,11 @@ class RunOnController extends Controller
                 'direction_id' => $appToken->direction_id
             ])
             ->whereHas('user', function ($q) {
-                return $q->whereRaw('(users.id = bids.user_id) 
+                return $q->whereRaw('users.id = bids.user_id AND (users.id = bids.user_id) 
                     AND (users.balance >= bids.consumption)');
             })
             ->whereHas('direction', function ($q) {
-                return $q->whereRaw('bids.consumption >= (directions.cost_price + (directions.cost_price * (directions.extra / 100)))');
+                return $q->whereRaw('directions.id = bids.direction_id AND bids.consumption >= (directions.cost_price + (directions.cost_price * (directions.extra / 100)))');
             })
             ->where(function ($q) use ($region) { //Определение региона надеюсь сработает
                 return $q->whereJsonContains('regions', [
