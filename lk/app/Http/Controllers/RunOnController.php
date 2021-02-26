@@ -69,6 +69,7 @@ class RunOnController extends Controller
                 Log::info("Claims is not Empty");
                 $claim = $this->RunOn->claimsMatch($claims, $region); //Поиск совпадения
                 if ($claim) { //Вторая проверка
+                    Log::info("Claim Founed");
                     $user = User::where(['role' => 'ROLE_USER', 'is_delete' => false])->find($claim->user_id);
                     if ($user) { //Заявка не должна попадать менеджеру или администратору
                         //** Обновление поступившей заявки
