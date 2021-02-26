@@ -72,6 +72,7 @@ class RunOnController extends Controller
                     Log::info("Claim Founed ID {$claim->id} Consumption {$claim->consumption}");
                     $user = User::where(['role' => 'ROLE_USER', 'is_delete' => false])->find($claim->user_id);
                     if ($user) { //Заявка не должна попадать менеджеру или администратору
+                        Log::info("Claim User success ID {$user->id}");
                         //** Обновление поступившей заявки
                         $deal->update([
                             'amount' => $claim->consumption,
