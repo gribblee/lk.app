@@ -32,7 +32,7 @@ class DirectoryController extends Controller
         $Response->options = Option::getKeyValue();
         $Response->status = Status::orderBy('order', 'DESC')->get();
         $Response->categories = Category::all();
-        $Response->regions = Region::all();
+        $Response->regions = Region::orderBy('name')->get();
 
         return response()->json($Response, 200);
     }
