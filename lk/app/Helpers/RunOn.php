@@ -43,8 +43,13 @@ class RunOn
                     break;
                 }
             }
-            if (($isRegion || count($item->regions) == 0) && $item->user->balance >= $item->consumption) {
-                $item->weight = mt_rand($min_r / 2, $item->consumption) 
+            $directionAmount = $item->direction->cost_price + ($item->direction->cost_price * ($item->direction->extra / 100));
+
+            if (($isRegion || count($item->regions) == 0)
+                && $item->user->balance >= $item->consumption
+                && $item->consumption >= $directionAmount
+            ) {
+                $item->weight = mt_rand($min_r / 2, $item->consumption)
                     / (($item->deals_today_count + 1) / 2) + ($isRegion ? $avg_r / ($min_r / $max_r) : 1);
                 //$rndSqrt = sqrt(rand(1, $item->consumption));
                 //$koef = (($item->consumption / $max_r)) * ($min_r / $max_r);
