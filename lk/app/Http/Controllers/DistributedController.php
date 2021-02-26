@@ -137,7 +137,7 @@ class DistributedController extends Controller
                 $deal->save();
                 return response()->json([
                     'success' => false,
-                    'error' => 'Статус не обновлён, заявка не распределена'
+                    'error' => 'Статус не обновлён, заявка не распределена',
                 ]);
             }
         }

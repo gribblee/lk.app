@@ -16,7 +16,20 @@ class Deal extends Model
     use HasFactory;
 
     protected $table = 'deals';
-    protected $fillable = ['is_view', 'price'];
+    protected $fillable = [
+        'is_view',
+        'amount',
+        'name',
+        'phone',
+        'email',
+        'is_manager_view',
+        'utm',
+        'region_id',
+        'direction_id',
+        'bid_id',
+        'status_id',
+        'token_id'
+    ];
 
     public static function getCount(string $role = '', int $user_id = 0, int $user_category = 0)
     {

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 use App\Models\Direction;
 use App\Models\Region;
@@ -73,7 +74,7 @@ class Bid extends Model
             ->when($today, function ($q) {
                 return $q->join('deals', function ($join) {
                     return $join->on('deals.bid_id', '=', 'bids.id');
-                })->whereRaw("deals.created_at >= date_trunc('day', current_date)");
+                })->whereRaw("date_trunc('day', deals.created_at) >= date_trunc('day', current_date)");
             })
             ->sum('consumption');
     }
@@ -95,7 +96,7 @@ class Bid extends Model
 
     public function dealsToday()
     {
-        return $this->hasMany(Deal::class)->whereRaw("deals.created_at = date_trunc('day', current_date)");
+        return $this->hasMany(Deal::class)->whereRaw("date_trunc('day', deals.created_at) = date_trunc('day', current_date)");
     }
 
     /**
@@ -105,11 +106,12 @@ class Bid extends Model
     {
         return $this->belongsTo(User::class);
     }
-    
+
     public function region()
     {
         return $this->belongsToJson(Region::class, 'regions', 'id');
     }
+    
 
     public function deals()
     {

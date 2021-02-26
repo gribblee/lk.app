@@ -91,10 +91,10 @@ class SVDMatrix
      */
     public function matrixConstruct($matrix, $rows, $columns)
     {
-
+        $neoMatrix = [];
         for ($i = 0; $i < $rows; $i++) {
             for ($j = 0; $j < $columns; $j++) {
-                $neoMatrix[$i][$j] = $matrix[$i][$j];
+                $neoMatrix[$i][$j] = intval($matrix[$i][$j]);
             }
         }
         return $neoMatrix;
@@ -186,7 +186,7 @@ class SVDMatrix
     {
 
         $m = count($matrix);
-        $n = count($matrix[0]);
+        $n = count($matrix[0]) - 1;
 
         $U  = $this->matrixConstruct($matrix, $m, $n);
         $V  = $this->matrixConstruct($matrix, $n, $n);
@@ -213,7 +213,7 @@ class SVDMatrix
                     $h = $f * $g - $s;
                     $U[$i][$i] = $f - $g;
                     for ($j = $l - 1; $j < $n; $j++) {
-                        for ($s = 0.0, $k = $i; $k < $m; $k++) $s += $U[$k][$i] * $U[$k][$j];
+                        for ($s = 0.0, $k = $i; $k < $m; $k++)  $s += $U[$k][$i] * $U[$k][$j];
                         $f = $s / $h;
                         for ($k = $i; $k < $m; $k++) $U[$k][$j] += $f * $U[$k][$i];
                     }
@@ -424,8 +424,8 @@ class SVDMatrix
 
         // Low-Rank Approximation
         $q = 0.9;
-        $k = 0;
-        $frobA = 0;
+        $k = 1;
+        $frobA = 1;
         $frobAk = 0;
 
         for ($i = 0; $i < $rank; $i++) $frobA += $W[$i];

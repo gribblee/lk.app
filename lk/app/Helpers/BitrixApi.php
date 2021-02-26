@@ -86,6 +86,19 @@ class BitrixApi extends Helper
         return Http::post($this->sendUrl . '/' . $this->action . '.add.json', $this->DATA_REQUEST);
     }
 
+    public function getData()
+    {
+        return [
+            'api_key' => $this->apiKey,
+            'action' => $this->action,
+            'data' => $this->DATA_REQUEST,
+            'utm' => $this->UTM_MARK,
+            'source_id' => $this->SOURCE_ID,
+            'source_register_id' => $this->SOURCE_REGISTER_ID,
+            'responsible_id' => $this->RESPONSIBLE_ID,
+        ];
+    }
+
     public function run()
     {
     }

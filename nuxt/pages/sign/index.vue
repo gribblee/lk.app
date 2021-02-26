@@ -26,6 +26,7 @@
                 />
               </a-form-model-item>
               <a-form-model-item
+                has-feedback
                 label="Телефон"
                 prop="phone"
                 v-if="!signIsCode"
@@ -62,13 +63,14 @@
               ref="formSignUp"
             >
               <template v-if="!signUpIsCode">
-                <a-form-model-item label="Имя" prop="name">
+                <a-form-model-item has-feedback label="Ваше ФИО" prop="name">
                   <a-input v-model="formSignUp.name" placeholder="Имя" />
                 </a-form-model-item>
-                <a-form-model-item label="Email" prop="email">
+                <a-form-model-item has-feedback label="Email" prop="email">
                   <a-input v-model="formSignUp.email" placeholder="Email" />
                 </a-form-model-item>
                 <a-form-model-item
+                  has-feedback
                   label="Телефон"
                   prop="phone"
                   v-mask="maskPhone"
@@ -78,13 +80,16 @@
                 <a-form-model-item prop="isOfferta">
                   <a-checkbox v-model="formSignUp.isOfferta"
                     >Я согласен с
-                    <a href="https://docs.google.com/document/d/1jQdxmXkYby1lG2IJ_wJdp8xzkdIhMsIswxI2OSAgr9o/edit" target="_blank"
+                    <a
+                      href="https://docs.google.com/document/d/1jQdxmXkYby1lG2IJ_wJdp8xzkdIhMsIswxI2OSAgr9o/edit"
+                      target="_blank"
                       >правилами пользования платформой</a
                     ></a-checkbox
                   >
                 </a-form-model-item>
               </template>
               <a-form-model-item
+                has-feedback
                 label="Код из СМС"
                 prop="code"
                 v-if="signUpIsCode"
@@ -96,7 +101,12 @@
                 />
               </a-form-model-item>
               <a-form-model-item>
-                <a-alert type="error" :message="errorMsg" banner v-show="isError" />
+                <a-alert
+                  type="error"
+                  :message="errorMsg"
+                  banner
+                  v-show="isError"
+                />
               </a-form-model-item>
               <a-form-model-item>
                 <a-button type="primary" @click="handleSignUp">
@@ -132,6 +142,21 @@ export default {
     };
   },
   data() {
+    let ValidateEmail = (rule, value, callback) => {
+      const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      if (!re.test(String(value).toLowerCase()) && String(value).length > 0) {
+        callback(new Error("Пожалуйста введите email адрес"));
+      } else {
+        callback();
+      }
+    };
+    let ValidateName = (rule, value, callback) => {
+      const re = /^[а-яё]{3,}([-][а-яё]{3,})?\s[а-яё]{3,}\s[а-яё]{3,}$/;
+      if (!re.test(String(value).toLowerCase())) {
+        callback(new Error("Введите ФИО"));
+      }
+      callback();
+    };
     return {
       isLoading: false,
       signIsCode: false,
@@ -154,12 +179,14 @@ export default {
               required: true,
               message: "Поле имя обязательно",
             },
+            { validator: ValidateName, trigger: "change" },
           ],
           email: [
             {
               required: true,
               message: "Поле Email обязательно",
             },
+            { validator: ValidateEmail, trigger: "change" },
           ],
           phone: [
             {

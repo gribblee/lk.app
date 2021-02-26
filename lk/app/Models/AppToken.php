@@ -10,7 +10,7 @@ class AppToken extends Model
     use HasFactory;
 
     protected $table = "api_token";
-    protected $fillable = ['hash', 'user_id', 'count_deals', 'direction_id', 'created_at', 'updated_at'];
+    protected $fillable = ['id', 'hash', 'user_id', 'count_deals', 'direction_id', 'created_at', 'updated_at'];
 
     public function deal()
     {

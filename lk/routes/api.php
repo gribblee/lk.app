@@ -20,12 +20,27 @@ Route::group([
     Route::post('/authorize', 'AuthController@authorizeToken');
 });
 
+
 Route::group([
-    'prefix' => 'app',
-    'middleware' => ['app.auth']
-], function () {
-    Route::post('{hash}/push', "AppController@push");
+    'prefix' => 'runon'
+], function() {
+    Route::match(['get', 'post'], '{hash}/append', "RunOnController@append");
 });
+
+Route::group([
+    'prefix' => 'app'
+], function() {
+    Route::match(['get', 'post'], '{hash}/push', "RunOnController@append");
+});
+
+
+// Route::group([
+//     'prefix' => 'app',
+//     'middleware' => ['app.auth']
+// ], function () {
+//     Route::post('{hash}/push', "AppController@push");
+// });
+
 
 /**
  * Миграции

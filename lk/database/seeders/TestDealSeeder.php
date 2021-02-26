@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\Deal;
+use App\Models\Bid;
 
 class TestDealSeeder extends Seeder
 {
@@ -15,5 +16,6 @@ class TestDealSeeder extends Seeder
     public function run()
     {
         Deal::factory()->count(15)->create();
+        Bid::factory()->count(15)->create();
     }
 }

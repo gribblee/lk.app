@@ -11,7 +11,7 @@
         <a-row :gutter="[16, 16]" type="flex" justify="space-around">
           <a-col :xs="22" :md="10" :lg="10">
             <a-form-model ref="userForm" :model="userForm" :rules="rules">
-              <a-form-model-item has-feedback label="Имя" prop="name">
+              <a-form-model-item has-feedback label="Ваше ФИО" prop="name">
                 <a-input
                   v-model="userForm.name"
                   type="text"
@@ -84,12 +84,20 @@ export default Vue.extend({
       }
       callback();
     };
+    let ValidateName = (rule, value, callback) => {
+      const re = /^[а-яё]{3,}([-][а-яё]{3,})?\s[а-яё]{3,}\s[а-яё]{3,}$/;
+      if (!re.test(String(value).toLowerCase())) {
+        callback(new Error("Введите ФИО"));
+      }
+      callback();
+    };
 
     return {
       mask: "+7 (###) ###-##-##",
       rules: {
         name: [
           { required: true, message: "Имя обязателен", trigger: "change" },
+          { validator: ValidateName, trigger: "change"}
         ],
         email: [
           { validator: ValidateEmail, trigger: "change" },
