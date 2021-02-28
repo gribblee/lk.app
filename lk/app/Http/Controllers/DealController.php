@@ -9,6 +9,7 @@ use Illuminate\Support\Carbon;
 use App\Models\Deal;
 use App\Models\DealFile;
 use App\Models\Status;
+use Illuminate\Support\Facades\Log;
 
 class DealController extends Controller
 {
@@ -23,8 +24,33 @@ class DealController extends Controller
             ->with('direction')
             ->with('disput')
             ->with('bids.user')
-            ->whereHas('direction', function($q) use($request) {
+            ->with('user')
+            ->whereHas('direction', function ($q) use ($request) {
                 return $q->whereJsonContains('directions.categories', $request->user()->category_id);
+            })
+            ->when($request->has('search_'), function ($q) use ($request) {
+                $srchBegin = $request->search_;
+                $srch = [];
+                foreach ($srchBegin as $key => $val) {
+                    if (!empty($val) && $val != null) {
+                        if ($key != 'datePicker') {
+                            if ($key != 'user_name') {
+                                $srch[] = [$key, '=', $val];
+                            } else {
+                                $q->whereHas('user', function($qm) use($val) {
+                                    return $qm->where('name','LIKE', "%{$val}%");
+                                });
+                            }
+                        } else {
+                            if ($key == 'datePicker') {
+                                //2021-02-25 17:19:54
+                                $srch[] = ['created_at', '>=', $val[0]];
+                                $srch[] = ['created_at', '<=', $val[1]];
+                            }
+                        }
+                    }
+                }
+                return $q->where($srch);
             })
             ->when($request->user()->role == 'ROLE_USER', function ($q)
             use ($request) {
@@ -36,7 +62,7 @@ class DealController extends Controller
                 return $q->whereHas('bids.user', function ($query) use ($request) {
                     return $query->where('manager_id', $request->user()->id);
                 });
-            })->orderBy('created_at', ($request->has('order_by') ?
+            })->orderBy($request->order_field, ($request->has('order_by') ?
                 ($request->order_by == 'DEF'
                     ? 'DESC'
                     : $request->order_by)

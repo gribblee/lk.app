@@ -18,6 +18,7 @@
                 <a-input
                   size="large"
                   v-model="searchField.name"
+                  @keyup.enter="handleSearch"
                   @blur="handleSearch"
                 />
               </a-form-item>
@@ -89,8 +90,18 @@
               <a-form-item label="На кого распределён">
                 <a-input
                   size="large"
-                  v-model="searchField.manager"
+                  v-model="searchField.user_name"
                   @blur="handleSearch"
+                />
+              </a-form-item>
+            </a-col>
+            <a-col :span="6">
+              <a-form-item label="Дата" :style="{marginLeft: '20px'}">
+                <a-range-picker
+                  size="large"
+                  v-model="searchField.datePicker"
+                  @blur="handleSearch"
+                  @keyup.enter="handleSearch"
                 />
               </a-form-item>
             </a-col>
@@ -194,6 +205,13 @@
             <template slot="created_at" slot-scope="text, record">
               {{ getDate(record.created_at) }}
             </template>
+            <template slot="amount" slot-scope="text, record">
+              <template
+                v-if="user.role == 'ROLE_ADMIN' || user.role == 'ROLE_MANAGER'"
+              >
+                {{ record.amount }} ₽
+              </template>
+            </template>
           </a-table>
         </a-config-provider>
       </div>
@@ -266,16 +284,16 @@
         <a-row>
           <a-col :span="12">
             <template v-if="dealData.region">
-            <b-description-item
-              title="Регион"
-              :content="dealData.region.name_with_type"
-            />
+              <b-description-item
+                title="Регион"
+                :content="dealData.region.name_with_type"
+              />
             </template>
             <template v-else>
               <b-description-item
-              title="Регион"
-              content="Регион не определён"
-            />
+                title="Регион"
+                content="Регион не определён"
+              />
             </template>
           </a-col>
           <a-col :span="12">
@@ -476,6 +494,16 @@ const columns = [
     sorter: (a, b) => {},
   },
   {
+    title: "Доход",
+    dataIndex: "amount",
+    key: "amount",
+    scopedSlots: { customRender: "amount" },
+    defaultSortOrder: "descend",
+    sortDirections: ["descend", "ascend"],
+    onFilter: (value, record) => {},
+    sorter: (a, b) => {},
+  },
+  {
     title: "На кого распределён",
     dataIndex: "bids",
     key: "bids",
@@ -504,12 +532,14 @@ export default {
       disputTypeData: [],
       pagination: {},
       order_by: "DEF",
+      order_field: "id",
       searchField: {
-        name: null,
+        name: '',
         status_id: null,
         region_id: null,
         direction_id: null,
-        manager: null,
+        user_name: '',
+        datePicker: [],
       },
       pStyle: {
         fontSize: "16px",
@@ -576,6 +606,11 @@ export default {
       } else {
         this.order_by = "DEF";
       }
+      if (typeof sorters.field != "undefined") {
+        this.order_field = sorters.field;
+      } else {
+        this.order_field = "id";
+      }
       this.loadTable({}, pager.current);
     },
     loadTable(postData = {}, currentPage = 1) {
@@ -584,6 +619,7 @@ export default {
         .post(`/deals?page=${currentPage}`, {
           search_: this.searchField,
           order_by: this.order_by,
+          order_field: this.order_field,
         })
         .then(({ data }) => {
           const pagination = { ...this.pagination };

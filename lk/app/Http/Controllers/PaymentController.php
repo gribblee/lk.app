@@ -32,8 +32,8 @@ class PaymentController extends Controller
         $options = Option::getKeyValue();
 
         $this->sendPulse = new SendPulse;
-        $this->bookIdBill = $options['bookIdBill'];
-        $this->bookIdBalance = $options['bookIdBalance'];
+        $this->bookIdBill = $options['bookIdBill'] ?? 0;
+        $this->bookIdBalance = $options['bookIdBalance'] ?? 0;
     }
 
     /**
@@ -273,42 +273,49 @@ class PaymentController extends Controller
             $request->has('paysum')
             && !empty($request->input('paysum'))
         ) {
-            $payment = Payment::create([
-                'type' => HelperPayment::TYPE_CD,
-                'status' => HelperPayment::CD_STATUS_CREATE,
-                'requisite_id' => null,
-                'user_id' => $request->user()->id,
-                'paysum' => $request->paysum,
-                'before_balance' => $request->user()->balance,
-                'after_balance' => $request->user()->balance
-            ]);
-            $tinkoff = new Tinkoff(config('tinkoff.url'), config('tinkoff.terminalKey'), config('tinkoff.secretKey'), config('tinkoff.credit_url'));
-            $paymentTinkoff = [
-                'OrderId'       => $payment->id,
-                'Amount'        => $request->paysum,
-                'Language'      => config('tinkoff.lang'),
-                'Description'   => config('tinkoff.description'),
-                'Email'         => $request->user()->email,
-                'Phone'         => $request->user()->phone,
-                'Name'          => $request->user()->name,
-                'Taxation'      => config('tinkoff.taxation')
-            ];
-            $tinkoffSettings[] = [
-                'Name'  => 'Пополнение личного счета',
-                'Price' => $request->paysum,
-                'NDS'   => config('tinkoff.nds'),
-            ];
-            $paymentURL = $tinkoff->paymentURL($paymentTinkoff, $tinkoffSettings);
-            if (!$paymentURL) {
+            if ($request->paysum >= 10000) {
+                $payment = Payment::create([
+                    'type' => HelperPayment::TYPE_CD,
+                    'status' => HelperPayment::CD_STATUS_CREATE,
+                    'requisite_id' => null,
+                    'user_id' => $request->user()->id,
+                    'paysum' => $request->paysum,
+                    'before_balance' => $request->user()->balance,
+                    'after_balance' => $request->user()->balance
+                ]);
+                $tinkoff = new Tinkoff(config('tinkoff.url'), config('tinkoff.terminalKey'), config('tinkoff.secretKey'), config('tinkoff.credit_url'));
+                $paymentTinkoff = [
+                    'OrderId'       => $payment->id,
+                    'Amount'        => $request->paysum,
+                    'Language'      => config('tinkoff.lang'),
+                    'Description'   => config('tinkoff.description'),
+                    'Email'         => $request->user()->email,
+                    'Phone'         => $request->user()->phone,
+                    'Name'          => $request->user()->name,
+                    'Taxation'      => config('tinkoff.taxation')
+                ];
+                $tinkoffSettings[] = [
+                    'Name'  => 'Пополнение личного счета',
+                    'Price' => $request->paysum,
+                    'NDS'   => config('tinkoff.nds'),
+                ];
+                $paymentURL = $tinkoff->paymentURL($paymentTinkoff, $tinkoffSettings);
+                if (!$paymentURL) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Ошибка не возможно произвести оплату'
+                    ]);
+                }
+                return response()->json([
+                    'success' => true,
+                    'payment_url' => $paymentURL,
+                ]);
+            } else {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Ошибка не возможно произвести оплату'
+                    'message' => 'Сумма должна быть не менее 10 000 руб.'
                 ]);
             }
-            return response()->json([
-                'success' => true,
-                'payment_url' => $paymentURL,
-            ]);
         }
         return response()->json([
             'success' => false,
@@ -333,67 +340,74 @@ class PaymentController extends Controller
             (!empty($request->input('requisite_id'))
                 && !empty($request->input('paysum')))
         ) {
-            $requis = Requisite::where('user_id', $request->user()->id)->find($request->requisite_id);
-            if ($requis) {
-                $paymentData = Payment::create([
-                    'type' => HelperPayment::TYPE_RQ,
-                    'status' => HelperPayment::RQ_STATUS_CREATE,
-                    'requisite_id' => $requis->id,
-                    'user_id' => $request->user()->id,
-                    'paysum' => $request->paysum,
-                    'before_balance' => $request->user()->balance,
-                    'after_balance' => $request->user()->balance
-                ]);
+            if ($request->paysum >= 10000) {
+                $requis = Requisite::where('user_id', $request->user()->id)->find($request->requisite_id);
+                if ($requis) {
+                    $paymentData = Payment::create([
+                        'type' => HelperPayment::TYPE_RQ,
+                        'status' => HelperPayment::RQ_STATUS_CREATE,
+                        'requisite_id' => $requis->id,
+                        'user_id' => $request->user()->id,
+                        'paysum' => $request->paysum,
+                        'before_balance' => $request->user()->balance,
+                        'after_balance' => $request->user()->balance
+                    ]);
 
-                /**
-                 *  BEGIN
-                 */
-                $pdfPath = '/payment/pdf/' . date("dmY", strtotime($paymentData->created_at)) . '-' . str_pad($paymentData->id . $paymentData->requisite_id, 6, '000000', STR_PAD_LEFT) . '.pdf';
+                    /**
+                     *  BEGIN
+                     */
+                    $pdfPath = '/payment/pdf/' . date("dmY", strtotime($paymentData->created_at)) . '-' . str_pad($paymentData->id . $paymentData->requisite_id, 6, '000000', STR_PAD_LEFT) . '.pdf';
 
-                $pdf = PDF::loadView('pdf.contract', [
-                    'payment' => $paymentData,
-                    'requisite' => $requis,
-                    'title' => date("dmY", strtotime($paymentData->created_at)) . '-' . str_pad($paymentData->id . $paymentData->requisite_id, 6, '000000', STR_PAD_LEFT),
-                    'bill' => str_pad($paymentData->id . $paymentData->requisite_id, 6, '000000', STR_PAD_LEFT),
-                    'sum_to_string' => HelperPayment::number2string($paymentData->paysum)
-                ]);
-                $pdf->save(Storage::disk('public')->path($pdfPath));
-                /**
-                 * END
-                 */
-                $paymentData['bill'] = date("dmY") . '-' . str_pad($paymentData->id . $requis->id, 6, '000000', STR_PAD_LEFT);
-                $paymentData['url'] = "/api/payment/{$paymentData->id}/doc";
-                /**
-                 * Отправка на почту 
-                 */
-                Mail::send([], [], function ($message) use ($request, $pdfPath, $paymentData) {
-                    $message->from('system@b2l.online', 'Leadz.Monster');
-                    $message->subject('Счёт на пополнение в сервисе Leadz.Monster');
-                    $message->to($request->user()->email)->cc($request->user()->email);
-                    $message->attach(Storage::disk('public')->path($pdfPath));
-                    $message->setBody('<h1>Здравствуйте</h1><br/><p>Вам выставлен счёт № ' . date("dmY", strtotime($paymentData->created_at)) . '-' . str_pad($paymentData->id . $paymentData->requisite_id, 6, '000000', STR_PAD_LEFT) . ' на сумму ' . $paymentData->paysum . ' ₽ в сервисе Leadz.Monster</p>', 'text/html');
-                });
+                    $pdf = PDF::loadView('pdf.contract', [
+                        'payment' => $paymentData,
+                        'requisite' => $requis,
+                        'title' => date("dmY", strtotime($paymentData->created_at)) . '-' . str_pad($paymentData->id . $paymentData->requisite_id, 6, '000000', STR_PAD_LEFT),
+                        'bill' => str_pad($paymentData->id . $paymentData->requisite_id, 6, '000000', STR_PAD_LEFT),
+                        'sum_to_string' => HelperPayment::number2string($paymentData->paysum)
+                    ]);
+                    $pdf->save(Storage::disk('public')->path($pdfPath));
+                    /**
+                     * END
+                     */
+                    $paymentData['bill'] = date("dmY") . '-' . str_pad($paymentData->id . $requis->id, 6, '000000', STR_PAD_LEFT);
+                    $paymentData['url'] = "/api/payment/{$paymentData->id}/doc";
+                    /**
+                     * Отправка на почту 
+                     */
+                    Mail::send([], [], function ($message) use ($request, $pdfPath, $paymentData) {
+                        $message->from('system@b2l.online', 'Leadz.Monster');
+                        $message->subject('Счёт на пополнение в сервисе Leadz.Monster');
+                        $message->to($request->user()->email)->cc($request->user()->email);
+                        $message->attach(Storage::disk('public')->path($pdfPath));
+                        $message->setBody('<h1>Здравствуйте</h1><br/><p>Вам выставлен счёт № ' . date("dmY", strtotime($paymentData->created_at)) . '-' . str_pad($paymentData->id . $paymentData->requisite_id, 6, '000000', STR_PAD_LEFT) . ' на сумму ' . $paymentData->paysum . ' ₽ в сервисе Leadz.Monster</p>', 'text/html');
+                    });
 
-                $this->sendPulse->addEmails($this->bookIdBill, [
-                    [
-                        'email' => $request->user()->email,
-                        'variables' => [
-                            'phone' => $request->user()->phone,
-                            'name' => $request->user()->name,
+                    $this->sendPulse->addEmails($this->bookIdBill, [
+                        [
+                            'email' => $request->user()->email,
+                            'variables' => [
+                                'phone' => $request->user()->phone,
+                                'name' => $request->user()->name,
+                            ]
                         ]
-                    ]
-                ]);
+                    ]);
 
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Успешно',
+                        'data' => $paymentData
+                    ], 200);
+                }
                 return response()->json([
-                    'success' => true,
-                    'message' => 'Успешно',
-                    'data' => $paymentData
-                ], 200);
+                    'success' => false,
+                    'message' => 'Не найдены такие реквизиты'
+                ], 404);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Сумма должна быть не менее 10 000 руб.'
+                ]);
             }
-            return response()->json([
-                'success' => false,
-                'message' => 'Не найдены такие реквизиты'
-            ], 404);
         }
         return response()->json([
             'success' => false,
@@ -416,62 +430,69 @@ class PaymentController extends Controller
             $request->has('sum')
             && !empty($request->input('sum'))
         ) {
-            $payment = Payment::create([
-                'type' => HelperPayment::TYPE_CT,
-                'status' => HelperPayment::CT_STATUS_CREATE,
-                'requisite_id' => null,
-                'user_id' => $request->user()->id,
-                'paysum' => $request->sum,
-                'before_balance' => $request->user()->balance,
-                'after_balance' => $request->user()->balance,
-            ]);
+            if ($request->sum >= 10000) {
+                $payment = Payment::create([
+                    'type' => HelperPayment::TYPE_CT,
+                    'status' => HelperPayment::CT_STATUS_CREATE,
+                    'requisite_id' => null,
+                    'user_id' => $request->user()->id,
+                    'paysum' => $request->sum,
+                    'before_balance' => $request->user()->balance,
+                    'after_balance' => $request->user()->balance,
+                ]);
 
-            $tinkoff = new Tinkoff(config('tinkoff.url'), config('tinkoff.terminalKey'), config('tinkoff.secretKey'), config('tinkoff.credit_url'));
+                $tinkoff = new Tinkoff(config('tinkoff.url'), config('tinkoff.terminalKey'), config('tinkoff.secretKey'), config('tinkoff.credit_url'));
 
-            /**
-             * Разбивка на ФИО
-             */
-            $fio = [];
-            $fioExplode = explode(" ", $request->user()->name);
-            $fio['lastName'] = $fioExplode[0] ?? '';
-            $fio['firstName'] = $fioExplode[1] ?? '';
-            $fio['middleName'] = $fioExplode[2] ?? '';
+                /**
+                 * Разбивка на ФИО
+                 */
+                $fio = [];
+                $fioExplode = explode(" ", $request->user()->name);
+                $fio['lastName'] = $fioExplode[0] ?? '';
+                $fio['firstName'] = $fioExplode[1] ?? '';
+                $fio['middleName'] = $fioExplode[2] ?? '';
 
-            $paymentTinkoff = [
-                'ShopId'     => config('tinkoff.shop_id'),
-                'ShowcaseId' => config('tinkoff.showcase_id'),
-                'Sum'        => $request->sum,
-                'OrderNumber' => $payment->id,
-                'Values'     => [
-                    'contact' => [
-                        'fio' => $fio,
-                        'mobilePhone' => preg_replace("/^(\+?(7|8))/", "", $request->user()->phone),
-                        'email' => $request->user()->email
+                $paymentTinkoff = [
+                    'ShopId'     => config('tinkoff.shop_id'),
+                    'ShowcaseId' => config('tinkoff.showcase_id'),
+                    'Sum'        => $request->sum,
+                    'OrderNumber' => $payment->id,
+                    'Values'     => [
+                        'contact' => [
+                            'fio' => $fio,
+                            'mobilePhone' => preg_replace("/^(\+?(7|8))/", "", $request->user()->phone),
+                            'email' => $request->user()->email
+                        ]
                     ]
-                ]
-            ];
-            $tinkoffSettings[] = [
-                'Name'  => 'Оформление рассрочки на сервисе Leadz.Monster',
-                'Quantity' => 1,
-                'Price' => $request->sum,
-                'VendorCode' => 'L-' . $payment->id . '-' . date("dmy-his"),
-                'Category'   => 'Leadz.Monster - Лиды',
-            ];
-            $paymentResponse = $tinkoff->creditCreate($paymentTinkoff, $tinkoffSettings);
-            if (!$paymentResponse) {
+                ];
+                $tinkoffSettings[] = [
+                    'Name'  => 'Оформление рассрочки на сервисе Leadz.Monster',
+                    'Quantity' => 1,
+                    'Price' => $request->sum,
+                    'VendorCode' => 'L-' . $payment->id . '-' . date("dmy-his"),
+                    'Category'   => 'Leadz.Monster - Лиды',
+                ];
+                $paymentResponse = $tinkoff->creditCreate($paymentTinkoff, $tinkoffSettings);
+                if (!$paymentResponse) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => $tinkoff->error
+                    ]);
+                }
+                $payment->update([
+                    'tcv_id' => $paymentResponse->id
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'payment_url' => $paymentResponse->link,
+                ]);
+            } else {
                 return response()->json([
                     'success' => false,
-                    'message' => $tinkoff->error
+                    'message' => 'Сума должна быть не менее 10 000 руб.'
                 ]);
             }
-            $payment->update([
-                'tcv_id' => $paymentResponse->id
-            ]);
-
-            return response()->json([
-                'success' => true,
-                'payment_url' => $paymentResponse->link,
-            ]);
         }
         /**
          * Ver 1.0 End

@@ -234,8 +234,8 @@
                 "
               >
                 <template v-if="Object(itsUser).hasOwnProperty('name')">
-                  <span
-                     class="bid-user-id"><nuxt-link :to="{ path: `/users/${itsUser.id}` }">
+                  <span class="bid-user-id"
+                    ><nuxt-link :to="{ path: `/users/${itsUser.id}` }">
                       Просмотреть пользователя {{ itsUser.name }}</nuxt-link
                     ></span
                   >

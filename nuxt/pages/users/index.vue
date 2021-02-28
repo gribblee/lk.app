@@ -44,11 +44,11 @@
                   <a-icon type="user" />
                   Востановить
                 </a-menu-item>
-                <a-menu-item :key="3" :style="{backgroundColor: '#FF00000F'}">
+                <a-menu-item :key="3" :style="{ backgroundColor: '#FF00000F' }">
                   <a-icon type="lock" />
                   Заблокировать
                 </a-menu-item>
-                <a-menu-item :key="4" :style="{backgroundColor: '#F0F0000F'}">
+                <a-menu-item :key="4" :style="{ backgroundColor: '#F0F0000F' }">
                   <a-icon type="key" />
                   Разблокировать
                 </a-menu-item>
@@ -175,12 +175,20 @@ const columns = [
     title: "ID",
     dataIndex: "id",
     key: "id",
+    defaultSortOrder: "descend",
+    sortDirections: ["descend", "ascend"],
+    onFilter: (value, record) => {},
+    sorter: (a, b) => {},
   },
   {
     title: "Имя",
     dataIndex: "name",
     key: "name",
     scopedSlots: { customRender: "name" },
+    defaultSortOrder: "descend",
+    sortDirections: ["descend", "ascend"],
+    onFilter: (value, record) => {},
+    sorter: (a, b) => {},
   },
   {
     title: "Телефон",
@@ -204,11 +212,19 @@ const columns = [
     dataIndex: "balance",
     key: "balance",
     scopedSlots: { customRender: "balance" },
+    defaultSortOrder: "descend",
+    sortDirections: ["descend", "ascend"],
+    onFilter: (value, record) => {},
+    sorter: (a, b) => {},
   },
   {
     title: "Количество заявок",
     dataIndex: "bids_count",
     key: "bids_count",
+    defaultSortOrder: "descend",
+    sortDirections: ["descend", "ascend"],
+    onFilter: (value, record) => {},
+    sorter: (a, b) => {},
   },
   {
     title: "Статус",
@@ -221,12 +237,20 @@ const columns = [
     dataIndex: "was_online",
     key: "was_online",
     scopedSlots: { customRender: "was_online" },
+    defaultSortOrder: "descend",
+    sortDirections: ["descend", "ascend"],
+    onFilter: (value, record) => {},
+    sorter: (a, b) => {},
   },
   {
     title: "Дата регистрации",
     dataIndex: "created_at",
     key: "created_at",
     scopedSlots: { customRender: "created_at" },
+    defaultSortOrder: "descend",
+    sortDirections: ["descend", "ascend"],
+    onFilter: (value, record) => {},
+    sorter: (a, b) => {},
   },
   {
     title: "Менеджер",
@@ -250,6 +274,8 @@ export default {
       eventDisabled: true,
       pagination: {},
       loading: false,
+      order_by: "DEF",
+      orderField: "id",
       search: {
         id: "",
         name: "",
@@ -296,6 +322,14 @@ export default {
       const pager = { ...this.pagination };
       pager.current = pagination.current;
       this.pagination = pager;
+      if (typeof sorters.order != "undefined") {
+        this.order_by = sorters.order == "ascend" ? "ASC" : "DESC";
+      } else {
+        this.order_by = "DEF";
+      }
+      if (typeof sorters.field != "undefined") {
+        this.orderField = sorters.field;
+      }
       this.loadUsers({}, pager.current);
     },
     addUser() {
@@ -386,14 +420,17 @@ export default {
       }
     },
     handleSearch(e) {
-      this.loadUsers({
-        search: this.search,
-      });
+      this.loadUsers({});
     },
     loadUsers(postData = {}, currentPage = 1) {
       this.loading = true;
       this.$axios
-        .post(`/users?page=${currentPage}`, postData)
+        .post(`/users?page=${currentPage}`, {
+          ...postData,
+          search: this.search,
+          order_by: this.order_by,
+          order_field: this.orderField
+        })
         .then(({ data }) => {
           const pagination = { ...this.pagination };
           this.data = data.data;

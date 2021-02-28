@@ -29,7 +29,10 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        $users = User::withCount('bids')->with('manager')->orderBy('id', 'DESC');
+        $orderField = $request->has('order_field') ? (empty($request->order_field) ? 'id' : $request->order_field) : 'id';
+        $orderSort = $request->has('order_by') ? ($request->order_by == 'DEF' ? 'DESC' : $request->order_by) : 'DESC';
+
+        $users = User::withCount('bids')->with('manager')->orderBy($orderField, $orderSort);
         if ($request->has('is_delete')) {
             $users->where('is_delete', $request->is_delete);
         } else {

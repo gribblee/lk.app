@@ -85,7 +85,7 @@ export default Vue.extend({
       callback();
     };
     let ValidateName = (rule, value, callback) => {
-      const re = /^[а-яё]{3,}([-][а-яё]{3,})?\s[а-яё]{3,}\s[а-яё]{3,}$/;
+      const re = /^[а-яё]{3,}([-][а-яё]{2,})?\s[а-яё]{2,}\s[а-яё]{3,}$/;
       if (!re.test(String(value).toLowerCase())) {
         callback(new Error("Введите ФИО"));
       }

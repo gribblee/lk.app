@@ -92,7 +92,9 @@ class ManagerController extends Controller
             if (empty($search_f->phone) === false) {
                 $userQuery->where('phone', 'LIKE', "%{$search_f->phone}%");
             }
-            $users = $userQuery->orderBy('id', 'DESC')->paginate(10);
+            $orderField = $request->has('order_field') ? $request->order_field : 'id';
+            $orderSort = $request->has('order_by') ? $request->order_by : 'DESC';
+            $users = $userQuery->orderBy($orderField, $orderSort)->paginate(10);
             foreach ($users->items() as $idx => $data) {
                 $users->items()[$idx]['subtable'] = HistoryPayment::selectRaw("type_transaction,
                 paysum,
