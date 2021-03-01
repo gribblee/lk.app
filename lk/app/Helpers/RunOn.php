@@ -45,8 +45,8 @@ class RunOn
             }
             $directionAmount = $item->direction->cost_price + ($item->direction->cost_price * ($item->direction->extra / 100));
 
-            if ((($isRegion || count($item->regions) == 0)
-                && $item->user->balance >= $item->consumption)
+            if (($isRegion || count($item->regions) == 0)
+                && $item->user->balance >= $item->consumption
                 && $item->consumption >= $directionAmount
             ) {
                 $item->weight = mt_rand($min_r / 2, $item->consumption)
