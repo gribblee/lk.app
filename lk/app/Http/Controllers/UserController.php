@@ -161,7 +161,7 @@ class UserController extends Controller
             }
             // if (count($regions) > 0 || count($regions[0]) > 0) {
             foreach ($regions as $region_id => $region) {
-                if (count($region) > 0) {
+                if (count(to_array($region)) > 0) {
                     $region['USERS_COUNT'] = User::whereExists(function ($query) use ($region_id) {
                         return $query->select(\DB::raw(1))
                             ->from('bids')
