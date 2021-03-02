@@ -161,39 +161,41 @@ class UserController extends Controller
             }
             // if (count($regions) > 0 || count($regions[0]) > 0) {
             foreach ($regions as $region_id => $region) {
-                if (count($region) > 0) {
-                    $region['USERS_COUNT'] = User::whereExists(function ($query) use ($region_id) {
-                        return $query->select(\DB::raw(1))
-                            ->from('bids')
-                            ->whereRaw('bids.user_id = users.id')
-                            ->where('bids.is_launch', true)
-                            ->where(function ($q) use ($region_id) {
-                                return $q->whereJsonContains('regions', [
-                                    ['id' => $region_id]
-                                ]);
-                            });
-                    })->count();
-                    $region['AVG_RATE'] = $region['AVG_RATE'] == 0 ? 1 : $region['AVG_RATE'];
-                    $region['COUNT'] = $region['COUNT'] == 0 ? 1 : $region['COUNT'];
-                    $region['USERS_COUNT'] = $region['USERS_COUNT'] == 0 ? 1 : $region['USERS_COUNT'];
+                if ($region) {
+                    if (count($region) > 0) {
+                        $region['USERS_COUNT'] = User::whereExists(function ($query) use ($region_id) {
+                            return $query->select(\DB::raw(1))
+                                ->from('bids')
+                                ->whereRaw('bids.user_id = users.id')
+                                ->where('bids.is_launch', true)
+                                ->where(function ($q) use ($region_id) {
+                                    return $q->whereJsonContains('regions', [
+                                        ['id' => $region_id]
+                                    ]);
+                                });
+                        })->count();
+                        $region['AVG_RATE'] = $region['AVG_RATE'] == 0 ? 1 : $region['AVG_RATE'];
+                        $region['COUNT'] = $region['COUNT'] == 0 ? 1 : $region['COUNT'];
+                        $region['USERS_COUNT'] = $region['USERS_COUNT'] == 0 ? 1 : $region['USERS_COUNT'];
 
-                    $region['AVG_RATE'] = ceil($region['AVG_RATE'] / $region['COUNT']) / $region['USERS_COUNT'];
-                    $region['LEAD_COUNT'] = ceil($region['balance'] / $region['AVG_RATE']);
+                        $region['AVG_RATE'] = ceil($region['AVG_RATE'] / $region['COUNT']) / $region['USERS_COUNT'];
+                        $region['LEAD_COUNT'] = ceil($region['balance'] / $region['AVG_RATE']);
 
-                    $region['budget'] = $region['direction']->cost_price * $region['LEAD_COUNT'];
+                        $region['budget'] = $region['direction']->cost_price * $region['LEAD_COUNT'];
 
-                    $source[] = [
-                        'DIRECTION_NAME' => $region['direction']->name,
-                        'REGION_NAME' => $region['REGION_NAME'],
-                        'LEAD_COUNT' => $region['LEAD_COUNT'],
-                        'USERS_COUNT' => $region['USERS_COUNT'],
-                        'MAX_RATE' => $region['MAX_RATE'],
-                        'AVG_RATE' => $region['AVG_RATE'],
-                        'LAST_DEAL_CREATE' => $region['LAST_DEAL_CREATE'],
-                        'LAST_DEAL_DISTRIBUTION' => $region['LAST_DEAL_DISTRIBUTION'],
-                        'balance' => $region['balance'],
-                        'budget' => $region['budget']
-                    ];
+                        $source[] = [
+                            'DIRECTION_NAME' => $region['direction']->name,
+                            'REGION_NAME' => $region['REGION_NAME'],
+                            'LEAD_COUNT' => $region['LEAD_COUNT'],
+                            'USERS_COUNT' => $region['USERS_COUNT'],
+                            'MAX_RATE' => $region['MAX_RATE'],
+                            'AVG_RATE' => $region['AVG_RATE'],
+                            'LAST_DEAL_CREATE' => $region['LAST_DEAL_CREATE'],
+                            'LAST_DEAL_DISTRIBUTION' => $region['LAST_DEAL_DISTRIBUTION'],
+                            'balance' => $region['balance'],
+                            'budget' => $region['budget']
+                        ];
+                    }
                 }
             }
             //            }
