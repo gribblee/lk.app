@@ -28,7 +28,8 @@ class Deal extends Model
         'direction_id',
         'bid_id',
         'status_id',
-        'token_id'
+        'token_id',
+        'request'
     ];
 
     public static function getCount(string $role = '', int $user_id = 0, int $user_category = 0)
