@@ -107,7 +107,7 @@ class AdminController extends Controller
                         'type' => HelperPayment::TYPE_REN,
                         'status' => HelperPayment::STATUS_COMPLETE,
                         'requisites_id' => null,
-                        'users_id' => $request->user_id,
+                        'user_id' => $request->user_id,
                         'paysum' => $updated['balance'],
                         'before_balance' => $user['balance'],
                         'after_balance' => $updated['balance'],

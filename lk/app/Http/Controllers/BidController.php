@@ -276,31 +276,29 @@ class BidController extends Controller
             'data' => []
         ]);
         if ($request->has('insurance_id')) {
-            $insurance = Insurance::findOrFail($request->insurance_id);
+            //$insurance = Insurance::findOrFail($request->insurance_id);
 
-            if ($request->user()->balance < $insurance->price) {
-                $Response->success  = false;
-                $Response->message = 'Не достаточно средств';
-                $Response->data = [];
+            // if ($request->user()->balance < $insurance->price) {
+            //     $Response->success  = false;
+            //     $Response->message = 'Не достаточно средств';
+            //     $Response->data = [];
+            // } else {
+            $bid = Bid::with('direction')
+                ->with('user')->where('user_id', $request->user()->id)->find($id);
+
+            if ($bid) {
+                $bid->update([
+                    'is_insurance' => !$bid->is_insurance
+                ]);
+                $Response->success = true;
+                $Response->message = 'Обновлено';
+                $Response->data = $bid;
             } else {
-                $bid = Bid::find($id)->where('user_id', $request->user()->id);
-                if ($bid) {
-                    $user = User::findOrFail($request->user()->id);
-                    $bid->insurance = $bid->insurance + $insurance->price;
-                    $bid->update();
-
-                    $user->balance = $user->balance - $insurance->price;
-                    $user->update();
-
-                    $Response->success = true;
-                    $Response->message = 'Обновлено';
-                    $Response->data = $bid;
-                } else {
-                    $Response->success = false;
-                    $Response->message = 'Это не ваша заявка';
-                    $Response->data = [];
-                }
+                $Response->success = false;
+                $Response->message = 'Это не ваша заявка';
+                $Response->data = [];
             }
+            // }
         }
         return response()->json($Response, 200);
     }

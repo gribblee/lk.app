@@ -485,9 +485,9 @@ const columns = [
   },
   {
     title: "Дата поступления",
-    dataIdnex: "created_at",
-    key: "created_at",
-    scopedSlots: { customRender: "created_at" },
+    dataIdnex: "updated_at",
+    key: "updated_at",
+    scopedSlots: { customRender: "updated_at" },
     defaultSortOrder: "descend",
     sortDirections: ["descend", "ascend"],
     onFilter: (value, record) => {},

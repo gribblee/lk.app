@@ -25,6 +25,7 @@ class Bid extends Model
         'is_launch',
         'is_notification',
         'is_delete',
+        'is_insurance',
         'daily_limit',
         'insurance',
         'created_at'

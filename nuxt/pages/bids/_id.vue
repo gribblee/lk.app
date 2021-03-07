@@ -247,10 +247,10 @@
                   <template v-else>Выбрать пользователя</template>
                 </a-button>
               </div>
-              <div class="bid-item" v-if="computedIsInsurances">
+              <div class="bid-item">
                 <div class="bid-label">Страховка</div>
                 <div class="bid-container">
-                  <div class="bid-content bc-space-bwn">
+                  <!-- <div class="bid-content bc-space-bwn">
                     <span>Количество заявок по страховке: {{ insurance }}</span>
                     <span>
                       <a-tooltip
@@ -261,19 +261,19 @@
                           :style="{ cursor: 'pointer' }"
                         /> </a-tooltip
                     ></span>
-                  </div>
+                  </div> -->
                   <div class="bid-content">
                     <div class="bid-content-switch">
                       <a-switch
                         v-model="isInsurance"
-                        @change="handleInsurance"
+                        @change="handleIBuy(id, $event)"
                       />
 
                       <span class="bid-insurance-label">
                         Подключить страховку
                       </span>
                     </div>
-                    <div class="bid-info" v-if="isInsurance">
+                    <!-- <div class="bid-info" v-if="isInsurance">
                       <a-list
                         item-layout="horizontal"
                         :data-source="insurancesData"
@@ -298,7 +298,7 @@
                           >
                         </a-list-item>
                       </a-list>
-                    </div>
+                    </div> -->
                   </div>
                 </div>
               </div>
@@ -626,6 +626,7 @@ export default {
       this.is_launch = data.is_launch;
       this.daily_limit = data.daily_limit;
       this.insurance = data.insurance;
+      this.isInsurance = data.is_insurance;
       this.regions = data.regions;
       this.direction = data.direction;
       this.options = data.options;
@@ -690,7 +691,7 @@ export default {
         .post(`/bid/${this.id}/buy_insurance`, { insurance_id: id })
         .then(({ data }) => {
           if (data.success == true) {
-            this.setData(data);
+            this.setData(data.data);
           } else {
             this.$message.error(data.message);
           }

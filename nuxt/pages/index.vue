@@ -279,7 +279,10 @@
               <a-table
                 :columns="columns"
                 :data-source="data"
-                :row-selection="rowSelection"
+                :row-selection="{
+                  selectedRowKeys: selectedRowKeys,
+                  onChange: onChange,
+                }"
                 :loading="isLoading"
                 :pagination="pagination"
                 @change="handleTableChange"
@@ -413,26 +416,30 @@ export default {
       isLoading: true,
       directionPPtext: "Все направления",
       selectedRows: [],
+      selectedRowKeys: [],
       userBalance: 0,
       statistic: {},
       alertBalance: false,
-      rowSelection: {
-        onChange: (selectedRowKeys, selectedRows) => {
-          console.log(
-            `selectedRowKeys:${selectedRowKeys}`,
-            "selectedRows: ",
-            selectedRows
-          );
-          this.eventDisabled = selectedRows.length === 0;
-          this.selectedRows = selectedRows;
-        },
-        onSelect: (record, selected, selectedRows) => {
-          console.log(record, selected, selectedRows);
-        },
-        onSelectAll: (selected, selectedRows, changeRows) => {
-          console.log(selected, selectedRows, changeRows);
-        },
-      },
+      eventDisabled: true,
+      // rowSelection: {
+      //   // onChange: (selectedRowKeys, selectedRows) => {
+      //   //   console.log(
+      //   //     `selectedRowKeys:${selectedRowKeys}`,
+      //   //     "selectedRows: ",
+      //   //     selectedRows
+      //   //   );
+      //   //   this.eventDisabled = selectedRows.length === 0;
+      //   //   this.selectedRows = selectedRows;
+      //   //   this.selectedRowKeys = selectedRowKeys;
+      //   // },
+      //   // onSelect: (record, selected, selectedRows) => {
+      //   //   console.log(record, selected, selectedRows);
+      //   // },
+      //   // onSelectAll: (selected, selectedRows, changeRows) => {
+      //   //   console.log(selected, selectedRows, changeRows);
+      //   //   this.selectedRows = selectedRows;
+      //   // },
+      // },
       search: {
         id: "",
         name: "",
@@ -442,7 +449,6 @@ export default {
         role: "",
         manager: "",
       },
-      eventDisabled: true,
     };
   },
   created() {
@@ -460,6 +466,16 @@ export default {
     });
   },
   methods: {
+    onChange(selectedRowKeys, selectedRows) {
+      console.log(
+        `selectedRowKeys:${selectedRowKeys}`,
+        "selectedRows: ",
+        selectedRows
+      );
+      this.eventDisabled = selectedRows.length === 0;
+      this.selectedRows = selectedRows;
+      this.selectedRowKeys = selectedRowKeys;
+    },
     handleOkTooltip() {},
     handleEndTooltip() {},
     handleSearch() {
@@ -482,6 +498,7 @@ export default {
           this.statistic = data.statistic;
           this.isLoading = false;
           this.pagination.total = data.bids.total;
+          this.selectedRowKeys = [];
         })
         .catch((_err) => {
           console.error(_err);

@@ -197,13 +197,13 @@
               :loading="isLoading"
             >
               <template slot="AVG_RATE" slot-scope="text">
-                {{ text }} ₽
+                {{ Math.ceil(text) }} ₽
               </template>
               <template slot="MAX_RATE" slot-scope="text">
-                {{ text }} ₽
+                {{ Math.ceil(text) }} ₽
               </template>
               <template slot="budget" slot-scope="text">
-                {{ text }} ₽
+                {{ Math.ceil(text) }} ₽
               </template>
             </a-table>
           </a-config-provider>

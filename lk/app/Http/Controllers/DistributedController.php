@@ -120,7 +120,7 @@ class DistributedController extends Controller
                     $bid->user->contact_id != null
                     && $bid->user->contact_id != 0
                 ) {
-                    $this->addBitrix($request, $bid);
+                    $this->addBitrix($request, $deal, $bid);
                 }
 
                 $this->sendMail($bid->user);
@@ -164,20 +164,20 @@ class DistributedController extends Controller
         }
     }
 
-    protected function addBitrix(Request $request, Bid $Bid)
+    protected function addBitrix(Request $request, Deal $deal, Bid $Bid)
     {
         $this->bitrix24
             ->lead('default', $request->header('referer')
                 ?? $request->input('referer')
                 ?? 'https://lk.leadz.monster')
             ->utm($request->all())
-            ->field('ADDRESS_CITY', $request->region->name ?? 'Не определно')
+            ->field('ADDRESS_CITY', $deal->region->name ?? 'Не определно')
             ->field('UF_CRM_1602571646472', $Bid->direction->name)
             ->field('OPPORTUNITY', $Bid->consumption)
             ->field('CURRENCY_ID', 'RUB')
-            ->field('EMAIL', $request->email, 'WORK')
-            ->field('PHONE', $request->phone, 'WORK')
-            ->field('NAME', $request->name ?? 'Без имени')
+            ->field('EMAIL', $deal->email, 'WORK')
+            ->field('PHONE', $deal->phone, 'WORK')
+            ->field('NAME', $deal->name ?? 'Без имени')
             ->field('ASSIGNED_BY_ID', $Bid->user->contact_id)
             ->add();
     }

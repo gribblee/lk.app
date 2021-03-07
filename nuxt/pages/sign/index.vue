@@ -17,7 +17,7 @@
               <a-form-model-item
                 label="Код из СМС"
                 prop="code"
-                v-if="signIsCode"
+                v-show="signIsCode"
               >
                 <a-input
                   v-model="formSignIn.code"
@@ -29,7 +29,7 @@
                 has-feedback
                 label="Телефон"
                 prop="phone"
-                v-if="!signIsCode"
+                v-show="!signIsCode"
               >
                 <a-input
                   v-model="formSignIn.phone"
@@ -46,6 +46,7 @@
                 <template v-if="!signIsCode">Далее</template>
                 <template v-if="signIsCode">Войти</template>
               </a-button>
+              {{ signIsCode ? "true" : "false" }}
               <a-button type="link" @click="() => (signIsCode = !signIsCode)">
                 <template v-if="!signIsCode">У меня уже есть код</template>
                 <template v-if="signIsCode">Вернуться</template></a-button
@@ -62,7 +63,7 @@
               :rules="rules.signUp"
               ref="formSignUp"
             >
-              <template v-if="!signUpIsCode">
+              <template v-show="!signUpIsCode">
                 <a-form-model-item has-feedback label="Ваше ФИО" prop="name">
                   <a-input v-model="formSignUp.name" placeholder="Имя" />
                 </a-form-model-item>
@@ -92,7 +93,7 @@
                 has-feedback
                 label="Код из СМС"
                 prop="code"
-                v-if="signUpIsCode"
+                v-show="signUpIsCode"
               >
                 <a-input
                   v-model="formSignUp.code"
@@ -169,7 +170,7 @@ export default {
             message: "Поле телефон обязательно",
           },
           code: {
-            required: true,
+            required: this.signIsCode,
             message: "Поле с кодом обязательно",
           },
         },
@@ -202,7 +203,7 @@ export default {
           ],
           code: [
             {
-              required: true,
+              required: this.signUpIsCode,
               message: "Поле с кодом обязательно",
             },
           ],

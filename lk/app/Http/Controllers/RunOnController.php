@@ -58,10 +58,12 @@ class RunOnController extends Controller
         try {
             $AppToken = AppToken::where('hash', $hash)->firstOrFail();
 
+
             $region = $this->definitionRegion($request); //Определение региона
             $deal = $this->createDeal($request, $AppToken, $region); //Создание заявки
-            $claims = $this->findClaims($AppToken, $region); //Поиск заявок
-
+            $notClaimsId = $this->foundedDealsClaimsId($AppToken, $request);
+            $claims = $this->findClaims($AppToken, $region, $notClaimsId); //Поиск заявок
+            
             Log::info("Deal: " . json_encode($deal));
             Log::info("Region: " . json_encode($region) . "\r\n");
 
@@ -77,16 +79,16 @@ class RunOnController extends Controller
                         $deal->update([
                             'amount' => $claim->consumption,
                             'bid_id' => $claim->id,
-                            'is_insurance' => $claim->insurance > 0,
+                            'is_insurance' => $claim->is_insurance,
                             'status_id' => Status::firstStatus()->id,
                         ]);
                         //** */ Списание страховки
-                        ($claim->insurance) > 0 ?
-                            Bid::find($claim->id)
-                            ->update([
-                                'insurance' => $claim->insurance - 1
-                            ])
-                            : false;
+                        // ($claim->insurance) > 0 ?
+                        //     Bid::find($claim->id)
+                        //     ->update([
+                        //         'insurance' => $claim->insurance - 1
+                        //     ])
+                        //     : false;
                         //** Посылка в битрикс и оплата
                         $category = Category::find($user->category_id);
                         ($user->contact_id != null && $user->contact_id != 0)
@@ -157,6 +159,32 @@ class RunOnController extends Controller
         Log::info("User ID-{$user->id} history payment: " . json_encode($hp));
     }
 
+    protected function foundedDealsClaimsId($AppToken, $request)
+    {
+        $notClaimsId = [];
+        $foundDeal = Deal::where([
+            [
+                'phone', 'LIKE', "%{$request->phone}%"
+            ],
+            [
+                'email', 'LIKE', "%{$request->email}%"
+            ],
+            [
+                'direction_id', '=', $AppToken->direction_id
+            ]
+        ])->where('is_delete', false)
+            ->whereNotNull('bid_id')
+            ->get(); //У заявки нужно ещ добавить чтобы там считался интервал по дням
+        if (!$foundDeal->isEmpty()) {
+            foreach ($foundDeal as $fd) {
+                if ($fd) {
+                    $notClaimsId[] = $fd->bid_id;
+                }
+            }
+        }
+        return $notClaimsId;
+    }
+
     protected function definitionRegion(Request $request)
     {
         $region = [];
@@ -171,7 +199,7 @@ class RunOnController extends Controller
         return $region;
     }
 
-    protected function findClaims(AppToken $appToken, $region)
+    protected function findClaims(AppToken $appToken, $region, $notClaimId)
     {
         /**
          * Ищет группы созданых направлений
@@ -200,6 +228,7 @@ class RunOnController extends Controller
                     return $qw->whereJsonLength('regions', 0);
                 });
             })
+            ->whereNotIn('id', $notClaimId)
             ->orderByDesc('consumption')
             ->limit(100)
             ->get(); //Пока установим лимит для оптимизации
