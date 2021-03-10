@@ -259,6 +259,7 @@ class RunOnController extends Controller
             'is_manager_view' => false,
             'is_delete' => false,
             'bid_id' => null,
+            'is_insurance' => false,
             'status_id' => Status::noDistributed()->id
         ]);
     }
