@@ -46,7 +46,6 @@
                 <template v-if="!signIsCode">Далее</template>
                 <template v-if="signIsCode">Войти</template>
               </a-button>
-              {{ signIsCode ? "true" : "false" }}
               <a-button type="link" @click="() => (signIsCode = !signIsCode)">
                 <template v-if="!signIsCode">У меня уже есть код</template>
                 <template v-if="signIsCode">Вернуться</template></a-button
