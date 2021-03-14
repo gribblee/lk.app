@@ -43,7 +43,7 @@
             let header = this.addElement('H1','Рейтинг компаний', {
                 style: 'display: block; text-align: center'
             });
-            let main = this.addElement("DIV", 'dsd', {
+            let main = this.addElement("DIV", '', {
                 style: "max-width: 100%;padding: 20px;background-color:#f5f5f5",
             }, [
                 header
