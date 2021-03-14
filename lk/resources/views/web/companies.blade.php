@@ -31,7 +31,7 @@
             return el;
         },
         init: function () {
-            this.data = JSON.parse("{{ $companies }}");
+            this.data = JSON.parse("{!!$companies!!}");
             let el = document.getElementById("id-companies-rating");
             if (typeof el != "undefined") {
                 if (el != null) {
