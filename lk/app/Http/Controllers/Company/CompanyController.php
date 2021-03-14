@@ -28,6 +28,18 @@ class CompanyController extends Controller
     }
 
     /**
+     * @param $request request
+     */
+
+    public function webCompanies(Request $request)
+    {
+        $companies = Company::with('issues')->with('user')->with('region')->orderByDesc('rating')->limit(10)->get();
+        return response()->view('web.companies', [
+            'companies' => json_encode($companies)
+        ])->header('Content-Type', 'application/javascript');
+    }
+
+    /**
      * @param $regionId
      * @return JsonResponse
      */

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Validator;
 
 use App\Models\Bid;
 use App\Models\Deal;
@@ -170,56 +171,101 @@ class BidController extends Controller
     }
 
     /**
+     * @param Request $request
      * @return JsonResponse
      */
     public function create(Request $request)
     {
-        /**
-         * Start Ver 1.0
-         */
-        $bidsColumns = Bid::selectRaw('direction_id')
-            ->where('bids.category_id', $request->user()->category_id)
-            ->groupBy('direction_id')
-            ->where('bids.user_id', $request->user()->id)
-            ->where('bids.is_delete', false)
-            ->whereHas('direction', function ($q) use ($request) {
-                return $q->whereJsonContains('categories', $request->user()->category_id);
-            })
-            ->get();
-        $bidsDirection = [];
-        foreach ($bidsColumns as $bca) {
-            $bidsDirection[] = $bca->direction_id;
-        }
-        $direction = Direction::whereJsonContains('categories', $request->user()->category_id)->first();
-        if ($direction) {
-            $drt = $direction;
-
-            $bid = Bid::create([
-                'direction_id' => $drt->id,
-                'category_id' => $request->user()->category_id,
-                'regions' => [],
-                'user_id' => $request->user()->id,
-                'consumption' => $drt->cost_price + ($drt->cost_price * ($drt->extra / 100)),
-                'is_launch' => false,
-                'is_notification' => false,
-                'daily_limit' => 0,
-                'is_delete' => false,
-                'insurance' => 0
-            ]);
-            return response()->json([
-                'STATUS' => 'OK',
-                'ID' => $bid->id
-            ]);
+        $data = $request->only([
+            'direction_id',
+            'regions',
+            'consumption',
+            'is_launch',
+            'is_insurance',
+            'daily_limit',
+        ]);
+        if ($request->user()->role == 'ROLE_ADMIN' || $request->user()->role == 'ROLE_MANAGER') {
+            $data['user_id'] = $request->user_id;
         } else {
+            $data['user_id'] = $request->user()->id;
+        }
+        $validate = Validator::make($data, [
+            'direction_id' => 'required',
+        ], [
+            'direction_id.required' => 'Направление обязательно'
+        ]);
+        if (!$validate->fails()) {
+            $bid = Bid::create(array_merge(
+                $data,
+                [
+                    'category_id' => $request->user()->category_id,
+                    'is_delete' => false,
+                    'insurance' => 0,
+                    'is_notification' => false
+                ]
+            ));
             return response()->json([
-                'success' => false,
-                'message' => 'Нельзя больше создавать заявки'
+                'msg' => 'Созданно',
+                'code' => 1001,
+                'id' => $bid->id
             ]);
         }
-        /**
-         * End Ver 1.0
-         */
+        return response()->json([
+            'msg' => ' Ошибка'
+        ], 402);
     }
+
+    /**
+     * @return JsonResponse
+     */
+    // public function create(Request $request)
+    // {
+    //     /**
+    //      * Start Ver 1.0
+    //      */
+    //     $bidsColumns = Bid::selectRaw('direction_id')
+    //         ->where('bids.category_id', $request->user()->category_id)
+    //         ->groupBy('direction_id')
+    //         ->where('bids.user_id', $request->user()->id)
+    //         ->where('bids.is_delete', false)
+    //         ->whereHas('direction', function ($q) use ($request) {
+    //             return $q->whereJsonContains('categories', $request->user()->category_id);
+    //         })
+    //         ->get();
+    //     $bidsDirection = [];
+    //     foreach ($bidsColumns as $bca) {
+    //         $bidsDirection[] = $bca->direction_id;
+    //     }
+    //     $direction = Direction::whereJsonContains('categories', $request->user()->category_id)->first();
+    //     if ($direction) {
+    //         $drt = $direction;
+
+    //         $bid = Bid::create([
+    //             'direction_id' => $drt->id,
+    //             'category_id' => $request->user()->category_id,
+    //             'regions' => [],
+    //             'user_id' => $request->user()->id,
+    //             'consumption' => $drt->cost_price + ($drt->cost_price * ($drt->extra / 100)),
+    //             'is_launch' => false,
+    //             'is_notification' => false,
+    //             'daily_limit' => 0,
+    //             'is_delete' => false,
+    //             'insurance' => 0
+    //         ]);
+    //         return response()->json([
+    //             'STATUS' => 'OK',
+    //             'ID' => $bid->id
+    //         ]);
+    //     } else {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Нельзя больше создавать заявки'
+    //         ]);
+    //     }
+    //     /**
+    //      * End Ver 1.0
+    //      */
+    // }
 
     /**
      * @return JsonResponse

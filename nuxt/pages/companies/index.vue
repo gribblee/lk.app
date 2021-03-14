@@ -184,29 +184,7 @@
   </a-layout-content>
 </template>
 <style scoped>
-.company-break {
-  position: relative;
-  overflow: hidden;
-}
-.company-break > * {
-  display: none;
-}
-.company-break::before {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  content: "Не переживайте раздел находится в разработке, и очень скоро будет доступен";
-  text-align: center;
-  font-size: 36px;
-  vertical-align: middle;
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: #fff;
-  z-index: 999;
-}
+
 </style>
 <script lang="ts">
 import Vue from "vue";

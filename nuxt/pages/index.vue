@@ -535,18 +535,19 @@ export default {
         });
     },
     handleCreateBid(_e) {
-      this.$axios
-        .post("/bid/create")
-        .then(({ data }) => {
-          if (data.STATUS === "OK") {
-            this.$router.push(`/bids/${data.ID}`);
-          } else {
-            this.$message.error(data.message);
-          }
-        })
-        .catch((_err) => {
-          console.error(_err);
-        });
+      this.$router.push('/bids/create');
+      // this.$axios
+      //   .post("/bid/create")
+      //   .then(({ data }) => {
+      //     if (data.STATUS === "OK") {
+      //       this.$router.push(`/bids/${data.ID}`);
+      //     } else {
+      //       this.$message.error(data.message);
+      //     }
+      //   })
+      //   .catch((_err) => {
+      //     console.error(_err);
+      //   });
     },
     handleStatusChange(el, is_launch) {
       this.$axios
