@@ -35,7 +35,7 @@ class CompanyController extends Controller
     {
         $companies = Company::with('issues')->with('user')->with('region')->orderByDesc('rating')->limit(10)->get();
         return response()->view('web.companies', [
-            'companies' => json_encode($companies)
+            'companies' => $companies
         ])->header('Content-Type', 'application/javascript');
     }
 
