@@ -180,14 +180,14 @@
                 </div>
                 <a-input-number
                   v-model="computedVMConsumption"
-                  :min="0"
+                  :min="computedMinConsumption"
                   :max="computedMaxConsumption"
                   size="large"
                   @blur="handleConsumption"
                 />
                 <a-slider
                   v-model="computedVMConsumption"
-                  :min="0"
+                  :min="computedMinConsumption"
                   :max="computedMaxConsumption"
                   :step="1"
                   :tip-formatter="null"
@@ -767,6 +767,15 @@ export default {
       }
       return dailyReturn;
     },
+    computedMinConsumption() {
+      if (Object.keys(this.direction).length > 0) {
+        const cost_price = Number(this.direction.cost_price);
+        const extra = Number(this.direction.extra);
+        return Number(cost_price) + cost_price * (extra / 100);
+      } else {
+        return Number(900);
+      }
+    },
     computedMaxConsumption() {
       return Number(this.user.balance) + 10000;
     },
@@ -778,7 +787,7 @@ export default {
       };
       const cost_price = Number(this.direction.cost_price);
       const extra = Number(this.direction.extra);
-      if (this.consumption < cost_price + cost_price * (extra / 100)) {
+      if (this.consumption < Number(cost_price) + Number(cost_price * (extra / 100))) {
         consumptionReturn.status = true;
         consumptionReturn.message =
           "При такой ставке Вы не будете получать заявки";
