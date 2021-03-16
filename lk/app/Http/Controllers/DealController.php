@@ -79,7 +79,7 @@ class DealController extends Controller
     {
         $DFiles = new DealFile;
         $request->validate([
-            'file' => 'required|mimes:mpeg3,x-mpeg-3,mpeg,x-mpeg,wav,x-wav,mp3'
+            'file' => ''
         ]);
 
         if ($request->file()) {
