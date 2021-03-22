@@ -1,7 +1,7 @@
 <template>
   <a-layout-content>
     <a-page-header
-      title="Магазин"
+      title="Новости"
       sub-title="Последние новости"
       @back="() => $router.go(-1)"
     >
@@ -12,27 +12,18 @@
           <a-col :xs="24" :md="24" :lg="24" v-if="user.role === 'ROLE_ADMIN'">
             <a-button
               type="primary"
-              @click="() => $router.push(`/store/create`)"
+              @click="() => $router.push(`/news/create`)"
             >
-              Добавить позицию
+              Добавить новость
               <a-icon type="plus" />
             </a-button>
           </a-col>
-          <a-col
-            :xs="8"
-            :md="8"
-            :lg="24"
-            v-for="(item, index) in store"
-            :key="index"
-          >
+          <a-col :xs="8" :md="8" :lg="24" v-for="(item, index) in news" :key="index">
             <a-card hoverable>
-              <template slot="actions" class="ant-card-actions">
-                <a-button v-if="user.balance >= item.price">Купить</a-button>
-              </template>
               <a-card-meta :title="item.title">
                 <template slot="description">
-                  <p>{{ item.short_description }}</p>
-                  <p>{{ item.price }} ₽</p>
+                  <p>{{ item.short_description }}</p> 
+                  <p>{{ item.tags }}</p>
                 </template>
               </a-card-meta>
             </a-card>
@@ -45,20 +36,20 @@
 <script lang="ts">
 import Vue from "vue";
 export default Vue.extend({
-  name: "store",
+  name: "news",
 
   data() {
     return {
-      store: [],
+      news: [],
     };
   },
 
   created() {
-    const app: any = this;
+    const app : any = this;
     app.$axios
-      .get(`/store`)
+      .get(`/news`)
       .then(({ data }: any) => {
-        app.store = data.data;
+        app.news = data.data;
       })
       .catch((err: any) => {
         console.error(err);

@@ -495,6 +495,20 @@ export default {
           type: "Route",
         },
         {
+          name: "Магазин",
+          icon: "shopping",
+          url: "/store",
+          rolesHidden: [],
+          type: "Route",
+        },
+        {
+          name: "Новости",
+          icon: "tag",
+          url: "/news",
+          rolesHidden: [],
+          type: "Route",
+        },
+        {
           name: "Не распределено",
           icon: "container",
           url: "/distributed",

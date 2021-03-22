@@ -66,6 +66,11 @@ Route::group([
 /**
  * Здесь Get Запросы
  */
+Route::get('news', "NewsController@index");
+Route::post('news/create', "NewsController@store");
+Route::post('news/{newsId}/update', "NewsController@update");
+Route::get('news/{newsId}', "NewsController@view");
+
 Route::get('me/companies', "Company\CompanyController@meCompanies");
 Route::get('company/{id}', 'Company\CompanyController@show');
 Route::get('companies', "Company\CompanyController@index");
