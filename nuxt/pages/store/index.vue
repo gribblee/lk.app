@@ -8,7 +8,7 @@
     </a-page-header>
     <a-layout class="setting-layout-sider">
       <a-layout-content class="setting-layout-content">
-        <a-row :gutter="[16, 16]" type="flex" justify="space-around">
+        <a-row :gutter="[16, 16]" type="flex" justify="start">
           <a-col :xs="24" :md="24" :lg="24" v-if="user.role === 'ROLE_ADMIN'">
             <a-button
               type="primary"
@@ -19,15 +19,23 @@
             </a-button>
           </a-col>
           <a-col
-            :xs="8"
+            :xs="24"
             :md="8"
-            :lg="24"
+            :lg="8"
             v-for="(item, index) in store"
             :key="index"
           >
             <a-card hoverable>
               <template slot="actions" class="ant-card-actions">
-                <a-button v-if="user.balance >= item.price">Купить</a-button>
+                <a-button type="primary" @click="() => $router.push(`/store/${item.id}`)">Просмотерть</a-button>
+                <a-popconfirm
+                  title="Вы действительно хотите купить?"
+                  ok-text="Купить"
+                  cancel-text="нет"
+                  @confirm="orderBuy(item.id)"
+                >
+                  <a-button v-if="user.balance >= item.price">Купить</a-button>
+                </a-popconfirm>
               </template>
               <a-card-meta :title="item.title">
                 <template slot="description">
@@ -64,6 +72,23 @@ export default Vue.extend({
         console.error(err);
       });
   },
-  methods: {},
+  methods: {
+    orderBuy(id: any) {
+      const app: any = this;
+      app.$axios
+        .post(`/store/${id}/buy`)
+        .then(({ data }: any) => {
+          if (data.success)
+          {
+            app.$message.success(data.message);
+          } else {
+            app.$message.error(data.message);
+          }
+        })
+        .catch((err: any) => {
+          console.error(err);
+        });
+    },
+  },
 });
 </script>

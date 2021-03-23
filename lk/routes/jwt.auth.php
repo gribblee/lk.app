@@ -71,6 +71,12 @@ Route::post('news/create', "NewsController@store");
 Route::post('news/{newsId}/update', "NewsController@update");
 Route::get('news/{newsId}', "NewsController@view");
 
+Route::get('store', "StoreController@index");
+Route::post('store/create', "StoreController@store");
+Route::post('store/{orderId}/update', "StoreController@update");
+Route::get('store/{orderId}', "StoreController@view");
+Route::post('store/{orderId}/buy', "StoreController@orderBuy");
+
 Route::get('me/companies', "Company\CompanyController@meCompanies");
 Route::get('company/{id}', 'Company\CompanyController@show');
 Route::get('companies', "Company\CompanyController@index");

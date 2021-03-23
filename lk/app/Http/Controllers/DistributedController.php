@@ -9,6 +9,9 @@ use App\Models\Deal;
 use App\Models\User;
 use App\Models\Status;
 use App\Models\Bid;
+use App\Models\Option;
+use App\Helpers\stdObject;
+use App\Models\HistoryPayment;
 
 use App\Helpers\BitrixApi;
 
@@ -99,12 +102,58 @@ class DistributedController extends Controller
                 ->orderByDesc('weight')->first();
 
             if ($bid) {
+                $option = Option::getKeyValue();
+                $optionBonus = Option::where('name', 'bill_bonus')->first()->bill_bonus ?? 1;
+                $bonus = (($optionBonus / 100) * $bid->consumption);
+
                 $user = User::findOrFail($bid->user->id);
-                $user->balance = $user->balance - $bid->consumption;
-                if ($bid->insurance > 0) { //Если заявка по страховке
-                    $bid->insurance = $bid->insurance - 1;
-                    $deal->is_insurance = true;
+                $paymentStory = new stdObject([
+                    'user_id' => $user->id,
+                    'type_transaction' => '12',
+                    'paysum' => 0,
+                    'paybonus' => 0,
+                    'before_balance' => 0,
+                    'after_balance' => 0,
+                    'before_bonus' => 0,
+                    'after_bonus' => 0
+                ]);
+
+
+                if ($user->with_bonus && $user->bonus >= $bonus) {
+
+                    $paymentStory->before_balance = $user->balance;
+                    $paymentStory->before_bonus = $user->bonus;
+                    $paymentStory->after_balance = $user->balance - ($bid->consumption - $bonus);
+                    $paymentStory->paysum = $bid->consumption;
+                    $paymentStory->after_bonus = $user->bonus - $bonus;
+                    $user->balance = $user->balance - ($bid->consumption - $bonus);
+                    $user->bonus = $user->bonus - $bonus;
+                } else {
+                    $paymentStory->before_balance = $user->balance;
+                    $paymentStory->before_bonus = $user->bonus;
+                    $paymentStory->after_balance = $user->balance - $bid->consumption;
+                    $paymentStory->paysum = $bid->consumption;
+                    $paymentStory->after_bonus = $user->bonus;
+
+                    $user->balance = $user->balance - $bid->consumption;
                 }
+
+                if ($bid->is_insurance) { //Если заявка по страховке
+                    if ($user->with_bonus && $user->bonus >= $bonus) {
+                        $insuranceAmount = ($bid->consumption + ($bid->consumption * ($option['insurance_rate'] / 100))) - $bonus;
+                    } else {
+                        $insuranceAmount = $bid->consumption + ($bid->consumption * ($option['insurance_rate'] / 100));
+                    }
+                    if ($bid->is_insurance && $bid->user->balance >= $insuranceAmount) {
+                        $deal->is_insurance = true;
+                        $deal->amount = $insuranceAmount;
+                    } else {
+                        $deal->amount = $bid->consumption;
+                    }
+                }
+
+                $hp = HistoryPayment::create($paymentStory->toArray());
+
                 if ($user->balance < $bid->consumption) {
                     $bid->is_launch = false;
                     $bid->save();
