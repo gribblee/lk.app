@@ -138,19 +138,38 @@ class DistributedController extends Controller
                     $user->balance = $user->balance - $bid->consumption;
                 }
 
-                if ($bid->is_insurance) { //Если заявка по страховке
-                    if ($user->with_bonus && $user->bonus >= $bonus) {
-                        $insuranceAmount = ceil(($bid->consumption + ($bid->consumption * ($option['insurance_rate'] / 100))) - $bonus);
-                    } else {
-                        $insuranceAmount = ceil($bid->consumption + ($bid->consumption * ($option['insurance_rate'] / 100)));
-                    }
-                    if ($bid->is_insurance && $bid->user->balance >= $insuranceAmount) {
+                $insuranceRate = $bid->consumption + ($bid->consumption * ($option['insurance_rate'] / 100));
+
+                if ($bid->is_insurance) {
+                    if ($user->balance >= $insuranceRate) {
                         $deal->is_insurance = true;
-                        $deal->amount = $insuranceAmount;
+                        if ($user->with_bonus && $user->bonus >= $bonus) {
+                            $deal->amount = $insuranceRate - $bonus;
+                        } else {
+                            $deal->amount = $insuranceRate;
+                        }
                     } else {
-                        $deal->amount = $bid->consumption;
+                        if ($user->with_bonus && $user->bonus >= $bonus) {
+                            $deal->amount = $bid->consumption - $bonus;
+                        } else {
+                            $deal->amount = $bid->consumption;
+                        }
                     }
                 }
+
+                // if ($bid->is_insurance) { //Если заявка по страховке
+                //     if ($user->with_bonus && $user->bonus >= $bonus) {
+                //         $insuranceAmount = ($bid->consumption + ($bid->consumption * ($option['insurance_rate'] / 100))) - $bonus;
+                //     } else {
+                //         $insuranceAmount = $bid->consumption + ;
+                //     }
+                //     if ($bid->is_insurance && $bid->user->balance >= $insuranceAmount) {
+                //         $deal->is_insurance = true;
+                //         $deal->amount = $insuranceAmount;
+                //     } else {
+                //         $deal->amount = $bid->consumption;
+                //     }
+                // }
 
                 $hp = HistoryPayment::create($paymentStory->toArray());
 
