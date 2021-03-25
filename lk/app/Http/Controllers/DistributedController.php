@@ -118,6 +118,7 @@ class DistributedController extends Controller
                     'after_bonus' => 0
                 ]);
 
+                $insuranceRate = $bid->consumption + ($bid->consumption * ($option['insurance_rate'] / 100));
 
                 if ($user->with_bonus && $user->bonus >= $bonus) {
 
@@ -126,7 +127,13 @@ class DistributedController extends Controller
                     $paymentStory->after_balance = ceil($user->balance - ($bid->consumption - $bonus));
                     $paymentStory->paysum = ceil($bid->consumption);
                     $paymentStory->after_bonus = ceil($user->bonus - $bonus);
-                    $user->balance = $user->balance - ceil($bid->consumption - $bonus);
+                    if ($bid->is_insurance && $user->balance >= $insuranceRate) {
+                        $user->balance = $user->balance - ceil($insuranceRate - $bonus);
+                    } else {
+                        $user->balance = ceil($user->balance - $insuranceRate);
+                    }
+
+                    
                     $user->bonus = ceil($user->bonus - $bonus);
                 } else {
                     $paymentStory->before_balance = $user->balance;
@@ -135,10 +142,14 @@ class DistributedController extends Controller
                     $paymentStory->paysum = $bid->consumption;
                     $paymentStory->after_bonus = ceil($user->bonus);
 
-                    $user->balance = $user->balance - $bid->consumption;
+                    if ($bid->is_insurance && $user->balance >= $insuranceRate) {
+                        $user->balance = ceil($user->balance - $insuranceRate);
+                    } else {
+                        $user->balance = ceil($user->balance - $bid->consumption);
+                    }
                 }
 
-                $insuranceRate = $bid->consumption + ($bid->consumption * ($option['insurance_rate'] / 100));
+
 
                 if ($bid->is_insurance) {
                     if ($user->balance >= $insuranceRate) {
@@ -181,7 +192,6 @@ class DistributedController extends Controller
 
                 $deal->bid_id = $bid->id;
                 $deal->status_id = $status->id;
-                $deal->amount = $bid->consumption;
                 $deal->save();
 
                 if (
