@@ -122,27 +122,27 @@ class DistributedController extends Controller
                 if ($user->with_bonus && $user->bonus >= $bonus) {
 
                     $paymentStory->before_balance = $user->balance;
-                    $paymentStory->before_bonus = $user->bonus;
-                    $paymentStory->after_balance = $user->balance - ($bid->consumption - $bonus);
-                    $paymentStory->paysum = $bid->consumption;
-                    $paymentStory->after_bonus = $user->bonus - $bonus;
-                    $user->balance = $user->balance - ($bid->consumption - $bonus);
-                    $user->bonus = $user->bonus - $bonus;
+                    $paymentStory->before_bonus = ceil($user->bonus);
+                    $paymentStory->after_balance = ceil($user->balance - ($bid->consumption - $bonus));
+                    $paymentStory->paysum = ceil($bid->consumption);
+                    $paymentStory->after_bonus = ceil($user->bonus - $bonus);
+                    $user->balance = $user->balance - ceil($bid->consumption - $bonus);
+                    $user->bonus = ceil($user->bonus - $bonus);
                 } else {
                     $paymentStory->before_balance = $user->balance;
                     $paymentStory->before_bonus = $user->bonus;
-                    $paymentStory->after_balance = $user->balance - $bid->consumption;
+                    $paymentStory->after_balance = ceil($user->balance - $bid->consumption);
                     $paymentStory->paysum = $bid->consumption;
-                    $paymentStory->after_bonus = $user->bonus;
+                    $paymentStory->after_bonus = ceil($user->bonus);
 
                     $user->balance = $user->balance - $bid->consumption;
                 }
 
                 if ($bid->is_insurance) { //Если заявка по страховке
                     if ($user->with_bonus && $user->bonus >= $bonus) {
-                        $insuranceAmount = ($bid->consumption + ($bid->consumption * ($option['insurance_rate'] / 100))) - $bonus;
+                        $insuranceAmount = ceil(($bid->consumption + ($bid->consumption * ($option['insurance_rate'] / 100))) - $bonus);
                     } else {
-                        $insuranceAmount = $bid->consumption + ($bid->consumption * ($option['insurance_rate'] / 100));
+                        $insuranceAmount = ceil($bid->consumption + ($bid->consumption * ($option['insurance_rate'] / 100)));
                     }
                     if ($bid->is_insurance && $bid->user->balance >= $insuranceAmount) {
                         $deal->is_insurance = true;
