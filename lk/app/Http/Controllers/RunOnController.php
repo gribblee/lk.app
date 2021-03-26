@@ -134,8 +134,8 @@ class RunOnController extends Controller
         ]);
 
         if ($user->with_bonus && $user->bonus >= $bonus) {
-            $userUpdate->balance = $user->balance - ($claim->consumption - $bonus);
-            $userUpdate->bonus = $user->bonus - $bonus;
+            $userUpdate->balance = ceil($user->balance - ($claim->consumption - $bonus));
+            $userUpdate->bonus = ceil($user->bonus - $bonus);
 
             $paymentStory->before_balance = $user->balance;
             $paymentStory->after_balance = $userUpdate->balance;
@@ -143,7 +143,7 @@ class RunOnController extends Controller
             $paymentStory->before_bonus = $user->bonus;
             $paymentStory->after_bonus = $userUpdate->bonus;
         } else {
-            $userUpdate->balance = $user->balance - $claim->consumption;
+            $userUpdate->balance = ceil($user->balance - $claim->consumption);
 
             $paymentStory->before_balance = $user->balance;
             $paymentStory->after_balance = $userUpdate->balance;
