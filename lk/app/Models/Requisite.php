@@ -24,7 +24,8 @@ class Requisite extends Model
         'poste_address',
         'director',
         'user_id',
-        'is_delete'
+        'is_delete',
+        'requisite_payment_id'
     ];
 
     public function user()

@@ -103,7 +103,8 @@ class UserController extends Controller
             $rgC = 1;
 
             foreach ($bidCollect as $cl) {
-                if (count($cl->regions) > 0) {
+                if (count($cl->regions) > 0 && ($cl->consumption >= ceil($cl->direction->cost_price +
+                ($cl->direction->cost_price * ($cl->direction->extra / 100))))) {
                     $rgC = 1;
                     foreach ($cl->regions as $region) {
                         if ($request->has('regionSort')) {
@@ -117,6 +118,7 @@ class UserController extends Controller
                             }
                             $regions[$region['id']]['AVG_RATE'] = $regions[$region['id']]['AVG_RATE'] + $cl->consumption;
                             $regions[$region['id']]['COUNT'] = $rgC;
+                            $regions[$region['id']]['IDS'][] = $cl->id;
                         } else {
                             $regions[$region['id']] = [
                                 'REGION_NAME' => $region['name'],
@@ -130,11 +132,13 @@ class UserController extends Controller
                                 'COUNT' => $rgC,
                                 'direction' => $cl->direction
                             ];
+                            $regions[$region['id']]['IDS'][] = $cl->id;
                         }
                     }
                 } else {
                     $rgC = 1;
                     if (count($regions[0]) > 0) {
+                        $regions[0]['IDS'][] =  $cl->id;
                         $regions[0]['LEAD_COUNT'] = $regions[0]['LEAD_COUNT'] + 1;
                         $regions[0]['balance'] = $regions[0]['balance'] + $cl->user->balance;
                         if (isset($regions[0]['MAX_RATE']) < $cl->consumption) {
@@ -155,6 +159,7 @@ class UserController extends Controller
                             'COUNT' => $rgC,
                             'direction' => $cl->direction
                         ];
+                        $regions[0]['IDS'][] = $cl->id;
                     }
                 }
                 $rgC++;
@@ -184,6 +189,7 @@ class UserController extends Controller
                         $region['budget'] = $region['direction']->cost_price * $region['LEAD_COUNT'];
 
                         $source[] = [
+                            'IDS' => $region['IDS'],
                             'DIRECTION_NAME' => $region['direction']->name,
                             'REGION_NAME' => $region['REGION_NAME'],
                             'LEAD_COUNT' => $region['LEAD_COUNT'],

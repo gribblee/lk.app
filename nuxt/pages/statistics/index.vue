@@ -196,6 +196,16 @@
               :data-source="dataSource"
               :loading="isLoading"
             >
+              <template slot="USERS_COUNT" slot-scope="text, record">
+                <template v-if="record.IDS.length > 0">
+                  <nuxt-link :to="`/?ids=${record.IDS.join(',')}`">{{
+                    text
+                  }}</nuxt-link>
+                </template>
+                <template v-else>
+                  {{ text }}
+                </template>
+              </template>
               <template slot="AVG_RATE" slot-scope="text">
                 {{ Math.ceil(text) }} ₽
               </template>
@@ -278,6 +288,7 @@ export default {
             title: "Кол-во клиентов",
             dataIndex: "USERS_COUNT",
             key: "USERS_COUNT",
+            scopedSlots: { customRender: "USERS_COUNT" },
           },
           {
             title: "Макс. стоимость",
@@ -324,6 +335,7 @@ export default {
             title: "Кол-во клиентов",
             dataIndex: "USERS_COUNT",
             key: "USERS_COUNT",
+            scopedSlots: { customRender: "USERS_COUNT" },
           },
           {
             title: "Макс. стоимость",

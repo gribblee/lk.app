@@ -58,6 +58,50 @@
               </a-form-model-item>
               <a-form-model-item
                 has-feedback
+                label="Бонусы от"
+                prop="billBonusFrom"
+              >
+                <a-input
+                  v-model="optionsForm.bill_bonus_from"
+                  type="text"
+                  autocomplete="off"
+                />
+              </a-form-model-item>
+              <a-form-model-item
+                has-feedback
+                label="Бонусы до"
+                prop="billBonusTo"
+              >
+                <a-input
+                  v-model="optionsForm.bill_bonus_to"
+                  type="text"
+                  autocomplete="off"
+                />
+              </a-form-model-item>
+              <a-form-model-item
+                has-feedback
+                label="Бонусы 1"
+                prop="billBonusЩту"
+              >
+                <a-input
+                  v-model="optionsForm.bill_bonus_one"
+                  type="text"
+                  autocomplete="off"
+                />
+              </a-form-model-item>
+              <a-form-model-item
+                has-feedback
+                label="Бонусы 2"
+                prop="billBonusTwo"
+              >
+                <a-input
+                  v-model="optionsForm.bill_bonus_two"
+                  type="text"
+                  autocomplete="off"
+                />
+              </a-form-model-item>
+              <a-form-model-item
+                has-feedback
                 label="Сообщение при мин. балансе"
                 prop="messageBalance"
               >
@@ -105,6 +149,10 @@ export default Vue.extend({
         message_balance: "",
         threshold_balance: "0",
         bill_bonus: "0",
+        bill_bonus_from: "0",
+        bill_bonus_to: "0",
+        bill_bonus_one: "0",
+        bill_bonus_two: "0"
       },
     };
   },

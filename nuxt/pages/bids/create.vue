@@ -744,8 +744,7 @@ export default {
         status: false,
         consumption: this.max_rate === 0 ? 1080 : this.max_rate,
       };
-
-      recommendReturn.status = this.consumption < recommendReturn.consumption;
+      recommendReturn.status = (this.consumption < recommendReturn.consumption) && Object.keys(this.direction).length > 0;
 
       return recommendReturn;
     },

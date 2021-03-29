@@ -21,6 +21,7 @@ class DisputController extends Controller
     {
         if ($request->user()->role == 'ROLE_ADMIN' || $request->user()->role == 'ROLE_MODERATOR') {
             $disputs = Disput::where('status', Disput::STATUS_START)
+                ->with('deal.bids.user')
                 ->orderBy('created_at', 'DESC')
                 ->paginate(15);
 
@@ -81,7 +82,7 @@ class DisputController extends Controller
             switch ($request->status) {
                 case 2006:
                     Notification::create([
-                        'description' => "Заявка #{$disput->deal->id} не соответствует критериям некачественной, поэтому мы вернули её Вам",
+                        'description' => "Заявка #{$disput->deal->id} была возвращена вам причина {$request->msg}",
                         'user_id' => $disput->deal->bids->user->id
                     ]);
                     $status = Status::where('type', 1000)->first();

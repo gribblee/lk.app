@@ -13,7 +13,17 @@
       <div :style="{ margin: '20px 0px 0 0px' }">
         <a-form>
           <a-row :gutter="24">
-            <a-col :span="6">
+            <a-col :span="4">
+              <a-form-item label="ID">
+                <a-input
+                  size="large"
+                  v-model="searchField.id"
+                  @keyup.enter="handleSearch"
+                  @blur="handleSearch"
+                />
+              </a-form-item>
+            </a-col>
+            <a-col :span="5">
               <a-form-item label="ФИО">
                 <a-input
                   size="large"
@@ -23,7 +33,7 @@
                 />
               </a-form-item>
             </a-col>
-            <a-col :span="6">
+            <a-col :span="5">
               <a-form-item label="Статус">
                 <a-select
                   size="large"
@@ -31,6 +41,11 @@
                   @change="handleSearch"
                 >
                   <a-select-option value>Любой статус</a-select-option>
+                  <a-select-option
+                    v-if="user.role === 'ROLE_ADMIN'"
+                    value="1000000"
+                    >Брак</a-select-option
+                  >
                   <a-select-option
                     v-for="(item, index) in $directory.status"
                     v-if="
@@ -48,7 +63,7 @@
                 </a-select>
               </a-form-item>
             </a-col>
-            <a-col :span="6">
+            <a-col :span="5">
               <a-form-item label="Регион">
                 <a-select
                   size="large"
@@ -65,7 +80,7 @@
                 </a-select>
               </a-form-item>
             </a-col>
-            <a-col :span="6">
+            <a-col :span="5">
               <a-form-item label="Направление">
                 <a-select
                   size="large"
@@ -86,7 +101,7 @@
           <a-row
             v-if="user.role == 'ROLE_MANAGER' || user.role == 'ROLE_ADMIN'"
           >
-            <a-col :span="6">
+            <a-col :span="4">
               <a-form-item label="На кого распределён">
                 <a-input
                   size="large"
@@ -96,7 +111,7 @@
               </a-form-item>
             </a-col>
             <a-col :span="6">
-              <a-form-item label="Дата" :style="{marginLeft: '20px'}">
+              <a-form-item label="Дата" :style="{ marginLeft: '20px' }">
                 <a-range-picker
                   size="large"
                   v-model="searchField.datePicker"
@@ -149,9 +164,11 @@
                     :value="item"
                     v-if="
                       (item.type === 1003 &&
-                        record.disput_count === 0 &&
-                        record.is_insurance == 1) ||
-                      (item.type !== 1003 && item.type !== 1004)
+                        record.disput === null &&
+                        record.is_insurance) ||
+                      (item.type !== 1000 &&
+                        item.type !== 1003 &&
+                        item.type !== 1004)
                     "
                     >{{ item.name }}</a-menu-item
                   >
@@ -369,7 +386,10 @@
               <a-icon type="inbox" />
             </p>
             <p class="ant-upload-text">Нажмите или перекиньте файлы звонков</p>
-            <p class="ant-upload-hint">Загрузить</p>
+            <p class="ant-upload-hint">
+              Файлы в формате mp3, mpeg, mpeg-4, ogg, wav не превышающие размера
+              16 Мб.
+            </p>
           </a-upload-dragger>
         </a-col>
       </a-row>
@@ -504,6 +524,16 @@ const columns = [
     sorter: (a, b) => {},
   },
   {
+    title: "Доход бонусы",
+    dataIndex: "amount_bonus",
+    key: "amount_bonus",
+    scopedSlots: { customRender: "amount_bonus" },
+    defaultSortOrder: "descend",
+    sortDirections: ["descend", "ascend"],
+    onFilter: (value, record) => {},
+    sorter: (a, b) => {},
+  },
+  {
     title: "На кого распределён",
     dataIndex: "bids",
     key: "bids",
@@ -534,11 +564,12 @@ export default {
       order_by: "DEF",
       order_field: "id",
       searchField: {
-        name: '',
+        id: "",
+        name: "",
         status_id: null,
         region_id: null,
         direction_id: null,
-        user_name: '',
+        user_name: "",
         datePicker: [],
       },
       pStyle: {

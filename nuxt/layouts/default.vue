@@ -351,6 +351,15 @@
               :style="{ height: '70px' }"
             ></a-textarea>
           </div>
+          <div :style="{ margin: '20px 0'}">
+            <a-upload
+              name="file"
+              :multiple="true"
+              action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+            >
+              <a-button> <a-icon type="upload" /> Загрузить картинки </a-button>
+            </a-upload>
+          </div>
           <div
             :style="{
               marginTop: '20px',

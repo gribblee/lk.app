@@ -50,7 +50,12 @@
               <a-button
                 slot="actions"
                 type="primary"
-                @click="handleCloseService($event, item.id)"
+                @click="
+                  () => {
+                    itemId = item.id;
+                    msgVisible = true;
+                  }
+                "
                 v-if="item.status !== 2006"
                 >В пользу сервиса</a-button
               >
@@ -62,6 +67,12 @@
                   >{{ item.name }}</a
                 >
               </a-list-item-meta>
+              <div>
+                Отправил на спор
+                <nuxt-link :to="`/users/${item.deal.bids.user.id}`">{{
+                  item.deal.bids.user.name
+                }}</nuxt-link>
+              </div>
               <!-- <div>
                 <span :style="{ display: 'flex', alignItems: 'center'}">
                     <a-icon type="clock-circle" :style="{ marginRight: '5px'}" />
@@ -109,7 +120,10 @@
           <b-description-item title="Телефон" :content="dealData.phone" />
         </a-col>
         <a-col :span="12">
-          <b-description-item title="Стоимость" :content="`${dealData.amount} ₽`" />
+          <b-description-item
+            title="Стоимость"
+            :content="`${dealData.amount} ₽`"
+          />
         </a-col>
       </a-row>
       <tempalte
@@ -176,21 +190,34 @@
         </a-col>
       </a-row>
     </a-drawer>
+    <a-modal
+      v-model="msgVisible"
+      title="Прична закрытия"
+      ok-text="Закрыть спор"
+      cancel-text="Отмена"
+      placeholder="Опишите причину закрытия"
+      @ok="handleCloseService($event, itemId)"
+    >
+      <a-input type="textarea" v-model="msgClose"/>
+    </a-modal>
   </a-layout-content>
 </template>
 <script>
 export default {
   data() {
     return {
+      itemId: 0,
       loading: true,
       loadingMore: false,
       showLoadingMore: false,
       pageTo: 1,
       pageTotal: 1,
       data: [],
+      msgClose: '',
       visible: false,
       uploadURL: "",
       fileList: [],
+      msgVisible: false,
       pStyle: {
         fontSize: "16px",
         color: "rgba(0,0,0,0.85)",
@@ -319,6 +346,7 @@ export default {
       this.$axios
         .post(`/disput/${disput_id}/close`, {
           status: 2006,
+          msg: this.msgClose
         })
         .then(({ data }) => {
           this.loadData((result) => {
@@ -328,6 +356,7 @@ export default {
             this.pageTotal = result.total;
             this.showLoadingMore = !(this.pageTo == this.pageTotal);
           }, "/disput");
+          this.msgVisible = false;
         })
         .catch((_err) => {
           console.error(_err);

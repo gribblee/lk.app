@@ -13,11 +13,13 @@ use Illuminate\Support\Facades\Log;
 
 class DealController extends Controller
 {
+    protected $is_delete = false;
     /**
      * Start Ver 1.0
      */
     public function index(Request $request)
     {
+        $this->is_delete = false;
         $Deals = Deal::selectRaw('*, deals.id AS deal_id')
             ->with('status')
             ->with('region')
@@ -35,10 +37,14 @@ class DealController extends Controller
                     if (!empty($val) && $val != null) {
                         if ($key != 'datePicker') {
                             if ($key != 'user_name') {
-                                $srch[] = [$key, '=', $val];
-                            } else {
-                                $q->whereHas('user', function($qm) use($val) {
-                                    return $qm->where('name','LIKE', "%{$val}%");
+                                if ($key == 'status_id' && $val == '1000000'){
+                                    $this->is_delete = true;
+                                } else {
+                                    $srch[] = [$key, '=', $val];
+                                }
+                            } elseif ($key == 'user_name') {
+                                $q->whereHas('bids.user', function ($qm) use ($val) {
+                                    return $qm->where('name', 'LIKE', "%{$val}%");
                                 });
                             }
                         } else {
@@ -66,7 +72,7 @@ class DealController extends Controller
                 ($request->order_by == 'DEF'
                     ? 'DESC'
                     : $request->order_by)
-                : 'DESC'))->where('is_delete', false);
+                : 'DESC'))->where('is_delete', $this->is_delete);
         return response()->json($Deals->paginate(10));
     }
 
@@ -140,33 +146,34 @@ class DealController extends Controller
             })
             ->where('is_delete', false)
             ->firstOrFail();
-        return response()->json($deal);
-        if (
-            $deal->status->id === 3 &&
-            ($request->user()->role != 'ROLE_ADMIN' && $request->user()->role != 'ROLE_WEBMASTER')
-        ) {
-            unset($deal->name);
-            unset($deal->phone);
-            unset($deal->email);
+        // if (
+        //     $deal->status->id === 3 &&
+        //     ($request->user()->role != 'ROLE_ADMIN' && $request->user()->role != 'ROLE_WEBMASTER')
+        // ) {
+        //     unset($deal->name);
+        //     unset($deal->phone);
+        //     unset($deal->email);
 
-            unset($deal->region);
-            unset($deal->bids);
-            $deal->bids = [
-                'direction' => ''
-            ];
-            $deal->region = [
-                'name' => ''
-            ];
-            $deal->deal_files = [];
-        }
-        if ($request->user()->role != 'ROLE_ADMIN' && $request->user()->role != 'ROLE_WEBMASTER') {
-            unset($deal->request);
-            unset($deal->referer);
-            unset($deal->utm);
-            unset($deal->api_id);
-        }
+        //     unset($deal->region);
+        //     unset($deal->bids);
+        //     $deal->bids = [
+        //         'direction' => ''
+        //     ];
+        //     $deal->region = [
+        //         'name' => ''
+        //     ];
+        //     $deal->deal_files = [];
+        // }
+        // if ($request->user()->role != 'ROLE_ADMIN' && $request->user()->role != 'ROLE_WEBMASTER') {
+        //     unset($deal->request);
+        //     unset($deal->referer);
+        //     unset($deal->utm);
+        //     unset($deal->api_id);
+        // }
         if ($deal->is_view == false && $request->user()->id == $deal->bids->user_id) {
-            Deal::find($deal->id)->update(['is_view' => true]);
+            Deal::where('id', $deal->id)->update(['is_view' => true]);
+        } else {
+            Deal::where('id', $deal->id)->update(['is_manager_view' => true]);
         }
         return response()->json($deal, 200);
     }

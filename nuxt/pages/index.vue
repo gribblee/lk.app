@@ -220,10 +220,28 @@
                     <a-input placeholder="Email" v-model="search.email" />
                   </a-col>
                   <a-col :span="4">
+                    <a-input placeholder="Email" v-model="search.email" />
+                  </a-col>
+                  <a-col :span="4">
                     <a-input
                       placeholder="Имя или Email менеджера"
                       v-model="search.manager"
                     />
+                  </a-col>
+                  <a-col :span="3">
+                    <a-select
+                      placeholder="Направление"
+                      prop-label-prop="label"
+                      v-model="search.direction_id"
+                      :style="{ width: '100%' }"
+                    >
+                      <a-select-option :key="0" value="" label="Не выбрано"
+                        >Не выбрано</a-select-option
+                      >
+                    <a-select-option :key="direction.id" :value="direction.id" v-for="direction in directory.directions">{{
+                        direction.name
+                      }}</a-select-option>
+                    </a-select>
                   </a-col>
                   <a-col :span="3">
                     <a-select
@@ -421,6 +439,7 @@ export default {
       statistic: {},
       alertBalance: false,
       eventDisabled: true,
+      directory: {},
       // rowSelection: {
       //   // onChange: (selectedRowKeys, selectedRows) => {
       //   //   console.log(
@@ -447,11 +466,20 @@ export default {
         phone: "",
         email: "",
         role: "",
+        direction_id: "",
         manager: "",
       },
     };
   },
   created() {
+    this.$axios
+      .get("/directory")
+      .then(({ data }) => {
+        this.directory = data;
+      })
+      .catch((_err) => {
+        console.error(_err);
+      });
     if (this.user.role != "ROLE_MANAGER" && this.user.role != "ROLE_ADMIN") {
       if (columns.length == 7) {
         columns.splice(-1, 1);
@@ -490,6 +518,9 @@ export default {
     },
     loadTable(postData = {}) {
       this.isLoading = true;
+      if (typeof this.$route.query.ids != "undefined") {
+        postData["ids"] = this.$route.query.ids;
+      }
       this.$axios
         .post(`/bids?page=${this.pagination.current}`, postData)
         .then(({ data }) => {
@@ -535,7 +566,7 @@ export default {
         });
     },
     handleCreateBid(_e) {
-      this.$router.push('/bids/create');
+      this.$router.push("/bids/create");
       // this.$axios
       //   .post("/bid/create")
       //   .then(({ data }) => {

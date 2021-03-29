@@ -62,6 +62,9 @@
             :data-source="data"
             :loading="isLoading"
           >
+            <template slot="requisite_payment_id" slot-scope="text, record">
+              {{ record.requisite.requisite_payment_id }}
+            </template>
             <template slot="status" slot-scope="text">
               <a-tag :color="tagLabel[text].color">
                 {{ tagLabel[text].title }}
@@ -140,245 +143,246 @@
 <script>
 const columns = [
   {
-    title: 'ID',
-    dataIndex: 'id',
-    key: 'id',
+    title: "ID",
+    dataIndex: "id",
+    key: "id",
   },
   {
-    title: 'Статус',
-    dataIndex: 'status',
-    key: 'status',
-    scopedSlots: { customRender: 'status' },
+    title: "Статус",
+    dataIndex: "status",
+    key: "status",
+    scopedSlots: { customRender: "status" },
   },
   {
-    title: 'Идентификатор платежа',
-    dataIndex: 'payment_id',
-    key: 'payment_id',
+    title: "Идентификатор платежа",
+    dataIndex: "requisite_payment_id",
+    key: "requisite_payment_id",
+    scopedSlots: { customRender: "requisite_payment_id" },
   },
   {
-    title: 'Пользователь',
-    dataIndex: 'user',
-    key: 'user',
-    scopedSlots: { customRender: 'user' },
+    title: "Пользователь",
+    dataIndex: "user",
+    key: "user",
+    scopedSlots: { customRender: "user" },
   },
   {
-    title: 'Реквизиты',
-    dataIndex: 'requisite',
-    key: 'requisite',
-    scopedSlots: { customRender: 'requisite' },
+    title: "Реквизиты",
+    dataIndex: "requisite",
+    key: "requisite",
+    scopedSlots: { customRender: "requisite" },
   },
   {
-    title: 'Сумма пополнения',
-    dataIndex: 'paysum',
-    key: 'paysum',
-    scopedSlots: { customRender: 'paysum' },
+    title: "Сумма пополнения",
+    dataIndex: "paysum",
+    key: "paysum",
+    scopedSlots: { customRender: "paysum" },
   },
   {
-    title: 'Баланс до пополнения',
-    dataIndex: 'before_balance',
-    key: 'before_balance',
-    scopedSlots: { customRender: 'before_balance' },
+    title: "Баланс до пополнения",
+    dataIndex: "before_balance",
+    key: "before_balance",
+    scopedSlots: { customRender: "before_balance" },
   },
   {
-    title: 'Дата создания',
-    dataIndex: 'created_at',
-    key: 'created_at',
-    scopedSlots: { customRender: 'created_at' },
+    title: "Дата создания",
+    dataIndex: "created_at",
+    key: "created_at",
+    scopedSlots: { customRender: "created_at" },
   },
   {
-    title: 'Дата обновления',
-    dataIndex: 'updated_at',
-    key: 'updated_at',
-    scopedSlots: { customRender: 'updated_at' },
+    title: "Дата обновления",
+    dataIndex: "updated_at",
+    key: "updated_at",
+    scopedSlots: { customRender: "updated_at" },
   },
-]
+];
 export default {
   data() {
     return {
       data: [],
       columns,
       isLoading: true,
-      actionPPtext: 'Все реквизиты',
+      actionPPtext: "Все реквизиты",
       visible: false,
       selectedRows: [],
       requisiteData: {
-        name: '',
-        bank: '',
-        bik: '',
-        created_at: '',
-        director: '',
-        inn: '',
-        jour_address: '',
-        kpp: '',
-        ksch: '',
-        ogrn: '',
-        poste_address: '',
+        name: "",
+        bank: "",
+        bik: "",
+        created_at: "",
+        director: "",
+        inn: "",
+        jour_address: "",
+        kpp: "",
+        ksch: "",
+        ogrn: "",
+        poste_address: "",
       },
       searchField: {
         name: {
-          label: 'Имя',
-          value: '',
+          label: "Имя",
+          value: "",
         },
         bank: {
-          label: 'Банк',
-          value: '',
+          label: "Банк",
+          value: "",
         },
         bik: {
-          label: 'БИК',
-          value: '',
+          label: "БИК",
+          value: "",
         },
         director: {
-          label: 'Директор',
-          value: '',
+          label: "Директор",
+          value: "",
         },
         inn: {
-          label: 'ИНН',
-          value: '',
+          label: "ИНН",
+          value: "",
         },
         jour_address: {
-          label: 'Юр. адрес',
-          value: '',
+          label: "Юр. адрес",
+          value: "",
         },
         kpp: {
-          label: 'КПП',
-          value: '',
+          label: "КПП",
+          value: "",
         },
         ksch: {
-          label: 'К/СЧ',
-          value: '',
+          label: "К/СЧ",
+          value: "",
         },
         ogrn: {
-          label: 'ОГРН',
-          value: '',
+          label: "ОГРН",
+          value: "",
         },
         poste_address: {
-          label: 'Почтовый адрес',
-          value: '',
+          label: "Почтовый адрес",
+          value: "",
         },
       },
       pStyle: {
-        fontSize: '16px',
-        color: 'rgba(0,0,0,0.85)',
-        lineHeight: '24px',
-        display: 'block',
-        marginBottom: '16px',
+        fontSize: "16px",
+        color: "rgba(0,0,0,0.85)",
+        lineHeight: "24px",
+        display: "block",
+        marginBottom: "16px",
       },
       pStyle2: {
-        marginBottom: '24px',
+        marginBottom: "24px",
       },
       tagLabel: {
         101: {
-          title: 'Создано',
-          color: 'geekblue',
+          title: "Создано",
+          color: "geekblue",
         },
         102: {
-          title: 'Частичная оплата',
-          color: 'red',
+          title: "Частичная оплата",
+          color: "red",
         },
         105: {
-            title: 'Оплачено',
-            color: 'green'
+          title: "Оплачено",
+          color: "green",
         },
       },
       rowSelection: {
         onChange: (selectedRowKeys, selectedRows) => {
           console.log(
             `selectedRowKeys:${selectedRowKeys}`,
-            'selectedRows: ',
+            "selectedRows: ",
             selectedRows
-          )
-          this.eventDisabled = selectedRows.length === 0
-          this.selectedRows = selectedRows
+          );
+          this.eventDisabled = selectedRows.length === 0;
+          this.selectedRows = selectedRows;
         },
         onSelect: (record, selected, selectedRows) => {
-          console.log(record, selected, selectedRows)
+          console.log(record, selected, selectedRows);
         },
         onSelectAll: (selected, selectedRows, changeRows) => {
-          console.log(selected, selectedRows, changeRows)
+          console.log(selected, selectedRows, changeRows);
         },
       },
       eventDisabled: true,
-    }
+    };
   },
   created() {
-    this.loadTable()
+    this.loadTable();
   },
   mounted() {
-    this.isLoading = false
+    this.isLoading = false;
   },
   methods: {
     updateTable(postData) {
       this.$axios
-        .post('/payment/requisites/update', postData)
+        .post("/payment/requisites/update", postData)
         .then(({ data }) => {
           if (data.success) {
-            this.loadTable()
-            this.$message.success(data.message)
+            this.loadTable();
+            this.$message.success(data.message);
           } else {
-            this.$message.error(data.message)
+            this.$message.error(data.message);
           }
         })
         .catch((err) => {
-          if (typeof err.response.data.message != 'undefined') {
-            this.$message.error(err.response.data.message)
+          if (typeof err.response.data.message != "undefined") {
+            this.$message.error(err.response.data.message);
           } else {
-            this.$message.error(err.response.data)
+            this.$message.error(err.response.data);
           }
-        })
+        });
     },
     loadTable(postData = {}) {
       this.$axios
-        .post('/payment/requisites', postData)
+        .post("/payment/requisites", postData)
         .then(({ data }) => {
-          this.data = data.data
+          this.data = data.data;
         })
         .catch((err) => {
-          if (typeof err.response.data.message != 'undefined') {
-            this.$message.error(err.response.data.message)
+          if (typeof err.response.data.message != "undefined") {
+            this.$message.error(err.response.data.message);
           } else {
-            this.$message.error(err.response.data)
+            this.$message.error(err.response.data);
           }
-        })
+        });
     },
     submitSearch(e) {
-      let searchData = {}
+      let searchData = {};
       Object.keys(this.searchField).forEach((key) => {
         if (this.searchField[key].value.length > 0) {
-          return (searchData[key] = this.searchField[key].value)
+          return (searchData[key] = this.searchField[key].value);
         }
-      })
+      });
       if (Object.keys(searchData).length > 0) {
         this.loadTable({
           search: searchData,
-        })
-        this.actionPPtext = 'Поиск по форме'
+        });
+        this.actionPPtext = "Поиск по форме";
       }
     },
     clearSearch(e) {
-      this.loadTable()
+      this.loadTable();
     },
     handleActionClick(e) {
       if (e.key == 3 || e.key == 4 || e.key == 5) {
         this.updateTable({
           action: e.key,
           ids: this.selectedRows.map((curr) => {
-            return curr.id
+            return curr.id;
           }),
-        })
+        });
       } else {
-        this.actionPPtext = e.item.value
+        this.actionPPtext = e.item.value;
         this.loadTable({
           action: e.key,
-        })
+        });
       }
     },
     showRequisite(data) {
-      this.requisiteData = data
-      this.visible = true
+      this.requisiteData = data;
+      this.visible = true;
     },
     onClose() {
-      this.visible = false
+      this.visible = false;
     },
   },
-}
+};
 </script>

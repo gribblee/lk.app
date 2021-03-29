@@ -19,6 +19,7 @@ class Deal extends Model
     protected $fillable = [
         'is_view',
         'amount',
+        'amount_bonus',
         'name',
         'phone',
         'email',
@@ -30,7 +31,8 @@ class Deal extends Model
         'status_id',
         'token_id',
         'request',
-        'is_insurance'
+        'is_insurance',
+        'user_id'
     ];
 
     public static function getCount(string $role = '', int $user_id = 0, int $user_category = 0)

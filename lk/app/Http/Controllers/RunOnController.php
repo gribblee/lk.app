@@ -63,7 +63,7 @@ class RunOnController extends Controller
             $deal = $this->createDeal($request, $AppToken, $region); //Создание заявки
             $notClaimsId = $this->foundedDealsClaimsId($AppToken, $request);
             $claims = $this->findClaims($AppToken, $region, $notClaimsId); //Поиск заявок
-            
+
             Log::info("Deal: " . json_encode($deal));
             Log::info("Region: " . json_encode($region) . "\r\n");
 
@@ -75,13 +75,6 @@ class RunOnController extends Controller
                     $user = User::where(['role' => 'ROLE_USER', 'is_delete' => false])->find($claim->user_id);
                     if ($user) { //Заявка не должна попадать менеджеру или администратору
                         Log::info("Claim User success ID {$user->id}");
-                        //** Обновление поступившей заявки
-                        $deal->update([
-                            'amount' => $claim->consumption,
-                            'bid_id' => $claim->id,
-                            'is_insurance' => $claim->is_insurance,
-                            'status_id' => Status::firstStatus()->id,
-                        ]);
                         //** */ Списание страховки
                         // ($claim->insurance) > 0 ?
                         //     Bid::find($claim->id)
@@ -94,7 +87,15 @@ class RunOnController extends Controller
                         ($user->contact_id != null && $user->contact_id != 0)
                             ? $this->addBitrix($request, $deal, $claim, $category->source_id)
                             : false;
-                        $this->userPayment($user, $claim); //Оплата
+                        $userPay = $this->userPayment($user, $claim); //Оплата
+                        //** Обновление поступившей заявки
+                        $deal->update([
+                            'amount_bonus' => $userPay['bonus'] ?? 0,
+                            'amount' => $claim->consumption,
+                            'bid_id' => $claim->id,
+                            'is_insurance' => $claim->is_insurance,
+                            'status_id' => Status::firstStatus()->id,
+                        ]);
                         //** Отправка на почту
                         $this->sendMail($user);
 
@@ -130,26 +131,29 @@ class RunOnController extends Controller
         ]);
         $userUpdate = new stdObject([
             'balance' => $user->balance,
-            'bonus' => $user->bonus
+            'bonus' => ceil($user->bonus)
         ]);
+
+        $payBonus = 0;
 
         if ($user->with_bonus && $user->bonus >= $bonus) {
             $userUpdate->balance = ceil($user->balance - ($claim->consumption - $bonus));
             $userUpdate->bonus = ceil($user->bonus - $bonus);
 
-            $paymentStory->before_balance = $user->balance;
-            $paymentStory->after_balance = $userUpdate->balance;
+            $paymentStory->before_balance = ceil($user->balance);
+            $paymentStory->after_balance = ceil($userUpdate->balance);
             $paymentStory->paysum = $claim->consumption;
-            $paymentStory->before_bonus = $user->bonus;
-            $paymentStory->after_bonus = $userUpdate->bonus;
+            $paymentStory->before_bonus = ceil($user->bonus);
+            $paymentStory->after_bonus = ceil($userUpdate->bonus);
+            $payBonus = ceil($bonus);
         } else {
             $userUpdate->balance = ceil($user->balance - $claim->consumption);
 
-            $paymentStory->before_balance = $user->balance;
-            $paymentStory->after_balance = $userUpdate->balance;
+            $paymentStory->before_balance = ceil($user->balance);
+            $paymentStory->after_balance = ceil($userUpdate->balance);
             $paymentStory->paysum = $claim->consumption;
-            $paymentStory->before_bonus = $user->bonus;
-            $paymentStory->after_bonus = $user->bonus;
+            $paymentStory->before_bonus = ceil($user->bonus);
+            $paymentStory->after_bonus = ceil($user->bonus);
         }
 
         $hp = HistoryPayment::create($paymentStory->toArray());
@@ -157,6 +161,10 @@ class RunOnController extends Controller
 
         Log::info('User payment: ' . json_encode($user));
         Log::info("User ID-{$user->id} history payment: " . json_encode($hp));
+        return [
+            'user' => $user,
+            'bonus' => $payBonus
+        ];
     }
 
     protected function foundedDealsClaimsId($AppToken, $request)

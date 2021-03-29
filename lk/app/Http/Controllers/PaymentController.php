@@ -374,12 +374,18 @@ class PaymentController extends Controller
                     /**
                      * Отправка на почту 
                      */
-                    Mail::send([], [], function ($message) use ($request, $pdfPath, $paymentData) {
+                    $paymentId = date("dmY", strtotime($paymentData->created_at)) . '-' . str_pad($paymentData->id . $paymentData->requisite_id, 6, '000000', STR_PAD_LEFT);
+
+                    Requisite::where('id', $requis->id)->update([
+                        'requisite_payment_id' => $paymentId
+                    ]);
+
+                    Mail::send([], [], function ($message) use ($request, $pdfPath, $paymentData, $paymentId) {
                         $message->from('system@b2l.online', 'Leadz.Monster');
                         $message->subject('Счёт на пополнение в сервисе Leadz.Monster');
                         $message->to($request->user()->email)->cc($request->user()->email);
                         $message->attach(Storage::disk('public')->path($pdfPath));
-                        $message->setBody('<h1>Здравствуйте</h1><br/><p>Вам выставлен счёт № ' . date("dmY", strtotime($paymentData->created_at)) . '-' . str_pad($paymentData->id . $paymentData->requisite_id, 6, '000000', STR_PAD_LEFT) . ' на сумму ' . $paymentData->paysum . ' ₽ в сервисе Leadz.Monster</p>', 'text/html');
+                        $message->setBody('<h1>Здравствуйте</h1><br/><p>Вам выставлен счёт № ' . $paymentId . ' на сумму ' . $paymentData->paysum . ' ₽ в сервисе Leadz.Monster</p>', 'text/html');
                     });
 
                     $this->sendPulse->addEmails($this->bookIdBill, [

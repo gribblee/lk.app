@@ -43,6 +43,9 @@ class BidController extends Controller
             ->with('user')
             ->where('is_delete', false)
             ->with('direction')
+            ->when($request->has('ids'), function($q) use($request)  {
+                return $q->whereIn('id', explode(",", $request->ids));
+            })
             ->withCount('deals');
         if ($request->has('status')) {
             switch ($request->status) {
