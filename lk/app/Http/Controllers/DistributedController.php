@@ -156,14 +156,14 @@ class DistributedController extends Controller
                         $deal->is_insurance = true;
                         if ($user->with_bonus && $user->bonus >= $bonus) {
                             $deal->amount = $insuranceRate - $bonus;
-                            $deal->amount_bonust = $bonus;
+                            $deal->amount_bonus = $bonus;
                         } else {
                             $deal->amount = $insuranceRate;
                         }
                     } else {
                         if ($user->with_bonus && $user->bonus >= $bonus) {
                             $deal->amount = $bid->consumption - $bonus;
-                            $deal->amount_bonust = $bonus;
+                            $deal->amount_bonus = $bonus;
                         } else {
                             $deal->amount = $bid->consumption;
                         }
