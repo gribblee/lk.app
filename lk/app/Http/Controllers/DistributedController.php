@@ -103,7 +103,7 @@ class DistributedController extends Controller
 
             if ($bid) {
                 $option = Option::getKeyValue();
-                $optionBonus = Option::where('name', 'bill_bonus')->first()->bill_bonus ?? 1;
+                $optionBonus = Option::where('name', 'bill_bonus')->first()->bill_bonus ?? 50;
                 $bonus = (($optionBonus / 100) * $bid->consumption);
 
                 $user = User::findOrFail($bid->user->id);
