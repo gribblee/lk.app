@@ -101,7 +101,7 @@ class AdminController extends Controller
                         'before_balance' => $user['balance'],
                         'after_balance' => $updated['balance'],
                         'before_bonus' => $user['bonus'],
-                        'after_bonus' => $user['bonus']
+                        'after_bonus' => $updated['balance']
                     ]);
                     Payment::create([
                         'type' => HelperPayment::TYPE_REN,
