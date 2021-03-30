@@ -118,7 +118,7 @@ class DistributedController extends Controller
                     'after_bonus' => 0
                 ]);
 
-                $insuranceRate = $bid->consumption + ($bid->consumption * ($option['insurance_rate'] / 100));
+                $insuranceRate = ceil($bid->consumption + ($bid->consumption * ($option['insurance_rate'] / 100)));
 
                 if ($user->with_bonus && $user->bonus >= $bonus) {
 
@@ -136,8 +136,8 @@ class DistributedController extends Controller
                     
                     $user->bonus = ceil($user->bonus - $bonus);
                 } else {
-                    $paymentStory->before_balance = $user->balance;
-                    $paymentStory->before_bonus = $user->bonus;
+                    $paymentStory->before_balance = ceil($user->balance);
+                    $paymentStory->before_bonus = ceil($user->bonus);
                     $paymentStory->after_balance = ceil($user->balance - $bid->consumption);
                     $paymentStory->paysum = $bid->consumption;
                     $paymentStory->after_bonus = ceil($user->bonus);
@@ -149,23 +149,21 @@ class DistributedController extends Controller
                     }
                 }
 
-
-
                 if ($bid->is_insurance) {
                     if ($user->balance >= $insuranceRate) {
                         $deal->is_insurance = true;
                         if ($user->with_bonus && $user->bonus >= $bonus) {
-                            $deal->amount = $insuranceRate - $bonus;
-                            $deal->amount_bonus = $bonus;
+                            $deal->amount = ceil($insuranceRate - $bonus);
+                            $deal->amount_bonus = ceil($bonus);
                         } else {
-                            $deal->amount = $insuranceRate;
+                            $deal->amount = ceil($insuranceRate);
                         }
                     } else {
                         if ($user->with_bonus && $user->bonus >= $bonus) {
-                            $deal->amount = $bid->consumption - $bonus;
-                            $deal->amount_bonus = $bonus;
+                            $deal->amount = ceil($bid->consumption - $bonus);
+                            $deal->amount_bonus = ceil($bonus);
                         } else {
-                            $deal->amount = $bid->consumption;
+                            $deal->amount = ceil($bid->consumption);
                         }
                     }
                 }

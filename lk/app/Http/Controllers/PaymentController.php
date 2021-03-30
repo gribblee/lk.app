@@ -221,23 +221,35 @@ class PaymentController extends Controller
                     case 4:
                         $paid = Payment::with('user')->whereIn('id', $request->ids)->get();
                         foreach ($paid as $pid) {
+                            $bonus = $pid->user->bonus;
+                            if (
+                                ($pid->paysum > 3000 && $pid->paysum < 10000) //Здесь поменять на данные с опций
+                                && ($pid->user->balance + ($pid->paysum / 2))
+                            ) {
+                                $bonus = ($pid->paysum / 100) * 10;
+                            }
                             $pid->user->balance = floor($pid->user->balance + $pid->paysum);
+                            $pid->user->bonus = floor($pid->user->bonus + $bonus);
                             $pid->user->save();
                             $pid->status = HelperPayment::RQ_STATUS_PAID;
                             $pid->after_balance = $pid->user->balance;
                             $pid->save();
+                            $msg = "Ваш баланс пополнен на {$pid->paysum} ₽";
+                            if ($bonus > 0) {
+                                $msg .= "\r\n\r\n Вы получили {$bonus} бонусных бала";
+                            }
                             Notification::create([
-                                'description' => "Ваш баланс пополнен на {$pid->paysum} ₽",
+                                'description' => $msg,
                                 'user_id' => $pid->user->id
                             ]);
                             HistoryPayment::create([
                                 'user_id' => $pid->user->id,
                                 'type_transaction' => '11',
                                 'paysum' => $pid->paysum,
-                                'paybonus' => 0,
+                                'paybonus' => $bonus,
                                 'before_balance' => $pid->user->balance - $pid->paysum,
                                 'after_balance' => $pid->user->balance,
-                                'before_bonus' => $pid->user->bonus,
+                                'before_bonus' => $pid->user->bonus - $bonus,
                                 'after_bonus' => $pid->user->bonus
                             ]);
                         }
