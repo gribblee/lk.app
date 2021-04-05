@@ -123,7 +123,7 @@ class DistributedController extends Controller
                     'after_bonus' => 0
                 ]);
 
-                $insuranceRate = ceil($bid->consumption + ($bid->consumption * ($option['insurance_rate'] / 100)));
+                $insuranceRate = ceil($bid->consumption + ($bid->consumption * ($option->insurance_rate / 100)));
 
                 if ($user->with_bonus && $user->bonus >= $bonus) {
 
