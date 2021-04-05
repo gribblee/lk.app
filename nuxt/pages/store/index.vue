@@ -26,8 +26,19 @@
             :key="index"
           >
             <a-card hoverable>
+              <nuxt-link v-if="user.role === 'ROLE_ADMIN'"  slot="extra" :to="`/news/edit/${item.id}`">Редактировать</nuxt-link>
+              <img
+                slot="cover"
+                alt="example"
+                :src="item.images[0]"
+                v-if="item.images.length > 0"
+              />
               <template slot="actions" class="ant-card-actions">
-                <a-button type="primary" @click="() => $router.push(`/store/${item.id}`)">Просмотерть</a-button>
+                <a-button
+                  type="primary"
+                  @click="() => $router.push(`/store/${item.id}`)"
+                  >Просмотерть</a-button
+                >
                 <a-popconfirm
                   title="Вы действительно хотите купить?"
                   ok-text="Купить"
@@ -39,7 +50,7 @@
               </template>
               <a-card-meta :title="item.title">
                 <template slot="description">
-                  <p>{{ item.short_description }}</p>
+                  <div class="order-description">{{ item.short_description }}</div>
                   <p>{{ item.price }} ₽</p>
                 </template>
               </a-card-meta>
@@ -66,7 +77,7 @@ export default Vue.extend({
     app.$axios
       .get(`/store`)
       .then(({ data }: any) => {
-        app.store = data.data;
+        app.store = data;
       })
       .catch((err: any) => {
         console.error(err);
@@ -78,8 +89,7 @@ export default Vue.extend({
       app.$axios
         .post(`/store/${id}/buy`)
         .then(({ data }: any) => {
-          if (data.success)
-          {
+          if (data.success) {
             app.$message.success(data.message);
           } else {
             app.$message.error(data.message);

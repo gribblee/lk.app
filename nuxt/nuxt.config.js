@@ -41,6 +41,10 @@ export default {
       mode: "client"
     },
     {
+      src: '@/plugins/vue-linkify',
+      mode: 'client'
+    },
+    {
       src: "./plugins/YandexMetrika",
       mode: "client"
     },

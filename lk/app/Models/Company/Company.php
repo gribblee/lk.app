@@ -15,7 +15,7 @@ class Company extends Model
 
     protected $table = 'company';
 
-    protected $fillable = ['name', 'description', 'region_id', 'rating', 'user_id', 'address', 'files'];
+    protected $fillable = ['name', 'description', 'region_id', 'rating', 'user_id', 'address', 'files', 'is_success'];
     protected $hidden = ['user_id'];
 
     public function issues()

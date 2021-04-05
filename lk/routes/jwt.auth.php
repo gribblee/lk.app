@@ -69,18 +69,26 @@ Route::group([
 Route::get('news', "NewsController@index");
 Route::post('news/create', "NewsController@store");
 Route::post('news/{newsId}/update', "NewsController@update");
+Route::post('news/{newsId}/delete', "NewsController@delete");
+Route::post('news/upload', "NewsController@upload");
 Route::get('news/{newsId}', "NewsController@view");
 
 Route::get('store', "StoreController@index");
 Route::post('store/create', "StoreController@store");
 Route::post('store/{orderId}/update', "StoreController@update");
+Route::post('store/upload', "StoreController@upload");
 Route::get('store/{orderId}', "StoreController@view");
 Route::post('store/{orderId}/buy', "StoreController@orderBuy");
+Route::post('store/{orderId}/delete', "StoreController@orderDelete");
 
 Route::get('me/companies', "Company\CompanyController@meCompanies");
 Route::get('company/{id}', 'Company\CompanyController@show');
+Route::post('company/{id}/success', 'Company\CompanyController@companySuccess');
+Route::get('companies/created', 'Company\CompanyController@companiesSuccess');
 Route::get('companies', "Company\CompanyController@index");
 Route::get('companies/{regionId}', "Company\CompanyController@companiesInRegion");
+
+Route::post('statistic/generated', "UserController@statisticGenerated");
 
 /**
  * Start Ver1.0

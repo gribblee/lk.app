@@ -62,6 +62,12 @@
                   </div>
                 </a-form-model-item>
               </template>
+              <!-- Одобрение -->
+              <template v-if="user.role === 'ROLE_ADMIN'">
+                <a-form-model-item has-feedback label="Показывать компанию" prop="rating">
+                  <a-switch checked-children="Одобрено" un-checked-children="Не одобрено" v-model="dataForm.is_success" />
+                </a-form-model-item>
+              </template>
               <!-- Адрес -->
               <a-form-model-item has-feedback label="Адрес" prop="address">
                 <a-input
@@ -275,6 +281,7 @@ export default Vue.extend({
       previewVisible: false,
       previewImage: "",
       dataIssues: [],
+      is_success: false,
       dataForm: {
         name: "",
       },
@@ -405,6 +412,7 @@ export default Vue.extend({
           name: data.name,
           rating: data.rating,
           region_id: data.region_id,
+          is_success: data.is_success
         };
         app.dataIssues = data.issues;
       })

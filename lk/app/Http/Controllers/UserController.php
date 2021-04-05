@@ -104,7 +104,7 @@ class UserController extends Controller
 
             foreach ($bidCollect as $cl) {
                 if (count($cl->regions) > 0 && ($cl->consumption >= ceil($cl->direction->cost_price +
-                ($cl->direction->cost_price * ($cl->direction->extra / 100))))) {
+                    ($cl->direction->cost_price * ($cl->direction->extra / 100))))) {
                     $rgC = 1;
                     foreach ($cl->regions as $region) {
                         if ($request->has('regionSort')) {
@@ -278,6 +278,62 @@ class UserController extends Controller
             'DEALS_NO_DISTRIBUTION' => $LastNoDistribution,
         ];
     }
+
+    /**
+     * @return JsonResponse
+     */
+    public function statisticGenerated(Request $request)
+    {
+        if ($request->user()->role == 'ROLE_ADMIN') {
+            $Response = new stdObject([
+                'received' => 0,
+                'distributed' => 0,
+                'distributedInsurance' => 0,
+                'noDistributed' => 0,
+                'returnedInsurance' => 0,
+                'sumDistributed' => 0,
+                'sumDistributedBonus' => 0,
+                'sumReturned' => 0,
+            ]);
+            $Response->received = Deal::count();
+            $Response->distributed = Deal::whereHas('status', function ($q) {
+                return $q->whereNotIn('type', [1004]);
+            })
+                ->where('is_delete', false)
+                ->count('id');
+            $Response->distributedInsurance = Deal::whereHas('status', function ($q) {
+                return $q->whereNotIn('type', [1004]);
+            })
+                ->where('is_insurance', true)
+                ->where('is_delete', false)
+                ->count('id');
+            $Response->noDistributed = Deal::whereHas('status', function ($q) {
+                return $q->where('type', 1004);
+            })
+                ->where('is_delete', false)
+                ->count('id');
+            $Response->returnedInsurance = Deal::whereHas('disput', function ($q) {
+                return $q->where('status', Disput::STATUS_CONFIRMED);
+            })->count();
+            $Response->sumDistributed =  Deal::whereHas('status', function ($q) {
+                return $q->whereNotIn('type', [1004]);
+            })
+                ->where('is_delete', false)
+                ->sum('amount');
+
+            $Response->sumDistributedBonus =  Deal::whereHas('status', function ($q) {
+                return $q->whereNotIn('type', [1004]);
+            })
+                ->where('is_delete', false)
+                ->sum('amount_bonus');
+            $Response->sumReturned = Deal::whereHas('disput', function ($q) {
+                return $q->where('status', Disput::STATUS_CONFIRMED);
+            })->sum('amount');
+
+            return response()->json($Response->toArray());
+        }
+    }
+
     /**
      * @return JsonResponse
      */

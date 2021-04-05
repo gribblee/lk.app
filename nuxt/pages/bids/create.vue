@@ -561,6 +561,9 @@ export default {
       .get("/directory")
       .then(({ data }) => {
         this.directory = data;
+        if (data.directions.length > 0) {
+          this.direction = data.directions[0];
+        }
       })
       .catch((_err) => {
         console.error(_err);
@@ -705,6 +708,13 @@ export default {
       this.handleUpdate("daily");
     },
     handleDirection(e) {
+      if (this.direction.max_rate != null) {
+        this.max_rate =
+          Number(this.direction.max_rate.consumption) +
+          Math.ceil((Number(this.direction.max_rate.consumption) / 100) * 5);
+      } else {
+        this.max_rate = this.directory.maxRate;
+      }
       // this.handleUpdate("direction");
     },
     handleConsumption(e) {
@@ -742,9 +752,10 @@ export default {
     computedRecommend() {
       const recommendReturn = {
         status: false,
-        consumption: this.max_rate === 0 ? 1080 : this.max_rate,
+        consumption:
+          this.max_rate === 0 ? this.directory.maxRate : this.max_rate,
       };
-      recommendReturn.status = (this.consumption < recommendReturn.consumption) && Object.keys(this.direction).length > 0;
+      recommendReturn.status = this.consumption < recommendReturn.consumption;
 
       return recommendReturn;
     },
@@ -811,7 +822,10 @@ export default {
       };
       const cost_price = Number(this.direction.cost_price);
       const extra = Number(this.direction.extra);
-      if (this.consumption < Number(cost_price) + Number(cost_price * (extra / 100))) {
+      if (
+        this.consumption <
+        Number(cost_price) + Number(cost_price * (extra / 100))
+      ) {
         consumptionReturn.status = true;
         consumptionReturn.message =
           "При такой ставке Вы не будете получать заявки";

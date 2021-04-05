@@ -26,13 +26,19 @@ class DirectoryController extends Controller
             'categories' => []
         ]);
 
-        $Response->directions = Direction::when($request->user()->role == 'ROLE_ADMIN', function ($q) use ($request) {
+        $Response->directions = Direction::with(['maxRate' => function($q) {
+            return $q->where('is_launch', true)->orderByDesc('consumption')->first();
+        }])->when($request->user()->role == 'ROLE_ADMIN', function ($q) use ($request) {
             return $q->whereJsonContains('categories', $request->user()->category_id);
         })->orderByDesc('id')->get();
         $Response->options = Option::getKeyValue();
         $Response->status = Status::orderBy('order', 'DESC')->get();
         $Response->categories = Category::all();
         $Response->regions = Region::orderBy('name')->get();
+        $Response->maxRate = ceil(Bid::where([
+            'is_launch' => true,
+            'is_delete' => false,
+        ])->avg('consumption'));
 
         return response()->json($Response, 200);
     }

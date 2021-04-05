@@ -102,6 +102,39 @@
               </a-form-model-item>
               <a-form-model-item
                 has-feedback
+                label="Процент бонуса за товар"
+                prop="bonusStore"
+              >
+                <a-input
+                  v-model="optionsForm.bonus_store"
+                  type="text"
+                  autocomplete="off"
+                />
+              </a-form-model-item>
+              <a-form-model-item
+                has-feedback
+                label="Регистрация балы"
+                prop="scoreRegistration"
+              >
+                <a-input
+                  v-model="optionsForm.score_registration"
+                  type="text"
+                  autocomplete="off"
+                />
+              </a-form-model-item>
+              <a-form-model-item
+                has-feedback
+                label="Балы за пополнение"
+                prop="scorePayment"
+              >
+                <a-input
+                  v-model="optionsForm.score_payment"
+                  type="text"
+                  autocomplete="off"
+                />
+              </a-form-model-item>
+              <a-form-model-item
+                has-feedback
                 label="Сообщение при мин. балансе"
                 prop="messageBalance"
               >
@@ -152,7 +185,10 @@ export default Vue.extend({
         bill_bonus_from: "0",
         bill_bonus_to: "0",
         bill_bonus_one: "0",
-        bill_bonus_two: "0"
+        bill_bonus_two: "0",
+        bonus_store: "0",
+        score_registration: "0",
+        score_payment: "0"
       },
     };
   },

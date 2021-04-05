@@ -24,9 +24,50 @@ class CompanyController extends Controller
      */
     public function index(Request $request)
     {
-        return Company::with('issues')->with('user')->with('region')->orderByDesc('rating')->paginate(10);
+        return Company::with('issues')
+            ->with('user')
+            ->with('region')
+            ->where('is_success', true)
+            ->orderByDesc('rating')
+            ->paginate(10);
     }
 
+    /**
+     * @return JsonResponse
+     */
+    public function companiesSuccess(Request $request)
+    {
+        if ($request->user()->role === 'ROLE_ADMIN') {
+            return Company::with('issues')
+                ->with('user')
+                ->with('region')
+                ->where('is_success', false)
+                ->orderByDesc('rating')
+                ->paginate(10);
+        }
+    }
+
+    /**
+     * @param Request $request
+     * @param $companyId
+     * @return JsonResponse
+     */
+    public function companySuccess(Request $request, $companyId)
+    {
+        if ($request->user()->role === 'ROLE_ADMIN') {
+            try {
+                $company = Company::findOrFail($companyId);
+                $company->update(['is_success' => $request->is_success]);
+                return response()->json([
+                    'message' => 'Обновлено'
+                ]);
+            } catch (Exception $e) {
+                return response()->json([
+                    'message' => 'Компания не найдена'
+                ], 404);
+            }
+        }
+    }
     /**
      * @param $request request
      */
@@ -55,6 +96,7 @@ class CompanyController extends Controller
     {
         try {
             $company = Company::create([
+                'is_success' => false,
                 'user_id' => $request->user()->id
             ]);
             return [
@@ -132,6 +174,7 @@ class CompanyController extends Controller
             ]);
             if ($request->user()->role === 'ROLE_ADMIN') {
                 $update['rating'] = $request->rating;
+                $update['is_success'] = $request->is_success;
             }
             $update['files'] = json_encode($update['files']);
             $company = Company::when($request->user()->role !== 'ROLE_ADMIN', function ($query) use ($request) {

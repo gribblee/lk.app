@@ -21,4 +21,8 @@ class Direction extends Model
         'name',
         'categories'
     ];
+
+    public function maxRate() {
+        return $this->hasOne(Bid::class, 'direction_id', 'id');
+    }
 }

@@ -351,7 +351,7 @@
               :style="{ height: '70px' }"
             ></a-textarea>
           </div>
-          <div :style="{ margin: '20px 0'}">
+          <div :style="{ margin: '20px 0' }">
             <a-upload
               name="file"
               :multiple="true"
@@ -504,6 +504,13 @@ export default {
           type: "Route",
         },
         {
+          name: "Модерация",
+          icon: "trophy",
+          url: "/companies/moderato",
+          rolesHidden: ["ROLE_USER", "ROLE_MANAGER", "ROLE_WEBMASTER"],
+          type: "Route",
+        },
+        {
           name: "Магазин",
           icon: "shopping",
           url: "/store",
@@ -521,6 +528,18 @@ export default {
           name: "Не распределено",
           icon: "container",
           url: "/distributed",
+          rolesHidden: [
+            "ROLE_USER",
+            "ROLE_MANAGER",
+            "ROLE_WEBMASTER",
+            "ROLE_ACCOUNAT",
+          ],
+          type: "Route",
+        },
+        {
+          name: "Брак",
+          icon: "container",
+          url: "/distributed/break",
           rolesHidden: [
             "ROLE_USER",
             "ROLE_MANAGER",
@@ -616,6 +635,13 @@ export default {
           name: "Статистика",
           icon: "pie-chart",
           url: "/statistics",
+          rolesHidden: ["ROLE_USER", "ROLE_MANAGER", "ROLE_ACCOUNAT"],
+          type: "Route",
+        },
+        {
+          name: "Сгенерировано",
+          icon: "pie-chart",
+          url: "/statistics/generated",
           rolesHidden: ["ROLE_USER", "ROLE_MANAGER", "ROLE_ACCOUNAT"],
           type: "Route",
         },

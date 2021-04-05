@@ -33,9 +33,14 @@ class DistributedController extends Controller
                 ->with('region')
                 ->with('direction')
                 ->with('status')
-                ->whereHas('status', function ($q) {
-                    $q->where('type', 1004);
-                })->where('deals.is_delete', false)
+                ->when($request->has('break'), function($q) {
+                    return $q->where('deals.is_delete', true)->whereNotNull('deals.bid_id');
+                })
+                ->when(!$request->has('break'), function($q) {
+                    return $q->whereHas('status', function ($q) {
+                        $q->where('type', 1004);
+                    })->where('deals.is_delete', false); 
+                })
                 ->orderBy('deals.created_at', 'DESC')
                 ->paginate(15);
             return response()->json([

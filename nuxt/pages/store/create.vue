@@ -59,6 +59,29 @@
                   suffix="₽"
                 />
               </a-form-model-item>
+              <a-form-model-item label="Картинки">
+                <a-upload
+                  action="http://lk.leadz.monster/api/store/upload"
+                  list-type="picture-card"
+                  :multiple="true"
+                  :file-list="orderForm.images"
+                  :headers="{ Authorization: $auth.getToken('local') }"
+                  @preview="handlePreview"
+                  @change="handleChange"
+                >
+                  <div v-if="orderForm.images.length < 8">
+                    <a-icon type="plus" />
+                    <div class="ant-upload-text">Загрузить</div>
+                  </div>
+                </a-upload>
+                <a-modal
+                  :visible="previewVisible"
+                  :footer="null"
+                  @cancel="handleCancel"
+                >
+                  <img alt="example" style="width: 100%" :src="previewImage" />
+                </a-modal>
+              </a-form-model-item>
               <a-form-model-item>
                 <a-button type="primary" @click="onSubmit">
                   Создать
@@ -73,11 +96,22 @@
 </template>
 <script lang="ts">
 import Vue from "vue";
+function getBase64(file: any) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = (error) => reject(error);
+  });
+}
+
 export default Vue.extend({
   name: "store-create",
 
   data() {
     return {
+      previewVisible: false,
+      previewImage: "",
       orderRule: {
         title: [
           {
@@ -114,6 +148,7 @@ export default Vue.extend({
         description: "",
         tags: "",
         price: 0,
+        images: [],
       },
     };
   },
@@ -124,15 +159,16 @@ export default Vue.extend({
   methods: {
     onSubmit() {
       const { $refs, $router, $message, $axios, orderForm }: any = this;
-      $refs.orderForm.validate((valid : any) => {
+      $refs.orderForm.validate((valid: any) => {
         if (valid) {
+          orderForm.images = orderForm.images.map((image: any) => image.response);
           $axios
             .post(`/store/create`, orderForm)
             .then(({ data }: any) => {
               $message.success("Готово");
               $router.push(`/store/${data.id}`);
             })
-            .catch((err : any) => {
+            .catch((err: any) => {
               $message.error("Ошибка !");
             });
         } else {
@@ -140,6 +176,21 @@ export default Vue.extend({
           return false;
         }
       });
+    },
+    handleCancel() {
+      const app: any = this;
+      app.previewVisible = false;
+    },
+    async handlePreview(file: any) {
+      if (!file.url && !file.preview) {
+        file.preview = await getBase64(file.originFileObj);
+      }
+      this.previewImage = file.url || file.preview;
+      this.previewVisible = true;
+    },
+    handleChange({ fileList }: any) {
+      const app: any = this;
+      app.orderForm.images = fileList;
     },
   },
 });

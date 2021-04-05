@@ -717,9 +717,8 @@ export default {
     computedRecommend() {
       const recommendReturn = {
         status: false,
-        consumption: this.max_rate === 0 ? 1080 : this.max_rate,
+        consumption: this.max_rate === 0 ? this.directory.maxRate : this.max_rate,
       };
-
       recommendReturn.status = this.consumption < recommendReturn.consumption;
 
       return recommendReturn;

@@ -17,6 +17,7 @@ class Store extends Model
         'description',
         'tags',
         'price',
-        'user_id'
+        'images',
+        'is_delete'
     ];
 }

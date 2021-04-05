@@ -42,7 +42,10 @@
                 v-model="userData.phone"
               />
             </div>
-            <div :style="{ marginTop: '15px' }" v-if="user.role == 'ROLE_ADMIN'">
+            <div
+              :style="{ marginTop: '15px' }"
+              v-if="user.role == 'ROLE_ADMIN'"
+            >
               <span>Баланс: </span>
               <a-input
                 :style="{ marginTop: ' 10px' }"
@@ -50,12 +53,25 @@
                 v-model="userData.balance"
               />
             </div>
-            <div :style="{ marginTop: '15px' }" v-if="user.role == 'ROLE_ADMIN'">
+            <div
+              :style="{ marginTop: '15px' }"
+              v-if="user.role == 'ROLE_ADMIN'"
+            >
               <span>Бонусы: </span>
               <a-input
                 :style="{ marginTop: ' 10px' }"
                 type="text"
                 v-model="userData.bonus"
+              />
+            </div>
+            <div
+              :style="{ marginTop: '15px' }"
+              v-if="user.role == 'ROLE_ADMIN'"
+            >
+              <span>Списывать с бонусов: </span>
+              <a-checkbox
+                :style="{ marginTop: ' 10px' }"
+                v-model="userData.with_bonus"
               />
             </div>
             <div :style="{ marginTop: '15px' }">
@@ -66,7 +82,10 @@
                 v-model="userData.contact_id"
               />
             </div>
-            <div :style="{ marginTop: '15px' }" v-if="user.role == 'ROLE_ADMIN'">
+            <div
+              :style="{ marginTop: '15px' }"
+              v-if="user.role == 'ROLE_ADMIN'"
+            >
               <span>Роль: </span>
               <a-select
                 v-model="userData.role"
@@ -90,7 +109,10 @@
                 >
               </a-select>
             </div>
-            <div :style="{ marginTop: '15px' }" v-if="user.role == 'ROLE_ADMIN'">
+            <div
+              :style="{ marginTop: '15px' }"
+              v-if="user.role == 'ROLE_ADMIN'"
+            >
               <span>Менеджер: </span>
               <a-select
                 v-model="userData.manager_id"
@@ -118,78 +140,79 @@
 </template>
 <script>
 export default {
-  middleware: 'roleManager',
+  middleware: "roleManager",
   head() {
     return {
-      title: 'Просмотр пользователя'
-    }
+      title: "Просмотр пользователя",
+    };
   },
   data() {
     return {
       userData: {
-        password: '',
+        password: "",
+        with_bonus: false,
       },
       defUser: {
-        password: '',
+        password: "",
       },
       userId: 0,
       managers: [],
-    }
+    };
   },
   created() {
     this.$axios
-      .post('/user/show', {
+      .post("/user/show", {
         user_id: this.$route.params.id,
       })
       .then(({ data }) => {
-        delete data.updated_at
-        delete data.created_at
-        this.userData = data
-        this.defUser = Object.assign({}, data)
-        this.userId = data.id
+        delete data.updated_at;
+        delete data.created_at;
+        this.userData = data;
+        this.defUser = Object.assign({}, data);
+        this.userId = data.id;
       })
       .catch((err) => {
-        console.error(err)
-      })
+        console.error(err);
+      });
     this.$axios
-      .get('/managers')
+      .get("/managers")
       .then(({ data }) => {
-        this.managers = data
+        this.managers = data;
       })
       .catch((err) => {
-        console.error(err)
-      })
+        console.error(err);
+      });
   },
   methods: {
     userSend(e) {
-      let formData = {}
+      let formData = {};
       for (let k in this.userData) {
         if (
           (this.userData[k] != this.defUser[k] &&
-            (this.userData[k]).toString().length > 0) ||
+            this.userData[k].toString().length > 0) ||
           (this.userData[k] != null && this.defUser[k] == null)
         ) {
-          formData[k] = this.userData[k]
+          formData[k] = this.userData[k];
         }
       }
       console.log(this.userData, this.defUser);
       this.$axios
-        .post('/user/updates', {
+        .post("/user/updates", {
           user_id: this.userId,
           update: formData,
         })
         .then(({ data }) => {
           if (data.success == true) {
-            this.$message.success(data.message)
-            this.defUser = data.user
-            delete this.defUser.updated_at
-            delete this.defUser.created_at
+            this.$message.success(data.message);
+            this.defUser = data.user;
+            delete this.defUser.updated_at;
+            delete this.defUser.created_at;
           }
         })
         .catch((err) => {
-          this.$message.error(err)
-        })
+          this.$message.error(err);
+        });
     },
   },
-}
+};
 </script>

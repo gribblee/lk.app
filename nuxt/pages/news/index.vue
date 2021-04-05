@@ -8,7 +8,7 @@
     </a-page-header>
     <a-layout class="setting-layout-sider">
       <a-layout-content class="setting-layout-content">
-        <a-row :gutter="[16, 16]" type="flex" justify="space-around">
+        <a-row :gutter="[24, 16]" type="flex" justify="space-around">
           <a-col :xs="24" :md="24" :lg="24" v-if="user.role === 'ROLE_ADMIN'">
             <a-button
               type="primary"
@@ -18,12 +18,45 @@
               <a-icon type="plus" />
             </a-button>
           </a-col>
-          <a-col :xs="8" :md="8" :lg="24" v-for="(item, index) in news" :key="index">
+          <a-col
+            :xs="24"
+            :md="8"
+            :lg="8"
+            v-for="(item, index) in news"
+            :key="index"
+          >
             <a-card hoverable>
-              <a-card-meta :title="item.title">
+              <img
+                slot="cover"
+                alt="example"
+                :src="`/${item.images[0]}`"
+                v-if="item.images.length > 0"
+              />
+              <a-card-meta>
+                <template slot="title">
+                  <nuxt-link :to="`/news/${item.id}`">{{
+                    item.title
+                  }}</nuxt-link>
+                </template>
                 <template slot="description">
-                  <p>{{ item.short_description }}</p> 
-                  <p>{{ item.tags }}</p>
+                  <div class="news-description">{{ item.short_description }}</div>
+                  <div class="news-tags">
+                    <div
+                      v-for="(tag, index) in item.tags
+                        .split(/(?:#|,| )+/)
+                        .filter((el) => {
+                          return (
+                            String(el).length !== 0 &&
+                            String(el).indexOf('#') === -1 &&
+                            String(el).indexOf(',') === -1
+                          );
+                        })"
+                      :key="index"
+                      class="news-tag-inner"
+                    >
+                      <span class="news-tag">#{{ tag }}</span>
+                    </div>
+                  </div>
                 </template>
               </a-card-meta>
             </a-card>
@@ -45,11 +78,11 @@ export default Vue.extend({
   },
 
   created() {
-    const app : any = this;
+    const app: any = this;
     app.$axios
       .get(`/news`)
       .then(({ data }: any) => {
-        app.news = data.data;
+        app.news = data;
       })
       .catch((err: any) => {
         console.error(err);

@@ -28,6 +28,6 @@ class Option extends Model
         {
             $keyValue[$option['name']] = $option['value'];
         }
-        return $keyValue;
+        return (object)$keyValue;
     }
 }
