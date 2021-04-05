@@ -18,7 +18,7 @@ class Option extends Model
     ];
 
     public static function getValue($key) {
-        return self::getKeyValue()[$key] ?? '';
+        return self::getKeyValue()->{$key} ?? '';
     }
 
     public static function getKeyValue()
