@@ -32,8 +32,8 @@ class PaymentController extends Controller
         $options = Option::getKeyValue();
 
         $this->sendPulse = new SendPulse;
-        $this->bookIdBill = $options['bookIdBill'] ?? 0;
-        $this->bookIdBalance = $options['bookIdBalance'] ?? 0;
+        $this->bookIdBill = $options->bookIdBill ?? 0;
+        $this->bookIdBalance = $options->bookIdBalance ?? 0;
     }
 
     /**
