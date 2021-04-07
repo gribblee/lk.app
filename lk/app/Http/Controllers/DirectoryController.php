@@ -97,7 +97,7 @@ class DirectoryController extends Controller
                 $directionAmount = ceil($direction->cost_price + ($direction->cost_price * ($direction->extra / 100)));
                 Bid::where([
                     ['direction_id', '=', $id],
-                    ['consumption', '<=', $directionAmount]
+                    ['consumption', '<', $directionAmount]
                 ])->update(['consumption' => $directionAmount]);
                 return response()->json([
                     'success' => true,

@@ -83,6 +83,11 @@ export default Vue.extend({
               title: "SendPulse",
               url: "/setting/admin/sendpulse",
             },
+            {
+              name: "setting-admin-checklist",
+              title: "Чек листы",
+              url: "/setting/admin/checklist",
+            },
           ],
         },
         {
