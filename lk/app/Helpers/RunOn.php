@@ -37,7 +37,7 @@ class RunOn
                             $regItem['rate'] >= ceil($item->direction->cost_price +
                             ($item->direction->cost_price * ($item->direction->extra / 100)))
                         ) {
-                            $insuranceAmount = $regItem['rate'] + ($regItem['rate'] * ($option['insurance_rate'] / 100));
+                            $insuranceAmount = $regItem['rate'] + ($regItem['rate'] * ($option->insurance_rate / 100));
                             if ($item->is_insurance && $item->user->balance >= $insuranceAmount) {
                                 $item->consumption = ceil($insuranceAmount);
                             } else {
@@ -55,7 +55,7 @@ class RunOn
                 && $item->user->balance >= $item->consumption
                 && $item->consumption >= $directionAmount
             ) {
-                $insuranceAmount = ceil($item->consumption + ($item->consumption * ($option['insurance_rate'] / 100)));
+                $insuranceAmount = ceil($item->consumption + ($item->consumption * ($option->insurance_rate / 100)));
                 if ($item->is_insurance && $item->user->balance >= $insuranceAmount) {
                     $item->consumption = $insuranceAmount;
                 }

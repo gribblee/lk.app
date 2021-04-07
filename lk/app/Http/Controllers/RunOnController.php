@@ -37,7 +37,7 @@ class RunOnController extends Controller
         $this->Response = new stdObject([
             'success' => false,
             'status' => 0,
-            'data' => []
+            'data' => (object)[]
         ]);
     }
 
@@ -116,7 +116,7 @@ class RunOnController extends Controller
 
     protected function userPayment($user, $claim)
     {
-        $optionBonus = Option::where('name', 'bill_bonus')->first()->bill_bonus ?? 50;
+        $optionBonus = Option::getValue('bill_bonus') ?? 50;
         $bonus = (($optionBonus / 100) * $claim->consumption);
 
         $paymentStory = new stdObject([
