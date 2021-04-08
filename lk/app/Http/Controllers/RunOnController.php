@@ -84,9 +84,14 @@ class RunOnController extends Controller
                         //     : false;
                         //** Посылка в битрикс и оплата
                         $category = Category::find($user->category_id);
-                        ($user->contact_id != null && $user->contact_id != 0)
-                            ? $this->addBitrix($request, $deal, $claim, $category->source_id)
-                            : false;
+                        $bitrixError = '';
+                        try {
+                            ($user->contact_id != null && $user->contact_id != 0)
+                                ? $this->addBitrix($request, $deal, $claim, $category->source_id)
+                                : false;
+                        } catch (Exception $e) {
+                            $bitrixError = $e->getMessage();
+                        }
                         $userPay = $this->userPayment($user, $claim); //Оплата
                         //** Обновление поступившей заявки
                         $deal->update([
