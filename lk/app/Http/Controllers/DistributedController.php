@@ -145,7 +145,7 @@ class DistributedController extends Controller
                     $paymentStory->before_balance = ceil($user->balance);
                     $paymentStory->before_bonus = ceil($user->bonus);
                     $paymentStory->after_balance = ceil($user->balance - $bid->consumption);
-                    $paymentStory->paybonus = ceil($bonus);
+                    // $paymentStory->paybonus = ceil($bonus);
                     $paymentStory->paysum = $bid->consumption;
                     $paymentStory->after_bonus = ceil($user->bonus);
 
