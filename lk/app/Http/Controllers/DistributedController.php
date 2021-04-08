@@ -33,13 +33,13 @@ class DistributedController extends Controller
                 ->with('region')
                 ->with('direction')
                 ->with('status')
-                ->when($request->has('break'), function($q) {
+                ->when($request->has('break'), function ($q) {
                     return $q->where('deals.is_delete', true)->whereNotNull('deals.bid_id');
                 })
-                ->when(!$request->has('break'), function($q) {
+                ->when(!$request->has('break'), function ($q) {
                     return $q->whereHas('status', function ($q) {
                         $q->where('type', 1004);
-                    })->where('deals.is_delete', false); 
+                    })->where('deals.is_delete', false);
                 })
                 ->orderBy('deals.created_at', 'DESC')
                 ->paginate(15);
@@ -138,7 +138,7 @@ class DistributedController extends Controller
                         $user->balance = ceil($user->balance - $insuranceRate);
                     }
 
-                    
+
                     $user->bonus = ceil($user->bonus - $bonus);
                 } else {
                     $paymentStory->before_balance = ceil($user->balance);
@@ -171,6 +171,13 @@ class DistributedController extends Controller
                             $deal->amount = ceil($bid->consumption);
                         }
                     }
+                } else {
+                    if ($user->with_bonus && $user->bonus >= $bonus) {
+                        $deal->amount = ceil($bid->consumption - $bonus);
+                        $deal->amount_bonus = ceil($bonus);
+                    } else {
+                        $deal->amount = ceil($bid->consumption);
+                    }
                 }
 
                 // if ($bid->is_insurance) { //Если заявка по страховке
@@ -198,12 +205,16 @@ class DistributedController extends Controller
                 $deal->bid_id = $bid->id;
                 $deal->status_id = $status->id;
                 $deal->save();
-
-                if (
-                    $bid->user->contact_id != null
-                    && $bid->user->contact_id != 0
-                ) {
-                    $this->addBitrix($request, $deal, $bid);
+                $bitrixError = '';
+                try {
+                    if (
+                        $bid->user->contact_id != null
+                        && $bid->user->contact_id != 0
+                    ) {
+                        $this->addBitrix($request, $deal, $bid);
+                    }
+                } catch (Exception $e) {
+                    $bitrixError = $e->getMessage();
                 }
 
                 $this->sendMail($bid->user);
