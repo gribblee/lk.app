@@ -514,7 +514,7 @@ const columns = [
     sorter: (a, b) => {},
   },
   {
-    title: "Доход",
+    title: "Стоимость",
     dataIndex: "amount",
     key: "amount",
     scopedSlots: { customRender: "amount" },
@@ -524,7 +524,7 @@ const columns = [
     sorter: (a, b) => {},
   },
   {
-    title: "Доход бонусы",
+    title: "Стоимость бонусы",
     dataIndex: "amount_bonus",
     key: "amount_bonus",
     scopedSlots: { customRender: "amount_bonus" },
