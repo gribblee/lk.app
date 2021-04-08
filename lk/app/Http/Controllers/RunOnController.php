@@ -143,6 +143,7 @@ class RunOnController extends Controller
             $paymentStory->before_balance = ceil($user->balance);
             $paymentStory->after_balance = ceil($userUpdate->balance);
             $paymentStory->paysum = $claim->consumption;
+            $paymentStory->paybonus = ceil($bonus);
             $paymentStory->before_bonus = ceil($user->bonus);
             $paymentStory->after_bonus = ceil($userUpdate->bonus);
             $payBonus = ceil($bonus);
