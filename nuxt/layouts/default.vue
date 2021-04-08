@@ -669,6 +669,7 @@ export default {
     };
   },
   created() {
+    this.payBonus = this.user.with_bonus;
     this.menuSelectedKeys = [];
     this.navMenu.forEach((each, index, array) => {
       if (each.url == this.$route.path) {
