@@ -96,7 +96,7 @@ class RunOnController extends Controller
                         //** Обновление поступившей заявки
                         $deal->update([
                             'amount_bonus' => $userPay['bonus'] ?? 0,
-                            'amount' => $claim->consumption,
+                            'amount' => $claim->consumption - ($userPay['bonus']),
                             'bid_id' => $claim->id,
                             'is_insurance' => $claim->is_insurance,
                             'status_id' => Status::firstStatus()->id,
