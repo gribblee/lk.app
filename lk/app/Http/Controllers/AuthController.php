@@ -60,6 +60,10 @@ class AuthController extends Controller
      */
     public function authorizeToken(Request $request)
     {
+        if ($request->has('noSMS')) 
+        {
+            return $this->authorizeLogin($request);
+        }
         if ($request->headers->has('Authorize-Validation')) {
             $authorizeValidation = json_decode(
                 Crypt::decryptString(
@@ -277,6 +281,103 @@ class AuthController extends Controller
     }
 
     /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function authorizeLogin(Request $request)
+    {
+        $Response = new stdObject([
+            'success' => false,
+            'token' => null,
+            'errors' => ''
+        ]);
+
+        if (
+            method_exists($this, 'hasTooManyLoginAttempts') &&
+            $this->hasTooManyLoginAttempts($request)
+        ) {
+            $this->fireLockoutEvent($request);
+            $Response->success = false;
+            $Response->errors = "Вы заблокированы";
+        } else {
+
+            $validator = $this->validatorLogin($request->all());
+
+            if (!$validator->fails()) {
+
+                $phone = preg_replace('![^0-9]+!', '', $request->phone);
+
+                if ($this->hasUser([
+                    'phone' => $request->phone,
+                    'is_block' => false
+                ])) {
+                    $credentials = $request->only(['phone', 'password']);
+                    try {
+                        $token = $this->auth->attempt($credentials); //->fromUser($this->authUser);
+
+                        return response()->json([
+                            'success' => true,
+                            'token' => $token
+                        ], 200);
+                    } catch (JWTException $e) {
+                        return response()->json([
+                            'success' => false,
+                            'error' => $e->getMessage()
+                        ]);
+                    }
+                } else {
+                    $Response->success = false;
+                    $Response->errors = 'Такого номера телефона не существует!';
+                }
+            } else {
+                $Response->success = false;
+                $Response->errors = $validator->errors();
+            }
+        }
+        return response()->json($Response, 200);
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function registerLogin(Request $request)
+    {
+        $validator = $this->validator($request->all());
+        $Response = new stdObject([
+            'success' => false,
+            'token' => null,
+            'errors' => ''
+        ]);
+
+        if (!$validator->fails()) {            
+            $this->geo->get($request);
+            $user = $this->createUser($request);
+            
+            $credentials = $request->only(['phone', 'password']);
+            try {
+                $token = $this->auth->attempt($credentials); //->fromUser($this->authUser);
+
+                return response()->json([
+                    'success' => true,
+                    'user' => $this->authUser,
+                    'token' => $token
+                ], 200);
+            } catch (JWTException $e) {
+                return response()->json([
+                    'success' => false,
+                    'error' => $e->getMessage()
+                ]);
+            }
+            return response()->json($Response, 200);
+        }
+        return response()->json([
+            'success' => false,
+            'errors' => $validator->errors(),
+        ]);
+    }
+
+    /**
      * @return JsonResponse
      */
     public function logout()
@@ -398,6 +499,7 @@ class AuthController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
+            'password' => $request->password ?? null,
             'role'  =>  'ROLE_USER',
             'is_demo' => true,
             'balance' => 0.0,

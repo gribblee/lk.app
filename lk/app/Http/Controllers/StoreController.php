@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use App\Models\Option;
 
+use Illuminate\Support\Facades\Log;
+
 class StoreController extends Controller
 {
     protected $validationRules = [
@@ -85,6 +87,7 @@ class StoreController extends Controller
                 ]);
                 return response()->json($order);
             } catch (Exception $e) {
+                Log::info("Order.Create.Error: " . json_encode($e->getMessage()));
                 return response()->json([
                     'message' => 'Ошибка'
                 ], 422);
