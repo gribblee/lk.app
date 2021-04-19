@@ -90,6 +90,11 @@ Route::get('companies/{regionId}', "Company\CompanyController@companiesInRegion"
 
 Route::post('statistic/generated', "UserController@statisticGenerated");
 
+Route::post('support', "SupportController@send");
+Route::post('support/upload', "SupportController@upload");
+Route::get('support/images/{uid}/{ymd}', "SupportController@images");
+
+
 /**
  * Start Ver1.0
  */

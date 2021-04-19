@@ -20,6 +20,7 @@ use App\Helpers\SendPulse;
 use App\Helpers\Geo;
 
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Hash;
 use stdClass;
 
 /**
@@ -354,13 +355,12 @@ class AuthController extends Controller
             $this->geo->get($request);
             $user = $this->createUser($request);
             
-            $credentials = $request->only(['phone', 'password']);
             try {
-                $token = $this->auth->attempt($credentials); //->fromUser($this->authUser);
+                $token = $this->auth->fromUser($user);
 
                 return response()->json([
                     'success' => true,
-                    'user' => $this->authUser,
+                    'user' => $user,
                     'token' => $token
                 ], 200);
             } catch (JWTException $e) {
@@ -499,7 +499,7 @@ class AuthController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
-            'password' => $request->password ?? null,
+            'password' => is_null($request->password) ? null : Hash::make($request->password),
             'role'  =>  'ROLE_USER',
             'is_demo' => true,
             'balance' => 0.0,

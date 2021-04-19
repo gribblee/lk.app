@@ -81,6 +81,11 @@ class BitrixApi extends Helper
         return $this;
     }
 
+    public function fieldsTask($fields) {
+        $this->DATA_REQUEST['FIELDS'] = array_merge($this->DATA_REQUEST['FIELDS'], $fields);
+        return $this;
+    }
+
     public function add()
     {
         return Http::post($this->sendUrl . '/' . $this->action . '.add.json', $this->DATA_REQUEST);

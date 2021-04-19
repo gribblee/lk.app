@@ -135,7 +135,7 @@ class RunOnController extends Controller
             'after_bonus' => 0
         ]);
         $userUpdate = new stdObject([
-            'balance' => $user->balance,
+            'balance' => abs($user->balance),
             'bonus' => ceil($user->bonus)
         ]);
 

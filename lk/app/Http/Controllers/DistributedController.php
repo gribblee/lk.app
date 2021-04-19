@@ -134,9 +134,9 @@ class DistributedController extends Controller
                     $paymentStory->paysum = ceil($bid->consumption);
                     $paymentStory->after_bonus = ceil($user->bonus - $bonus);
                     if ($bid->is_insurance && $user->balance >= $insuranceRate) {
-                        $user->balance = ceil($user->balance - ceil($insuranceRate - $bonus));
+                        $user->balance = abs(ceil($user->balance - ceil($insuranceRate - $bonus)));
                     } else {
-                        $user->balance = ceil($user->balance - $insuranceRate);
+                        $user->balance = abs(ceil($user->balance - $insuranceRate));
                     }
 
 
@@ -150,9 +150,9 @@ class DistributedController extends Controller
                     $paymentStory->after_bonus = ceil($user->bonus);
 
                     if ($bid->is_insurance && $user->balance >= $insuranceRate) {
-                        $user->balance = ceil($user->balance - $insuranceRate);
+                        $user->balance = abs(ceil($user->balance - $insuranceRate));
                     } else {
-                        $user->balance = ceil($user->balance - $bid->consumption);
+                        $user->balance = abs(ceil($user->balance - $bid->consumption));
                     }
                 }
 

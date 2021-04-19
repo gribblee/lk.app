@@ -44,6 +44,33 @@
                   v-mask="mask"
                 />
               </a-form-model-item>
+              <a-form-model-item
+                has-feedback
+                label="Старый пароль"
+                prop="password"
+              >
+                <a-input
+                  v-model="userForm.password"
+                  type="password"
+                  autocomplete="off"
+                />
+                <a-alert
+                  type="error"
+                  :message="errorPass"
+                  v-if="errorPass.length > 0"
+                />
+              </a-form-model-item>
+              <a-form-model-item
+                has-feedback
+                label="Новый пароль"
+                prop="password_new"
+              >
+                <a-input
+                  v-model="userForm.password_new"
+                  type="password"
+                  autocomplete="off"
+                />
+              </a-form-model-item>
               <a-form-model-item>
                 <a-button type="primary" @click="submitForm('userForm')">
                   Сохранить
@@ -94,6 +121,7 @@ export default Vue.extend({
 
     return {
       mask: "+7 (###) ###-##-##",
+      errorPass: '',
       rules: {
         name: [
           { required: true, message: "Имя обязателен", trigger: "change" },
@@ -108,12 +136,16 @@ export default Vue.extend({
           { validator: ValidatePhone, trigger: "change" },
           { required: true, message: "Телефон обязателен", trigger: "change" },
         ],
+        password: [],
+        password_new: []
       },
       userForm: {
         name: "",
         email: "",
         emailNotification: "",
         phone: "",
+        password: "",
+        password_new: ""
       },
     };
   },
@@ -123,7 +155,7 @@ export default Vue.extend({
       name,
       email,
       emailNotification: email_notification,
-      phone,
+      phone
     };
   },
   methods: {
@@ -133,6 +165,11 @@ export default Vue.extend({
           this.$axios.post("/user/update", this.userForm).then(({ data }) => {
             if (data.success) {
               this.$message.success(data.message);
+              if (data.errors.pass) {
+                this.errorPass = data.errors.pass;
+              } else {
+                this.errorPass = '';
+              }
             } else {
               this.$message.error(data.error);
             }

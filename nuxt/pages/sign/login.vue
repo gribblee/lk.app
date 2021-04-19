@@ -14,27 +14,18 @@
               :rules="rules.signIn"
               ref="formSignIn"
             >
-              <a-form-model-item
-                label="Код из СМС"
-                prop="code"
-                v-show="signIsCode"
-              >
-                <a-input
-                  v-model="formSignIn.code"
-                  placeholder="Код из смс"
-                  v-mask="maskCode"
-                />
-              </a-form-model-item>
-              <a-form-model-item
-                has-feedback
-                label="Телефон"
-                prop="phone"
-                v-show="!signIsCode"
-              >
+              <a-form-model-item has-feedback label="Телефон" prop="phone">
                 <a-input
                   v-model="formSignIn.phone"
                   placeholder="Телефон"
                   v-mask="maskPhone"
+                />
+              </a-form-model-item>
+              <a-form-model-item has-feedback label="Пароль" prop="password">
+                <a-input
+                  v-model="formSignIn.password"
+                  placeholder="Пароль"
+                  type="password"
                 />
               </a-form-model-item>
             </a-form-model>
@@ -43,13 +34,8 @@
             </a-form-model-item>
             <a-form-model-item>
               <a-button type="primary" @click="handleSignIn">
-                <template v-if="!signIsCode">Далее</template>
-                <template v-if="signIsCode">Войти</template>
+                <template>Войти</template>
               </a-button>
-              <a-button type="link" @click="() => (signIsCode = !signIsCode)">
-                <template v-if="!signIsCode">У меня уже есть код</template>
-                <template v-if="signIsCode">Вернуться</template></a-button
-              >
             </a-form-model-item>
           </a-tab-pane>
           <a-tab-pane key="2">
@@ -62,7 +48,7 @@
               :rules="rules.signUp"
               ref="formSignUp"
             >
-              <template v-show="!signUpIsCode">
+              <template>
                 <a-form-model-item has-feedback label="Ваше ФИО" prop="name">
                   <a-input v-model="formSignUp.name" placeholder="Имя" />
                 </a-form-model-item>
@@ -77,6 +63,13 @@
                 >
                   <a-input v-model="formSignUp.phone" placeholder="Телефон" />
                 </a-form-model-item>
+                <a-form-model-item has-feedback label="Пароль" prop="password">
+                  <a-input
+                    v-model="formSignUp.password"
+                    placeholder="Пароль"
+                    type="password"
+                  />
+                </a-form-model-item>
                 <a-form-model-item prop="isOfferta">
                   <a-checkbox v-model="formSignUp.isOfferta"
                     >Я согласен с
@@ -88,18 +81,6 @@
                   >
                 </a-form-model-item>
               </template>
-              <a-form-model-item
-                has-feedback
-                label="Код из СМС"
-                prop="code"
-                v-show="signUpIsCode"
-              >
-                <a-input
-                  v-model="formSignUp.code"
-                  placeholder="Код из смс"
-                  v-mask="maskCode"
-                />
-              </a-form-model-item>
               <a-form-model-item>
                 <a-alert
                   type="error"
@@ -110,16 +91,8 @@
               </a-form-model-item>
               <a-form-model-item>
                 <a-button type="primary" @click="handleSignUp">
-                  <template v-if="!signUpIsCode">Далее</template>
-                  <template v-if="signUpIsCode">Войти</template>
+                  <template>Регистрация</template>
                 </a-button>
-                <a-button
-                  type="link"
-                  @click="() => (signUpIsCode = !signUpIsCode)"
-                >
-                  <template v-if="!signUpIsCode">У меня уже есть код</template>
-                  <template v-if="signUpIsCode">Вернуться</template></a-button
-                >
               </a-form-model-item>
             </a-form-model>
           </a-tab-pane>
@@ -134,7 +107,7 @@ import BRadioGroup from "../../components/b-radio-group.vue";
 import BTextfield from "../../components/b-textfield.vue";
 export default {
   components: { BTextfield, BButton, BRadioGroup },
-  name: "sign",
+  name: "sign-login",
   layout: "signInUp",
   head() {
     return {
@@ -159,8 +132,6 @@ export default {
     };
     return {
       isLoading: false,
-      signIsCode: false,
-      signUpIsCode: false,
       delayTime: 500,
       rules: {
         signIn: {
@@ -168,9 +139,9 @@ export default {
             required: true,
             message: "Поле телефон обязательно",
           },
-          code: {
-            required: this.signIsCode,
-            message: "Поле с кодом обязательно",
+          password: {
+            required: true,
+            message: "Поле с паролем обязательно",
           },
         },
         signUp: {
@@ -194,16 +165,16 @@ export default {
               message: "Поле телефон обязательно",
             },
           ],
+          password: [
+            {
+              required: true,
+              message: "Поле с паролем обязательно",
+            },
+          ],
           isOfferta: [
             {
               required: true,
               message: "Для регистрации вы должны согласиться с условиями",
-            },
-          ],
-          code: [
-            {
-              required: this.signUpIsCode,
-              message: "Поле с кодом обязательно",
             },
           ],
         },
@@ -212,14 +183,13 @@ export default {
         email: "",
         name: "",
         phone: "",
-        code: "",
+        password: "",
       },
       formSignIn: {
         phone: "",
-        code: "",
+        password: "",
       },
       maskPhone: "+7 (###) ###-##-##",
-      maskCode: "###-###",
       isError: false,
       errorMsg: "",
       errorsData: {},
@@ -231,31 +201,29 @@ export default {
     handleSignUp() {
       this.$refs.formSignUp.validate((valid) => {
         if (valid) {
-          if (!this.signUpIsCode) {
-            this.isLoading = true;
-            const { name, email, phone } = this.formSignUp;
-            this.$axios
-              .post("/register", {
-                name: name,
-                email: email,
-                phone: phone,
-              })
-              .then(({ data }) => {
-                if (data.success == true) {
-                  localStorage.setItem("auth.validation", data.token);
-                } else {
-                  this.isError = true;
-                  this.errorsData = data.errors;
-                }
-                this.signUpIsCode = true;
-                this.isLoading = false;
-              })
-              .catch((err) => {
-                console.error(err);
-              });
-          } else {
-            this.handleCodeSubmit(this.formSignUp);
-          }
+          this.isLoading = true;
+          const { name, email, phone, password } = this.formSignUp;
+          this.$axios
+            .post("/sign/register", {
+              name: name,
+              email: email,
+              phone: phone,
+              password: password,
+            })
+            .then(({ data }) => {
+              this.errorMsg = data.errorsData;
+              this.errorData = data.errors;
+              if (data.success == true) {
+                this.$auth.setUserToken(data.token, false).then(() => this.$toast.success('User set!'));
+              } else {
+                this.isError = true;
+              }
+              this.isLoading = false;
+            })
+            .catch((err) => {
+              this.isLoading = false;
+              console.error(err);
+            });
         }
       });
     },
@@ -263,66 +231,33 @@ export default {
       this.$refs.formSignIn.validate((valid) => {
         if (valid) {
           this.isLoading = true;
-          if (!this.signIsCode) {
-            const { phone } = this.formSignIn;
-            this.$axios
-              .post("/login", {
-                phone: phone,
-              })
-              .then(({ data }) => {
-                if (data.success == true) {
-                  this.signIsCode = true;
-                  localStorage.setItem("auth.validation", data.token);
-                  this.errorsData = data.errors;
-                } else {
-                  this.isError = true;
-                  this.errorsData = data.errors;
-                }
-                this.isLoading = false;
-              })
-              .catch((err) => {
-                console.error(err);
-              });
-          } else {
-            this.handleCodeSubmit(this.formSignIn);
-          }
+          const { phone, password } = this.formSignIn;
+          this.$axios
+            .post("/sign/login", {
+              phone: phone,
+              password: password,
+            })
+            .then(({ data }) => {
+              this.errorMsg = data.errors;
+              this.errorData = data.errors;
+              if (data.success == true) {
+                this.$auth.setUserToken(data.token, data.token).then(() => this.$toast.success('User set!'));
+              } else {
+                this.isError = true;
+              }
+              this.isLoading = false;
+            })
+            .catch((err) => {
+              this.isError = true;
+              this.isLoading = false;
+              console.error(err);
+            });
         } else {
           console.log("error submit!!");
+          this.isLoading = false;
           return false;
         }
       });
-    },
-    handleCodeSubmit(form) {
-      /**
-       * Верификация кода
-       */
-      this.isLoading = true;
-      if (localStorage.getItem("auth.validation")) {
-        this.$axios.setHeader(
-          "Authorize-Validation",
-          localStorage.getItem("auth.validation")
-        );
-        this.$auth
-          .login({
-            data: {
-              passphrase: form.code,
-            },
-          })
-          .then(({ data }) => {
-            if (data.success == true) {
-              this.$metrika.reachGoal("client_register");
-              this.$router.push("/");
-            } else {
-              this.isError = true;
-              this.errorMsg = data.error;
-            }
-            this.isLoading = false;
-          })
-          .catch((err) => {
-            console.error(err);
-            this.isLoading = false;
-          });
-      }
     },
   },
 };

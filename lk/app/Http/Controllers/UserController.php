@@ -17,6 +17,8 @@ use App\Models\Bid;
 use App\Models\AppToken;
 use App\Models\Region;
 
+use Illuminate\Support\Facades\Hash;
+
 
 use App\Helpers\stdObject;
 use App\Models\Direction;
@@ -469,6 +471,7 @@ class UserController extends Controller
     public function update(Request $request)
     {
         $user = User::find($request->user()->id);
+        $errors = [];
         if ($user) {
             if ($request->has('name') && empty($request->name) == false && !empty($request->email)) {
                 if ($request->has('name')) {
@@ -483,10 +486,18 @@ class UserController extends Controller
                 if ($request->has('phone')) {
                     $user->phone = $request->phone;
                 }
+                if ($request->has('password') && $request->has('password_new')) {
+                    if (Hash::check($request->password, $user->password)) {
+                        $user->password = Hash::make($request->password_new);
+                    } else {
+                        $errors['pass'] = 'Не правильный пароль';
+                    }
+                }
                 $user->save();
                 return response()->json([
                     'success' => true,
-                    'message' => 'Настройки обновлены'
+                    'message' => 'Настройки обновлены',
+                    'errors' => $errors
                 ]);
             }
             return response()->json([

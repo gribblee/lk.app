@@ -41,8 +41,8 @@ export default {
       mode: "client"
     },
     {
-      src: '@/plugins/vue-linkify',
-      mode: 'client'
+      src: "@/plugins/vue-linkify",
+      mode: "client"
     },
     {
       src: "./plugins/YandexMetrika",
@@ -77,13 +77,12 @@ export default {
    */
 
   auth: {
-    localStorage: false,
     strategies: {
       local: {
         token: {
           property: "token",
           required: true,
-          type: "Bearer"
+          type: "Bearer",
         },
         endpoints: {
           login: {
@@ -101,7 +100,7 @@ export default {
             method: "get"
           }
         }
-      }
+      },
     },
     redirect: {
       login: "/sign",
@@ -127,7 +126,7 @@ export default {
    ** See https://axios.nuxtjs.org/options
    */
   axios: {
-    baseURL: "https://lk.leadz.monster/api", //`${process.env.NODE_BASE_URL}`
+    baseURL: "https://lk.leadz.monster/api" //`${process.env.NODE_BASE_URL}`
   },
 
   // Build Configuration (https://go.nuxtjs.dev/config-build)
