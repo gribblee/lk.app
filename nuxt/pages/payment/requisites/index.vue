@@ -125,6 +125,9 @@
           <b-description-item title="КПП" :content="requisiteData.kpp" />
         </a-col>
         <a-col :span="24">
+          <b-description-item title="Р/СЧ" :content="requisiteData.rsch" />
+        </a-col>
+        <a-col :span="24">
           <b-description-item title="К/СЧ" :content="requisiteData.ksch" />
         </a-col>
         <a-col :span="24">
