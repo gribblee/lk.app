@@ -393,7 +393,6 @@
                 <a-checkbox value="UI.Regions">Регионы</a-checkbox>
                 <a-checkbox value="UI.Direction">Направления</a-checkbox>
                 <a-checkbox value="UX.Logout">Авторизация</a-checkbox>
-                <a-checkbox value="UX.Insurance">Страховка</a-checkbox>
                 <a-checkbox value="API.Error">Странные ошибки</a-checkbox>
               </a-checkbox-group>
             </div>
