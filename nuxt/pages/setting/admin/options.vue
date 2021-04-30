@@ -146,6 +146,17 @@
                   :rows="5"
                 />
               </a-form-model-item>
+              <a-form-model-item
+                has-feedback
+                label="Время для автозакрытия заявки в днях"
+                prop="dayClaimClose"
+              >
+                <a-input
+                  v-model="optionsForm.day_claim_close"
+                  type="text"
+                  autocomplete="off"
+                />
+              </a-form-model-item>
               <a-form-model-item>
                 <a-button type="primary" @click="submitForm('optionsForm')">
                   Сохранить
@@ -188,7 +199,8 @@ export default Vue.extend({
         bill_bonus_two: "0",
         bonus_store: "0",
         score_registration: "0",
-        score_payment: "0"
+        score_payment: "0",
+        day_claim_close: "5"
       },
     };
   },

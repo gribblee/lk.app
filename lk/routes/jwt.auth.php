@@ -160,7 +160,7 @@ Route::group([
 
 Route::group(['prefix' => 'deals'], function () {
     Route::post('', "DealController@index");
-
+    Route::post('/export', "DealController@export");
     /**
      * Distributed
      */

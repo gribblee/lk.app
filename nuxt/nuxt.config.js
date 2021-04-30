@@ -56,7 +56,7 @@ export default {
     {
       src: "./plugins/VueAudio",
       mode: "client"
-    }
+    },
   ],
 
   // Auto import components (https://go.nuxtjs.dev/config-components)
@@ -65,7 +65,8 @@ export default {
   // Modules for dev and build (recommended) (https://go.nuxtjs.dev/config-modules)
   buildModules: [
     // https://go.nuxtjs.dev/typescript
-    "@nuxt/typescript-build"
+    "@nuxt/typescript-build",
+    //"@nuxtjs/laravel-echo"
   ],
 
   // Modules (https://go.nuxtjs.dev/config-modules)
@@ -82,7 +83,7 @@ export default {
         token: {
           property: "token",
           required: true,
-          type: "Bearer",
+          type: "Bearer"
         },
         endpoints: {
           login: {
@@ -100,7 +101,7 @@ export default {
             method: "get"
           }
         }
-      },
+      }
     },
     redirect: {
       login: "/sign",
@@ -128,6 +129,9 @@ export default {
   axios: {
     baseURL: "https://lk.leadz.monster/api" //`${process.env.NODE_BASE_URL}`
   },
+  // echo: {
+  //   plugins: ["~/plugins/echo.ts"]
+  // },
 
   // Build Configuration (https://go.nuxtjs.dev/config-build)
   build: {

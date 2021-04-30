@@ -120,6 +120,16 @@
                 />
               </a-form-item>
             </a-col>
+            <a-col :span="6" v-if="user.role === 'ROLE_ADMIN'">
+              <a-form-item
+                label="Экспортировать по фильтрам"
+                :style="{ marginLeft: '20px' }"
+              >
+                <a-button size="large" @click="handleExport">
+                  Экспортировать
+                </a-button>
+              </a-form-item>
+            </a-col>
           </a-row>
         </a-form>
       </div>
@@ -164,6 +174,7 @@
                     :value="item"
                     v-if="
                       (item.type === 1003 &&
+                        overLR(record.created_at, Date.now()) &&
                         record.disput === null &&
                         record.is_insurance) ||
                       (item.type !== 1000 &&
@@ -259,6 +270,7 @@
                 :key="index"
                 v-if="
                   (status_item.type === 1003 &&
+                    overLR(dealData.created_at, Date.now()) &&
                     dealData.disput === null &&
                     dealData.is_insurance) ||
                   (status_item.type !== 1000 &&
@@ -272,6 +284,16 @@
               <a-radio-button value="3" v-if="dealData.disput === null">Спорная</a-radio-button>
               <a-radio-button value="4">Закрыто</a-radio-button>-->
             </a-radio-group>
+          </div>
+        </a-col>
+        <a-col :span="24">
+          <div :style="{ marginTop: '20px' }">
+            <a-alert
+              :message="close_day"
+              type="info"
+              show-icon
+              v-if="!overLR(dealData.created_at, Date.now())"
+            />
           </div>
         </a-col>
       </a-row>
@@ -457,6 +479,7 @@
 </template>
 <script>
 import moment from "moment";
+const download = require("js-file-download");
 const columns = [
   {
     title: "ID",
@@ -541,6 +564,24 @@ const columns = [
   },
 ];
 
+const getFileName = (response) => {
+  const contentDisposition = response.headers["content-disposition"];
+
+  let fileName = `deals-${Date.now()}.xlsx`;
+  if (contentDisposition) {
+    let fileNameMatch = contentDisposition.match(/filename="(.+)"/);
+    if (!fileNameMatch) {
+      fileNameMatch = contentDisposition.match(/filename=(.+)/);
+      if (fileNameMatch.length === 2) {
+        fileName = fileNameMatch[1];
+      }
+    } else if (fileNameMatch.length === 2) {
+      fileName = fileNameMatch[1];
+    }
+  }
+  return fileName;
+};
+
 export default {
   head() {
     return {
@@ -549,6 +590,8 @@ export default {
   },
   data() {
     return {
+      close_day: '',
+      directory: [],
       data: [],
       columns,
       fileList: [],
@@ -605,8 +648,15 @@ export default {
         direction: {
           name: "",
         },
+        created_at: "",
       },
     };
+  },
+  beforeCreate() {
+    this.$axios.get("/directory").then(({ data }) => {
+      this.directory = data;
+      this.close_day = '"Данная заявка была автоматически принята, т.к. согласно Правил системы с ее получения прошло ' + data.options.day_claim_close + ' Дней, и Вы не отправили заявку в спор ' + data.options.day_claim_close + ' дней считается с момента Распределения заявки (не с момента Создания)';
+    });
   },
   created() {
     if (this.user.role != "ROLE_MANAGER" && this.user.role != "ROLE_ADMIN") {
@@ -625,8 +675,35 @@ export default {
       });
   },
   methods: {
+    handleExport(keys) {
+      this.$axios
+        .post(
+          "/deals/export",
+          {
+            search_: this.searchField,
+            order_by: this.order_by,
+            order_field: this.order_field,
+          },
+          {
+            responseType: "blob",
+          }
+        )
+        .then((response) => {
+          download(response.data, getFileName(response));
+        });
+    },
     getDate(date) {
       return moment(date).format("DD-MM-YYYY HH:mm:ss", true);
+    },
+    overLR(l, r) {
+      let day_claim_close = 5;
+      if (typeof this.directory.options !== 'undefined') {
+        day_claim_close = this.directory.options.day_claim_close;
+      }
+      return (
+        moment(l).add(day_claim_close, "days").unix() >
+        moment(r).unix()
+      );
     },
     handleTableChange(pagination, filters, sorters) {
       const pager = { ...this.pagination };

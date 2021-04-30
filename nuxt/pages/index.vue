@@ -238,9 +238,12 @@
                       <a-select-option :key="0" value="" label="Не выбрано"
                         >Не выбрано</a-select-option
                       >
-                    <a-select-option :key="direction.id" :value="direction.id" v-for="direction in directory.directions">{{
-                        direction.name
-                      }}</a-select-option>
+                      <a-select-option
+                        :key="direction.id"
+                        :value="direction.id"
+                        v-for="direction in directory.directions"
+                        >{{ direction.name }}</a-select-option
+                      >
                     </a-select>
                   </a-col>
                   <a-col :span="3">

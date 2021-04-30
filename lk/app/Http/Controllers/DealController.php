@@ -10,10 +10,23 @@ use App\Models\Deal;
 use App\Models\DealFile;
 use App\Models\Status;
 use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Excel;
+use App\Exports\DealExport;
 
 class DealController extends Controller
 {
     protected $is_delete = false;
+
+    function __construct(Excel $excel)
+    {
+        $this->excel = $excel;
+        /**
+         * https://inprocess.by/blog/eksport-v-excel-iz-laravel/ Гайд по Excel
+         * https://docs.laravel-excel.com/3.1/exports/collection.html Второй Гайд
+         * https://www.studentstutorial.com/laravel/export Третьий гайд
+         */
+    }
+
     /**
      * Start Ver 1.0
      */
@@ -37,7 +50,7 @@ class DealController extends Controller
                     if (!empty($val) && $val != null) {
                         if ($key != 'datePicker') {
                             if ($key != 'user_name') {
-                                if ($key == 'status_id' && $val == '1000000'){
+                                if ($key == 'status_id' && $val == '1000000') {
                                     $this->is_delete = true;
                                 } else {
                                     $srch[] = [$key, '=', $val];
@@ -76,6 +89,70 @@ class DealController extends Controller
         return response()->json($Deals->paginate(10));
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function export(Request $request)
+    {
+        if ($request->user()->role == 'ROLE_ADMIN') {
+            $query = Deal::selectRaw('*, deals.id AS deal_id')
+                ->with('status')
+                ->with('region')
+                ->with('direction')
+                ->with('disput')
+                ->with('bids.user')
+                ->with('user')
+                ->whereHas('direction', function ($q) use ($request) {
+                    return $q->whereJsonContains('directions.categories', $request->user()->category_id);
+                })
+                ->when($request->has('search_'), function ($q) use ($request) {
+                    $srchBegin = $request->search_;
+                    $srch = [];
+                    foreach ($srchBegin as $key => $val) {
+                        if (!empty($val) && $val != null) {
+                            if ($key != 'datePicker') {
+                                if ($key != 'user_name') {
+                                    if ($key == 'status_id' && $val == '1000000') {
+                                        $this->is_delete = true;
+                                    } else {
+                                        $srch[] = [$key, '=', $val];
+                                    }
+                                } elseif ($key == 'user_name') {
+                                    $q->whereHas('bids.user', function ($qm) use ($val) {
+                                        return $qm->where('name', 'LIKE', "%{$val}%");
+                                    });
+                                }
+                            } else {
+                                if ($key == 'datePicker') {
+                                    //2021-02-25 17:19:54
+                                    $srch[] = ['created_at', '>=', $val[0]];
+                                    $srch[] = ['created_at', '<=', $val[1]];
+                                }
+                            }
+                        }
+                    }
+                    return $q->where($srch);
+                })
+                ->when($request->user()->role == 'ROLE_USER', function ($q)
+                use ($request) {
+                    return $q->whereHas('bids', function ($query)
+                    use ($request) {
+                        return $query->where('bids.user_id', $request->user()->id);
+                    });
+                })->when($request->user()->role == 'ROLE_MANAGER', function ($q) use ($request) {
+                    return $q->whereHas('bids.user', function ($query) use ($request) {
+                        return $query->where('manager_id', $request->user()->id);
+                    });
+                })->orderBy($request->order_field, ($request->has('order_by') ?
+                    ($request->order_by == 'DEF'
+                        ? 'DESC'
+                        : $request->order_by)
+                    : 'DESC'))->where('is_delete', $this->is_delete);
+            //Здесь скачивание документа
+            return $this->excel->download(new DealExport($query), 'deals.xlsx');
+        }
+    }
 
     /**
      * @param $id

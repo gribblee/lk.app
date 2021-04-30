@@ -32,7 +32,8 @@ class Deal extends Model
         'token_id',
         'request',
         'is_insurance',
-        'user_id'
+        'user_id',
+        'was_online'
     ];
 
     public static function getCount(string $role = '', int $user_id = 0, int $user_category = 0)

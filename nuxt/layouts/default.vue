@@ -345,7 +345,7 @@
         >
           <div>
             <a-textarea
-              placeholder="Опишите проблему и причину возникновения"
+              placeholder="Укажите техническую проблему, с которой Вы столкнулись (что-то не работает, ошибка и т.д.)"
               v-model="supportForm.description"
               auto-size
               :style="{ height: '70px' }"
@@ -392,8 +392,7 @@
                 <a-checkbox value="UI.Bids">Заявки</a-checkbox>
                 <a-checkbox value="UI.Regions">Регионы</a-checkbox>
                 <a-checkbox value="UI.Direction">Направления</a-checkbox>
-                <a-checkbox value="UI.Rate">Ставка</a-checkbox>
-                <a-checkbox value="UX.Logout">Выход</a-checkbox>
+                <a-checkbox value="UX.Logout">Авторизация</a-checkbox>
                 <a-checkbox value="UX.Insurance">Страховка</a-checkbox>
                 <a-checkbox value="API.Error">Странные ошибки</a-checkbox>
               </a-checkbox-group>
