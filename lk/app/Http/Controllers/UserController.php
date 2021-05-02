@@ -190,7 +190,7 @@ class UserController extends Controller
 
                         $region['budget'] = $region['direction']->cost_price * $region['LEAD_COUNT'];
 
-                        $source[] = [
+                        $source[] = collect([
                             'IDS' => $region['IDS'],
                             'DIRECTION_NAME' => $region['direction']->name,
                             'REGION_NAME' => $region['REGION_NAME'],
@@ -202,15 +202,28 @@ class UserController extends Controller
                             'LAST_DEAL_DISTRIBUTION' => $region['LAST_DEAL_DISTRIBUTION'],
                             'balance' => $region['balance'],
                             'budget' => $region['budget']
-                        ];
+                        ]);
                     }
                 }
+            }
+            $src = collect($source);
+            $srcDat = null;
+            switch ($request->order_by) {
+                case 'DEF' :
+                    $srcDat = $src->sortBy($request->order_field);
+                    break;
+                case 'ASC':
+                    $srcDat = $src->sortBy($request->order_field);
+                    break;
+                case 'DESC':
+                    $srcDat = $src->sortByDesc($request->order_field);
+                    break;
             }
             //            }
             return response()->json([
                 'success' => true,
                 'statistic' => [
-                    'source' => $source,
+                    'source' => $srcDat->values()->all(),
                     'general' => $this->getGeneralStatistic($request)
                 ]
             ]);
@@ -492,6 +505,12 @@ class UserController extends Controller
                     } else {
                         $errors['pass'] = 'Не правильный пароль';
                     }
+                }
+                if ($request->has('category_id')) {
+                    $user->category_id = $request->category_id;
+                }
+                if ($request->has('region_id')) {
+                    $user->region_id = $request->region_id;
                 }
                 $user->save();
                 return response()->json([

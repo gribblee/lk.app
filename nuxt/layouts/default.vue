@@ -53,11 +53,6 @@
             >
           </div>
           <div class="layout-top">
-            <div class="layout-top__region">
-              <a class="ant-dropdown-link" @click.prevent="openRegionModal">
-                Ваш регион {{ regionName }} <a-icon type="down" />
-              </a>
-            </div>
             <span :style="{ padding: '0 10px' }">
               <a-tag color="green"
                 >Вы зашли как {{ $userUpdated.typeName }}</a-tag
@@ -121,36 +116,12 @@
                 backgroundColor: 'rgba(34, 34, 34, 0.4)',
               }"
             ></div>
-            <a-dropdown :trigger="['click']" :style="{ marginLeft: '30px' }">
-              <a class="ant-dropdown-link">
-                {{ user.name }}
-                <a-icon type="down" />
-              </a>
-              <a-menu slot="overlay" @click="handleUserTypeUpdate">
-                <a-menu-item
-                  v-for="(category, index) in $directory.categories"
-                  :key="index"
-                  :style="{ position: 'relative', paddingRight: '27px' }"
-                  :value="category.id"
-                  >Я {{ category.name }}
-                  <i
-                    :style="{
-                      position: 'absolute',
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      right: '10px',
-                      borderRadius: '50%',
-                      width: '10px',
-                      height: '10px',
-                      backgroundColor: '#40a9ff',
-                    }"
-                    v-if="userType === category.id"
-                  ></i
-                ></a-menu-item>
-                <a-menu-divider />
-                <a-menu-item key="3" @click="signOut">Выйти</a-menu-item>
-              </a-menu>
-            </a-dropdown>
+            <div :style="{ marginLeft: '25px' }">
+              <a-space :size="25">
+                <nuxt-link to="/setting">{{ user.name }}</nuxt-link>
+                <a-button @click="signOut">Выйти</a-button>
+              </a-space>
+            </div>
           </div>
         </div>
       </a-layout-header>

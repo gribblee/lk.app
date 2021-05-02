@@ -267,6 +267,7 @@ Route::group([
     'prefix' => 'admin'
 ], function () {
     Route::post('statistic', "UserController@statistic");
+    Route::post('lead/{userId}/delete', "AdminController@deleteLead");
 });
 
 Route::group([], function () {

@@ -195,6 +195,7 @@
               :columns="columns"
               :data-source="dataSource"
               :loading="isLoading"
+              @change="handleTableChange"
             >
               <template slot="USERS_COUNT" slot-scope="text, record">
                 <template v-if="record.IDS.length > 0">
@@ -224,6 +225,7 @@
 </template>
 <script>
 const columns = [];
+import moment from "moment";
 
 export default {
   middleware: "roleWebmaster",
@@ -256,6 +258,8 @@ export default {
       ],
       statisticDropdownTitle: "Статистика за неделю",
       isLoading: false,
+      order_by: "DEF",
+      order_field: "id",
     };
   },
   created() {
@@ -277,6 +281,10 @@ export default {
             title: "Сгенерировать",
             dataIndex: "LEAD_COUNT",
             key: "LEAD_COUNT",
+            defaultSortOrder: "descend",
+            sortDirections: ["descend", "ascend"],
+            onFilter: (value, record) => {},
+            sorter: (a, b) => {},
           },
           {
             title: "Бюджет",
@@ -289,26 +297,46 @@ export default {
             dataIndex: "USERS_COUNT",
             key: "USERS_COUNT",
             scopedSlots: { customRender: "USERS_COUNT" },
+            defaultSortOrder: "descend",
+            sortDirections: ["descend", "ascend"],
+            onFilter: (value, record) => {},
+            sorter: (a, b) => {},
           },
           {
             title: "Макс. стоимость",
             dataIndex: "MAX_RATE",
             key: "MAX_RATE",
+            defaultSortOrder: "descend",
+            sortDirections: ["descend", "ascend"],
+            onFilter: (value, record) => {},
+            sorter: (a, b) => {},
           },
           {
             title: "Сред. стоимость",
             dataIndex: "AVG_RATE",
             key: "AVG_RATE",
+            defaultSortOrder: "descend",
+            sortDirections: ["descend", "ascend"],
+            onFilter: (value, record) => {},
+            sorter: (a, b) => {},
           },
           {
             title: "Поступление заявки",
             dataIndex: "LAST_DEAL_CREATE",
             key: "LAST_DEAL_CREATE",
+            defaultSortOrder: "descend",
+            sortDirections: ["descend", "ascend"],
+            onFilter: (value, record) => {},
+            sorter: (a, b) => {},
           },
           {
             title: "Распределение заявки",
             dataIndex: "LAST_DEAL_DISTRIBUTION",
             key: "LAST_DEAL_DISTRIBUTION",
+            defaultSortOrder: "descend",
+            sortDirections: ["descend", "ascend"],
+            onFilter: (value, record) => {},
+            sorter: (a, b) => {},
           },
         ];
       } else {
@@ -324,40 +352,68 @@ export default {
             title: "Сгенерировать",
             dataIndex: "LEAD_COUNT",
             key: "LEAD_COUNT",
+            defaultSortOrder: "descend",
+            sortDirections: ["descend", "ascend"],
+            onFilter: (value, record) => {},
+            sorter: (a, b) => {},
           },
           {
             title: "Бюджет",
             dataIndex: "budget",
             key: "budget",
             scopedSlots: { customRender: "budget" },
+            defaultSortOrder: "descend",
+            sortDirections: ["descend", "ascend"],
+            onFilter: (value, record) => {},
+            sorter: (a, b) => {},
           },
           {
             title: "Кол-во клиентов",
             dataIndex: "USERS_COUNT",
             key: "USERS_COUNT",
             scopedSlots: { customRender: "USERS_COUNT" },
+            defaultSortOrder: "descend",
+            sortDirections: ["descend", "ascend"],
+            onFilter: (value, record) => {},
+            sorter: (a, b) => {},
           },
           {
             title: "Макс. стоимость",
             dataIndex: "MAX_RATE",
             key: "MAX_RATE",
             scopedSlots: { customRender: "MAX_RATE" },
+            defaultSortOrder: "descend",
+            sortDirections: ["descend", "ascend"],
+            onFilter: (value, record) => {},
+            sorter: (a, b) => {},
           },
           {
             title: "Сред. стоимость",
             dataIndex: "AVG_RATE",
             key: "AVG_RATE",
             scopedSlots: { customRender: "AVG_RATE" },
+            defaultSortOrder: "descend",
+            sortDirections: ["descend", "ascend"],
+            onFilter: (value, record) => {},
+            sorter: (a, b) => {},
           },
           {
             title: "Поступление заявки",
             dataIndex: "LAST_DEAL_CREATE",
             key: "LAST_DEAL_CREATE",
+            defaultSortOrder: "descend",
+            sortDirections: ["descend", "ascend"],
+            onFilter: (value, record) => {},
+            sorter: (a, b) => {},
           },
           {
             title: "Распределение заявки",
             dataIndex: "LAST_DEAL_DISTRIBUTION",
             key: "LAST_DEAL_DISTRIBUTION",
+            defaultSortOrder: "descend",
+            sortDirections: ["descend", "ascend"],
+            onFilter: (value, record) => {},
+            sorter: (a, b) => {},
           },
         ];
       }
@@ -378,6 +434,8 @@ export default {
         postData.regionSort = this.models.regionSort;
       }
       if (Object.keys(postData).length > 0) {
+        postData.order_by = this.order_by;
+        postData.order_field = this.order_field;
         this.$axios
           .post("/admin/statistic", postData)
           .then(({ data }) => {
@@ -397,6 +455,42 @@ export default {
             this.$message.error(response.data);
           });
       }
+    },
+    handleTableChange(pagination, filters, sorters) {
+      if (typeof sorters.order != "undefined") {
+        this.order_by = sorters.order == "ascend" ? "ASC" : "DESC";
+      } else {
+        this.order_by = "DEF";
+      }
+      if (typeof sorters.field != "undefined") {
+        this.order_field = sorters.field;
+      } else {
+        this.order_field = "id";
+      }
+      let postData = {};
+      postData.order_by = this.order_by;
+      postData.order_field = this.order_field;
+      this.updateStatistic();
+      // this.$axios
+      //   .post("/admin/statistic", postData)
+      //   .then(({ data }) => {
+      //     console.log(data);
+      //     if (data.success === true) {
+      //       const { statistic } = data;
+      //       this.dataSource = statistic.source;
+      //       this.generalStatistic = statistic.general;
+      //       this.generalStatistic.BUDGET_MIN_LEAD_GENERATE = statistic.general.BUDGET_MIN_LEAD_GENERATE.toFixed(
+      //         2
+      //       );
+      //       this.isLoading = false;
+      //     } else {
+      //       this.$message.error(data.msg);
+      //     }
+      //   })
+      //   .catch(({ response }) => {
+      //     this.$message.error(response.data);
+      //   });
+      //this.handleUpdateColumn();
     },
   },
 };

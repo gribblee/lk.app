@@ -501,6 +501,7 @@ class AuthController extends Controller
             'phone' => $request->phone,
             'password' => is_null($request->password) ? null : Hash::make($request->password),
             'role'  =>  'ROLE_USER',
+            'category_id' => $request->category_id,
             'is_demo' => true,
             'balance' => 0.0,
             'bonus' => 0.0,

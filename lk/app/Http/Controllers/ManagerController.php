@@ -34,7 +34,8 @@ class ManagerController extends Controller
             try {
                 return User::with(['category', 'region'])->where([
                     'manager_id' => null,
-                    'role' => 'ROLE_USER'
+                    'role' => 'ROLE_USER',
+                    'is_delete' => false
                 ])->orderByDesc('created_at')->paginate(10);
             } catch (Exception $e) {
                 return response()->json([

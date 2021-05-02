@@ -23,6 +23,18 @@
                 @click="takeLead(lead.id, $event)"
                 >Забрать</a-button
               >
+              <a-popconfirm
+                v-if="user.role === 'ROLE_ADMIN'"
+                slot="extra"
+                title="Вы действительно хотите удалить пользователя"
+                ok-text="Да"
+                cancel-text="Нет"
+                @confirm="deleteLead(lead.id, $event)"
+              >
+                <a-button type="danger" :style="{ marginLeft: '20px' }"
+                  >Удалить</a-button
+                >
+              </a-popconfirm>
               <p><b>Телефон:</b> {{ lead.phone }}</p>
               <p><b>Email:</b> {{ lead.email }}</p>
               <p>
@@ -90,6 +102,19 @@ export default Vue.extend({
     takeLead(userId, e) {
       this.$axios
         .post(`/manager/lead/${userId}/take`)
+        .then(({ data }) => {
+          this.$message.success(data.message);
+        })
+        .catch((err) => {
+          this.$message.error(err.response.message);
+        })
+        .finally(() => {
+          this.getLeads();
+        });
+    },
+    deleteLead(userId, e) {
+      this.$axios
+        .post(`/admin/lead/${userId}/delete`)
         .then(({ data }) => {
           this.$message.success(data.message);
         })

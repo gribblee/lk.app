@@ -18,6 +18,36 @@
                   autocomplete="off"
                 />
               </a-form-model-item>
+              <a-form-model-item
+                has-feedback
+                label="Ваша специализация"
+                prop="category_id"
+              >
+                <a-select v-model="userForm.category_id">
+                  <a-select-option
+                    v-for="(category, index) in $directory.categories"
+                    :key="index"
+                    :value="category.id"
+                  >
+                    {{ category.name }}
+                  </a-select-option>
+                </a-select>
+              </a-form-model-item>
+              <a-form-model-item
+                has-feedback
+                label="Ваш регион"
+                prop="region"
+              >
+                <a-select v-model="userForm.region_id">
+                  <a-select-option
+                    v-for="(region, index) in $directory.regions"
+                    :key="index"
+                    :value="region.id"
+                  >
+                    {{ region.name_with_type }}
+                  </a-select-option>
+                </a-select>
+              </a-form-model-item>
               <a-form-model-item has-feedback label="Email" prop="email">
                 <a-input
                   v-model="userForm.email"
@@ -137,10 +167,14 @@ export default Vue.extend({
           { required: true, message: "Телефон обязателен", trigger: "change" },
         ],
         password: [],
-        password_new: []
+        password_new: [],
+        category_id: [],
+        region_id: []
       },
       userForm: {
         name: "",
+        category_id: "",
+        region_id: "",
         email: "",
         emailNotification: "",
         phone: "",
@@ -150,12 +184,15 @@ export default Vue.extend({
     };
   },
   mounted() {
-    const { name, email, email_notification, phone } = this.user;
+    console.log(this.user);
+    const { name, email, email_notification, phone, category_id, region } = this.user;
     this.userForm = {
       name,
       email,
       emailNotification: email_notification,
-      phone
+      phone,
+      category_id,
+      region_id: region.id
     };
   },
   methods: {

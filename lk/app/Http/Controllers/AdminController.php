@@ -9,10 +9,20 @@ use App\Models\HistoryPayment;
 use App\Models\Payment;
 
 use App\Helpers\HelperPayment;
+use Exception;
+
+use Faker\Factory as Faker;
 
 class AdminController extends Controller
 {
     //
+
+    protected $faker;
+
+    function __construct()
+    {
+        $this->faker = Faker::create('RU_ru');
+    }
 
     /**
      * @return JsonResponse
@@ -60,6 +70,29 @@ class AdminController extends Controller
             return response()->json($users);
         }
         return response('Доступ запрещён!', 403);
+    }
+
+    /**
+     * @param Request $request
+     * @param $userId
+     * @return JsonResponse
+     */
+    public function deleteLead(Request $request, $userId)
+    {
+        if ($request->user()->role === 'ROLE_ADMIN') {
+            try {
+                $user = User::findOrFail($userId);
+                $user->is_delete = true;
+                $user->save();
+                return response()->json([
+                    'message' => 'Пользователь удалён'
+                ]);
+            } catch (Exception $e) {
+                return response()->json([
+                    'message' => 'Такого пользователя не существует'
+                ], 404);
+            }
+        }
     }
 
     /**
@@ -138,10 +171,10 @@ class AdminController extends Controller
     {
         if ($request->user()->role == 'ROLE_ADMIN') {
             $user = User::create([
-                'name' => time(),
+                'name' => $this->faker->userName,
                 'balance' => 0.0,
                 'bonus' => 0.0,
-                'phone' => '',
+                'phone' => $this->faker->phoneNumber,
                 'role' => 'ROLE_USER'
             ]);
             return response()->json([

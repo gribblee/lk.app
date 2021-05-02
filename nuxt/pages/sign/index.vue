@@ -1,6 +1,6 @@
 <template>
   <div class="form-signInUp">
-    <a-card title="Вход в панель">
+    <a-card title="Вход в панель по смс">
       <a-spin :spinning="isLoading" :delay="delayTime">
         <a-icon slot="indicator" type="loading" style="font-size: 24px" spin />
         <a-tabs default-active-key="1">
@@ -51,6 +51,9 @@
                 <template v-if="signIsCode">Вернуться</template></a-button
               >
             </a-form-model-item>
+            <a-form-model-item>
+                <nuxt-link to="/sign/login">Войти по паролю</nuxt-link>
+              </a-form-model-item>
           </a-tab-pane>
           <a-tab-pane key="2">
             <span slot="tab">
@@ -68,6 +71,21 @@
                 </a-form-model-item>
                 <a-form-model-item has-feedback label="Email" prop="email">
                   <a-input v-model="formSignUp.email" placeholder="Email" />
+                </a-form-model-item>
+                <a-form-model-item
+                  has-feedback
+                  label="Ваша специализация"
+                  prop="category_id"
+                >
+                  <a-select v-model="formSignUp.category_id">
+                    <a-select-option
+                      v-for="(category, index) in $directory.categories"
+                      :key="index"
+                      :value="category.id"
+                    >
+                      {{ category.name }}
+                    </a-select-option>
+                  </a-select>
                 </a-form-model-item>
                 <a-form-model-item
                   has-feedback
@@ -120,6 +138,9 @@
                   <template v-if="!signUpIsCode">У меня уже есть код</template>
                   <template v-if="signUpIsCode">Вернуться</template></a-button
                 >
+              </a-form-model-item>
+              <a-form-model-item>
+                <nuxt-link to="/sign/login">Регистрация по паролю</nuxt-link>
               </a-form-model-item>
             </a-form-model>
           </a-tab-pane>
@@ -206,6 +227,12 @@ export default {
               message: "Поле с кодом обязательно",
             },
           ],
+          category_id: [
+            {
+              required: true,
+              message: "Обязательно нужно выбрать специализацию"
+            }
+          ]
         },
       },
       formSignUp: {
@@ -213,6 +240,7 @@ export default {
         name: "",
         phone: "",
         code: "",
+        category_id: "",
       },
       formSignIn: {
         phone: "",
@@ -233,12 +261,13 @@ export default {
         if (valid) {
           if (!this.signUpIsCode) {
             this.isLoading = true;
-            const { name, email, phone } = this.formSignUp;
+            const { name, email, phone, category_id } = this.formSignUp;
             this.$axios
               .post("/register", {
                 name: name,
                 email: email,
                 phone: phone,
+                category_id: category_id
               })
               .then(({ data }) => {
                 if (data.success == true) {

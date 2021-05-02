@@ -92,14 +92,16 @@
                   @change="handleDirection"
                   option-label-prop="label"
                 >
-                  <a-select-option
-                    v-for="direction in directory.directions"
-                    :key="direction.id"
-                    :value="direction.id"
-                    :label="direction.name"
-                  >
-                    {{ direction.name }}
-                  </a-select-option>
+                  <template v-for="direction in directory.directions">
+                    <a-select-option
+                      :key="direction.id"
+                      :value="direction.id"
+                      :label="direction.name"
+                      v-if="direction.categories.indexOf(user.category_id) > -1"
+                    >
+                      {{ direction.name }}
+                    </a-select-option>
+                  </template>
                 </a-select>
               </div>
               <div class="bid-item">
@@ -256,6 +258,21 @@
                       <span class="bid-insurance-label">
                         Подключить страховку
                       </span>
+                      <div :style="{ marginTop: '20px' }">
+                        <b
+                          >Бесплатный возврат денег в случае некачественной
+                          заявки (битый номер, дубль, конкурент, клиенту не
+                          интересно). Стоимость: +{{ insuranceRate }}% к цене
+                          заявки. Возврат денег осуществляется на Ваш бонусный
+                          счет</b
+                        >
+                        <a
+                          href="https://docs.google.com/document/d/1q5-y6dntdafDKXjkEwujbfWnHE9Q2JwYbD3qZu0JCoM/edit"
+                          target="_blank"
+                          :style="{ marginTop: '10px', display: 'inline-block' }"
+                          >Прочитать условия</a
+                        >
+                      </div>
                     </div>
                     <!-- <div class="bid-info" v-if="isInsurance">
                       <a-list
@@ -541,6 +558,7 @@ export default {
       itsUser: {},
       meUsers: [],
       user_id: 0,
+      insuranceRate: "",
       visibleItsUser: false,
       usersPagination: {
         current: 1,
@@ -564,6 +582,7 @@ export default {
         if (data.directions.length > 0) {
           this.direction = data.directions[0];
         }
+        this.insuranceRate = data.options.insurance_rate;
       })
       .catch((_err) => {
         console.error(_err);
