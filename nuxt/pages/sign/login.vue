@@ -65,7 +65,7 @@
                 >
                   <a-select v-model="formSignUp.category_id">
                     <a-select-option
-                      v-for="(category, index) in $directory.categories"
+                      v-for="(category, index) in categories"
                       :key="index"
                       :value="category.id"
                     >
@@ -154,6 +154,7 @@ export default {
     return {
       isLoading: false,
       delayTime: 500,
+      categories: [],
       rules: {
         signIn: {
           phone: {
@@ -223,7 +224,11 @@ export default {
       errorsData: {},
     };
   },
-  created() {},
+  created() {
+    this.$axios.get('/directory/categories').then(({ data }) => {
+      this.categories = data;
+    });
+  },
   mounted() {},
   methods: {
     handleSignUp() {

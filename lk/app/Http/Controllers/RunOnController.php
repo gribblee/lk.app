@@ -75,14 +75,6 @@ class RunOnController extends Controller
                     $user = User::where(['role' => 'ROLE_USER', 'is_delete' => false])->find($claim->user_id);
                     if ($user) { //Заявка не должна попадать менеджеру или администратору
                         Log::info("Claim User success ID {$user->id}");
-                        //** */ Списание страховки
-                        // ($claim->insurance) > 0 ?
-                        //     Bid::find($claim->id)
-                        //     ->update([
-                        //         'insurance' => $claim->insurance - 1
-                        //     ])
-                        //     : false;
-                        //** Посылка в битрикс и оплата
                         $category = Category::find($user->category_id);
                         $bitrixError = '';
                         try {

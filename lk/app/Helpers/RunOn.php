@@ -35,7 +35,7 @@ class RunOn
                     if (isset($regItem['rate'])) {
                         if (
                             $regItem['rate'] >= ceil($item->direction->cost_price +
-                            ($item->direction->cost_price * ($item->direction->extra / 100)))
+                                ($item->direction->cost_price * ($item->direction->extra / 100)))
                         ) {
                             $insuranceAmount = $regItem['rate'] + ($regItem['rate'] * ($option->insurance_rate / 100));
                             if ($item->is_insurance && $item->user->balance >= $insuranceAmount) {
@@ -52,8 +52,8 @@ class RunOn
             $directionAmount = $item->direction->cost_price + ($item->direction->cost_price * ($item->direction->extra / 100));
 
             if (($isRegion || count($item->regions) == 0)
-                && $item->user->balance >= $item->consumption
-                && $item->consumption >= $directionAmount
+                && ($item->user->balance >= $item->consumption
+                    && $item->consumption >= $directionAmount)
             ) {
                 $insuranceAmount = ceil($item->consumption + ($item->consumption * ($option->insurance_rate / 100)));
                 if ($item->is_insurance && $item->user->balance >= $insuranceAmount) {

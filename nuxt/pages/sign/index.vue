@@ -52,8 +52,8 @@
               >
             </a-form-model-item>
             <a-form-model-item>
-                <nuxt-link to="/sign/login">Войти по паролю</nuxt-link>
-              </a-form-model-item>
+              <nuxt-link to="/sign/login">Войти по паролю</nuxt-link>
+            </a-form-model-item>
           </a-tab-pane>
           <a-tab-pane key="2">
             <span slot="tab">
@@ -79,7 +79,7 @@
                 >
                   <a-select v-model="formSignUp.category_id">
                     <a-select-option
-                      v-for="(category, index) in $directory.categories"
+                      v-for="(category, index) in categories"
                       :key="index"
                       :value="category.id"
                     >
@@ -182,6 +182,7 @@ export default {
       isLoading: false,
       signIsCode: false,
       signUpIsCode: false,
+      categories: [],
       delayTime: 500,
       rules: {
         signIn: {
@@ -230,9 +231,9 @@ export default {
           category_id: [
             {
               required: true,
-              message: "Обязательно нужно выбрать специализацию"
-            }
-          ]
+              message: "Обязательно нужно выбрать специализацию",
+            },
+          ],
         },
       },
       formSignUp: {
@@ -253,7 +254,11 @@ export default {
       errorsData: {},
     };
   },
-  created() {},
+  created() {
+    this.$axios.get("/directory/categories").then(({ data }) => {
+      this.categories = data;
+    });
+  },
   mounted() {},
   methods: {
     handleSignUp() {
@@ -267,7 +272,7 @@ export default {
                 name: name,
                 email: email,
                 phone: phone,
-                category_id: category_id
+                category_id: category_id,
               })
               .then(({ data }) => {
                 if (data.success == true) {

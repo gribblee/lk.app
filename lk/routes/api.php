@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Route;
  */
 
 //EMPTY
+Route::get('/directory/categories', function() {
+    return \DB::table('categories')->get();
+});
 
 /**
  * Здесь Post запросы
