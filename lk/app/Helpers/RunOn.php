@@ -32,19 +32,19 @@ class RunOn
             $isRegion = false;
             foreach ($item->regions as $regItem) {
                 if ($regItem['id'] == $region->id) {
-                    if (isset($regItem['rate'])) {
-                        if (
-                            $regItem['rate'] >= ceil($item->direction->cost_price +
-                                ($item->direction->cost_price * ($item->direction->extra / 100)))
-                        ) {
-                            $insuranceAmount = $regItem['rate'] + ($regItem['rate'] * ($option->insurance_rate / 100));
-                            if ($item->is_insurance && $item->user->balance >= $insuranceAmount) {
-                                $item->consumption = ceil($insuranceAmount);
-                            } else {
-                                $item->consumption = ceil($regItem['rate']);
-                            }
-                        }
-                    }
+                    // if (isset($regItem['rate'])) {
+                    //     if (
+                    //         $regItem['rate'] >= ceil($item->direction->cost_price +
+                    //             ($item->direction->cost_price * ($item->direction->extra / 100)))
+                    //     ) {
+                    //         $insuranceAmount = $regItem['rate'] + ($regItem['rate'] * ($option->insurance_rate / 100));
+                    //         if ($item->is_insurance && $item->user->balance >= $insuranceAmount) {
+                    //             $item->consumption = ceil($insuranceAmount);
+                    //         } else {
+                    //             $item->consumption = ceil($regItem['rate']);
+                    //         }
+                    //     }
+                    // }
                     $isRegion = true;
                     break;
                 }
