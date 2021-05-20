@@ -124,12 +124,21 @@
         <div :style="{ padding: '20px 0 0 0' }">
           <div :style="{ display: 'flex' }">
             <div class="action-button">
+              <a-button
+                type="primary"
+                :style="{ zIndex: '99' }"
+                size="large"
+                @click="handleCreatePackage"
+              >
+                <a-icon type="plus" />
+                Запустить рекламную компанию
+              </a-button>
               <a-tooltip
                 :visible="helpTooltip == '1'"
                 title="Чтобы начать, нажмите"
               >
                 <a-button
-                  type="primary"
+                  type="default"
                   :style="{ zIndex: '99' }"
                   size="large"
                   @click="handleCreateBid"
@@ -497,6 +506,9 @@ export default {
     });
   },
   methods: {
+    handleCreatePackage() {
+      this.$router.push("/bids/package/create");
+    },
     onChange(selectedRowKeys, selectedRows) {
       console.log(
         `selectedRowKeys:${selectedRowKeys}`,
