@@ -1,0 +1,5 @@
+<?php
+return [
+    'SENDPULSE_API_ID' => env('SENDPULSE_API_ID'),
+    'SENDPULSE_API_SECRET' => env('SENDPULSE_API_SECRET')
+];
