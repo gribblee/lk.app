@@ -3,7 +3,10 @@ export default {
    ** Nuxt target
    ** See https://nuxtjs.org/api/configuration-target
    */
-  target: "server",
+  // target: "static",
+  // ssr: false,
+  // type: "spa",
+  // mode: "spa",
   loading: "@/components/loading.vue",
   loadingIndicator: {
     name: "circle",
@@ -56,7 +59,7 @@ export default {
     {
       src: "./plugins/VueAudio",
       mode: "client"
-    },
+    }
   ],
 
   // Auto import components (https://go.nuxtjs.dev/config-components)
@@ -65,7 +68,7 @@ export default {
   // Modules for dev and build (recommended) (https://go.nuxtjs.dev/config-modules)
   buildModules: [
     // https://go.nuxtjs.dev/typescript
-    "@nuxt/typescript-build",
+    "@nuxt/typescript-build"
     //"@nuxtjs/laravel-echo"
   ],
 
@@ -127,7 +130,7 @@ export default {
    ** See https://axios.nuxtjs.org/options
    */
   axios: {
-    baseURL: "http://lk.leadz.monster/api" //`${process.env.NODE_BASE_URL}`
+    baseURL: "https://lk.leadz.monster/api" //`${process.env.NODE_BASE_URL}`
   },
   // echo: {
   //   plugins: ["~/plugins/echo.ts"]
@@ -135,6 +138,27 @@ export default {
 
   // Build Configuration (https://go.nuxtjs.dev/config-build)
   build: {
-    transpile: ["@nuxtjs/auth"]
+    transpile: ["@nuxtjs/auth"],
+    analyze: true,
+    // or
+    analyze: {
+      analyzerMode: 'static'
+    },
+    html: {
+      minify: {
+        collapseBooleanAttributes: true,
+        decodeEntities: true,
+        minifyCSS: true,
+        minifyJS: true,
+        processConditionalComments: true,
+        removeEmptyAttributes: true,
+        removeRedundantAttributes: true,
+        trimCustomFragments: true,
+        useShortDoctype: true,
+        removeComments: true,
+        preserveLineBreaks: false,
+        collapseWhitespace: true
+      }
+    }
   }
 };

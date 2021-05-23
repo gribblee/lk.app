@@ -13,6 +13,7 @@
     "@nuxt/typescript-runtime": "^2.0.0",
     "ant-design-vue": "^1.6.5",
     "core-js": "^3.6.5",
+    "html-minifier": "^4.0.0",
     "js-file-download": "^0.4.12",
     "laravel-echo-server": "^1.6.2",
     "mobile-device-detect": "^0.4.3",

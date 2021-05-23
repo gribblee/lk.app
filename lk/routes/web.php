@@ -1,6 +1,8 @@
 <?php
 
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,9 +15,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::get('/{path?}', function () {
+    return view('default');
 });
 
+// Route::get('/', function () {
+//     return view('welcome');
+// });
 
 Route::get('web/companies', 'Company\CompanyController@webCompanies');
