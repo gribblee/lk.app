@@ -456,28 +456,6 @@ class UserSeeder extends Seeder
                 'password' => null
             ],
             [
-                'name' => 'Кочетова Виктория Викторовна',
-                'email' => 'vikavv.83@mail.ru',
-                'phone' => '+7 923 446-13-97',
-                'category_id' => 1,
-                'balance' => 0,
-                'email_notification' => Carbon::now()->toDateString(),
-                'manager_id' => null,
-                'contact_id' => null,
-                'bonus' => 0,
-                'with_bonus' => false,
-                'role' => 'ROLE_USER',
-                'is_registration' => true,
-                'is_delete' => false,
-                'was_online' => Carbon::now(),
-                'is_demo' => false,
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-                'region_id' => 1,
-                'is_block' => false,
-                'password' => null
-            ],
-            [
                 'name' => 'Макаренкова Екатерина Сергеевна',
                 'email' => 'Lastoshka@mail.ru',
                 'phone' => '+7 916 002-08-20',
