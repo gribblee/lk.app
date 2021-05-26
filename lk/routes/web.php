@@ -17,5 +17,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/{path?}', function () {
+    return view('default');
+});
+
 
 Route::get('web/companies', 'Company\CompanyController@webCompanies');
