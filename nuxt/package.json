@@ -18,6 +18,7 @@
     "mobile-device-detect": "^0.4.3",
     "nuxt-edge": "latest",
     "nuxt-socket-io": "^1.1.17",
+    "nuxt-ssr-cache": "^1.5.2",
     "nuxt-vuex-localstorage": "^1.2.7",
     "pusher-js": "^7.0.3",
     "socket.io-client": "^4.0.1",

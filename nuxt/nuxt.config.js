@@ -5,6 +5,7 @@ export default {
    */
   target: "server",
   loading: "@/components/loading.vue",
+  // debug: true,
   loadingIndicator: {
     name: "circle",
     color: "#3B8070",
