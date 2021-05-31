@@ -230,6 +230,6 @@ class DirectoryController extends Controller
      */
     public function getRegions(Request $request)
     {
-        return Region::orderByDesc('id')->paginate(12);
+        return Region::orderBy('name')->paginate(12);
     }
 }
