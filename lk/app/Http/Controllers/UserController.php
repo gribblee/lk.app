@@ -24,6 +24,8 @@ use App\Helpers\stdObject;
 use App\Models\Direction;
 use Exception;
 
+use function PHPUnit\Framework\isNull;
+
 class UserController extends Controller
 {
     /**
@@ -209,7 +211,7 @@ class UserController extends Controller
             $src = collect($source);
             $srcDat = null;
             switch ($request->order_by) {
-                case 'DEF' :
+                case 'DEF':
                     $srcDat = $src->sortBy($request->order_field);
                     break;
                 case 'ASC':
@@ -499,7 +501,9 @@ class UserController extends Controller
                 if ($request->has('phone')) {
                     $user->phone = $request->phone;
                 }
-                if ($request->has('password') && $request->has('password_new')) {
+                if (isNull($user->password) && $request->has('password_new')) {
+                    $user->password = Hash::make($request->password_new);
+                } elseif($request->has('password') && $request->has('password_new')) {
                     if (Hash::check($request->password, $user->password)) {
                         $user->password = Hash::make($request->password_new);
                     } else {
