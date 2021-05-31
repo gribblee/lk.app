@@ -1,0 +1,64 @@
+.textfield {
+  display: block;
+  position: relative;
+  height: 40px;
+  z-index: 2;
+  margin-top: 14px;
+
+  &-group {
+    margin-top: 30px;
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -1px;
+    height: 2px;
+    background-color: #496dab;
+    width: 0;
+    transition: width 0.23s;
+    z-index: 2;
+  }
+
+  &--focus {
+    & > .textfield__label {
+      top: 0;
+      left: 0;
+      font-size: 14px;
+      color: #8fb1ee;
+    }
+    &::before {
+      width: 100%;
+    }
+  }
+
+  &__label {
+    position: absolute;
+    line-height: 40px;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    color: #496dab;
+    transition: top 0.17s, left 0.17s, color 0.23s;
+    z-index: -1;
+    font-family: "Circe";
+    font-size: 16px;
+  }
+
+  &__input {
+    border: none;
+    background-color: transparent;
+    outline: none;
+    border-bottom: 1px solid #8fb1ee;
+    line-height: 40px;
+    font-size: 16px;
+    color: #496dab;
+    font-family: "Circe";
+    padding: 0 0 0 10px;
+    width: 100%;
+    &:-internal-autofill-selected {
+      background-color: transparent;
+    }
+  }
+}

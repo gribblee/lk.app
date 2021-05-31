@@ -1,0 +1,48 @@
+.form-sign {
+}
+
+@media screen and (min-width: 1030px) {
+    
+}
+
+@media screen and (max-width: 1029px) {
+  .form-sign {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .form-about {
+    font-family: "Cera Pro";
+    font-style: normal;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 15px;
+    text-align: center;
+    margin-top: 0;
+    color: #e63023;
+    margin-top: 30px;
+  }
+
+  .form-subabout {
+    font-family: "Cera Pro";
+    font-style: normal;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 23px;
+    color: #5e5e5e;
+    margin-top: 20px;
+    max-width: 335px;
+    text-align: center;
+  }
+
+  .form-container {
+    max-width: 500px;
+    background-color: #fff;
+    border: 2px solid #222222;
+    padding: 40px 20px;
+    box-shadow: 10px 10px 0px #111111;
+    margin-top: 30px;
+  }
+}

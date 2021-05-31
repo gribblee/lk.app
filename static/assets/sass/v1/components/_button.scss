@@ -1,0 +1,22 @@
+.b-button {
+    background-color: transparent;
+    outline: none;
+    font-family: "Circe";
+    font-size: 16px;
+    color: #222222;
+    border: none;
+    cursor: pointer;
+}
+
+.b-link {
+    border-bottom: 1px solid #222222;
+    line-height: 16px;
+    font-size: 14px;
+    font-weight: 300;
+    transition: border-bottom-color 0.18s;
+    padding: 0;
+    &:hover {
+        border-bottom-color: transparent;
+    }
+    @extend .button;
+}
