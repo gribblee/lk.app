@@ -505,7 +505,7 @@ class AuthController extends Controller
             'is_demo' => true,
             'balance' => 0.0,
             'bonus' => 0.0,
-            'region_id' => $this->geo->region->id,
+            'region_id' => $this->geo->region->id ?? 1,
             'manager_id' => null, //$this->getRandManager()->id ?? null,
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
