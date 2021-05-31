@@ -13,7 +13,9 @@ use App\Models\Bid;
 
 use App\Helpers\stdObject;
 use GrahamCampbell\ResultType\Success;
-
+/**
+ * 
+ */
 class DirectoryController extends Controller
 {
     public function index(Request $request)
