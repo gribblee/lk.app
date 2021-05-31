@@ -36,7 +36,7 @@ class DirectoryController extends Controller
         $Response->options = Option::getKeyValue();
         $Response->status = Status::orderBy('order', 'DESC')->get();
         $Response->categories = Category::all();
-        $Response->regions = Region::orderByRaw('name wins DESC')->get();
+        $Response->regions = Region::orderByRaw('regions.name wins ASC')->get();
         $Response->maxRate = ceil(Bid::where([
             'is_launch' => true,
             'is_delete' => false,
