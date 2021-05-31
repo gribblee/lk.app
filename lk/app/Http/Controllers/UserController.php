@@ -503,8 +503,7 @@ class UserController extends Controller
                 }
                 if ((empty($user->password) || $user->password == null) && $request->has('password_new')) {
                     $user->password = Hash::make($request->password_new);
-                }
-                if ($request->has('password') && $request->has('password_new')) {
+                } elseif($request->has('password') && $request->has('password_new')) {
                     if (Hash::check($request->password, $user->password)) {
                         $user->password = Hash::make($request->password_new);
                     } else {
