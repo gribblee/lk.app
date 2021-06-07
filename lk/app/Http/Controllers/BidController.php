@@ -12,8 +12,11 @@ use App\Models\Direction;
 use App\Models\Region;
 use App\Models\Insurance;
 use App\Models\User;
+use App\Models\Option;
 
 use App\Helpers\stdObject;
+use App\Models\HistoryPayment;
+use Illuminate\Support\Facades\Log;
 
 class BidController extends Controller
 {
@@ -43,7 +46,7 @@ class BidController extends Controller
             ->with('user')
             ->where('is_delete', false)
             ->with('direction')
-            ->when($request->has('ids'), function($q) use($request)  {
+            ->when($request->has('ids'), function ($q) use ($request) {
                 return $q->whereIn('id', explode(",", $request->ids));
             })
             ->withCount('deals');
@@ -271,6 +274,88 @@ class BidController extends Controller
     // }
 
     /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function adsCreate(Request $request)
+    {
+        //* Добавить garant_rate - Процент гарантии списание
+        // Добавить conversion_call - Конверсия звонка
+        // Добавить step_discount - При каком пороге показывать скидку
+        // Добавить max_discount - Максимальная скидка
+        // Добавить discount_rate - Скидка
+        $validator = Validator::make($request->only(['costPerRate', 'directionId']), [
+            'costPerRate' => 'required',
+            'directionId' => 'required|exists:App\Models\Direction,id'
+        ]);
+        if ($validator->fails())
+            return response()->json(['errors' => $validator->errors()]);
+        $user = User::find($request->user()->id);
+        $fields = (object)$request->only(['costPerRate', 'directionId', 'countEmployee', 'isDealGarant', 'isDealInsurance', 'regions']);
+        $direction = Direction::find($fields->directionId);
+        $option = Option::getKeyValue();
+
+        $totalBudget = 0;
+        $discount = 0;
+        $conversionMeetings = ($direction->conversion_meetings) / 100;
+        $conversionContract = ($direction->conversion_contract) / 100;
+        $costPerRate = $fields->costPerRate;
+        if ($fields->isDealInsurance) {
+            $costPerRate = $costPerRate + $costPerRate * ($option->insurance_rate / 100);
+        }
+        if ($fields->isDealGarant) {
+            $costPerRate = $costPerRate + $costPerRate * ($option->garant_rate / 100);
+        }
+
+        $conversionCall = ($conversionMeetings * $conversionContract);
+        $countEmployee = ceil($fields->countEmployee / $conversionCall);
+        $totalBudget = ($countEmployee * $costPerRate);
+        $costContract = ($totalBudget / $countEmployee);
+        $discountRate = floor($totalBudget / $option->step_discount) * $option->discount_rate;
+        if ($discountRate > $option->max_discount) {
+            $discount = $totalBudget * ($option->max_discount / 100);
+        } else {
+            $discount = $totalBudget * ($discountRate / 100);
+        }
+
+        $total = $totalBudget - $discount;
+        if ($user->balance < $totalBudget) {
+            return response()->json(['message' => 'Не достаточно средств пополните баланс'], 402);
+        }
+        // Добавить поле discount nullable
+        $payment = $this->userPayment($user->id, $totalBudget, $discount);
+        
+        if (!$payment->fails) {
+            // Если оплата прошла
+            $bid = Bid::create([
+                'regions' => $fields->regions,
+                'direction_id' => $direction->id,
+                'category_id' => $user->category_id,
+                'user_id' => $user->id,
+                'consumption' => $costPerRate,
+                'is_garant' => $fields->isDealGarant,
+                'is_insurance' => $fields->isDealInsurance,
+                'employee_target' => $countEmployee,
+                'ads_employee_count' => $fields->countEmployee,
+                'employee_count' => 0,
+                'total_budget' => $totalBudget,
+                'discount' => $discount,
+                'is_launch' => true,
+                'is_delete' => false,
+                'is_ads' => true,
+            ]);
+            return response()->json([
+                'message' => 'Рекламная компания создана',
+                'data' => [
+                    'id' => $bid->id
+                ]
+            ]);
+        }
+        // Если оплата не прошла
+        return response()->json(['message' => 'Ошибка', 'errors' => $payment->errors], 402);
+    }
+
+    /**
      * @return JsonResponse
      */
     public function launch(Request $request, int $id)
@@ -477,4 +562,47 @@ class BidController extends Controller
     /**
      * End Ver 1.0
      */
+
+    protected function userPayment($userId, $sum, $discount)
+    {
+        $user = User::find($userId);
+        $story = collect([
+            'user_id' => $user->id,
+            'type_transaction' => '16',
+            'paysum' => 0,
+            'paybonus' => 0,
+            'before_balance' => 0,
+            'after_balance' => 0,
+            'before_bonus' => 0,
+            'after_bonus' => 0
+        ]);
+        $update = collect([
+            'balance' => abs($user->balance),
+        ]);
+        $data = [
+            'fails' => false, //Ошибка или нет
+            'errors' => [] // Массив ошибок
+        ];
+        if ($user->balance >= $sum) {
+
+            $story->before_balance = ceil($user->balance);
+            $story->after_balance = ceil($user->balance - $sum);
+            $story->paysum = $sum;
+            $story->paybonus = $discount;
+            $story->before_bonus = ceil($user->bonus);
+            $story->after_bonus = ceil($user->bonus + $discount);
+
+            $hp = HistoryPayment::create($story->toArray());
+            
+            $user->balance = ceil($user->balance - $sum);
+            $user->save();
+            
+            Log::info('User payment: ' . json_encode($user));
+            Log::info("User ID-{$user->id} history payment: " . json_encode($hp));
+        } else {
+            $data['fails'] = true;
+            $data['errors']['payment'] = 'Не достаточно средств';
+        }
+        return (object)$data;
+    }
 }

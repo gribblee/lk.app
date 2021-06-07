@@ -16,7 +16,7 @@ class CreatePaymentHistoryTable extends Migration
         Schema::create('payment_history', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('user_id');
-            $table->enum('type_transaction', [10, 11, 12, 13, 14, 15]);
+            $table->enum('type_transaction', [10, 11, 12, 13, 14, 15, 16]);
             $table->bigInteger('paysum');
             $table->bigInteger('paybonus');
             $table->bigInteger('before_balance');

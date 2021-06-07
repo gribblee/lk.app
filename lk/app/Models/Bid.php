@@ -28,6 +28,13 @@ class Bid extends Model
         'is_insurance',
         'daily_limit',
         'insurance',
+        'is_ads',
+        'discount',
+        'employee_count',
+        'employee_target',
+        'ads_employee_count',
+        'total_budget',
+        'is_garant',
         'created_at'
     ];
 

@@ -221,6 +221,7 @@ Route::group([
     'prefix' => 'bid',
 ], function () {
     Route::post('create', 'BidController@create');
+    Route::post('ads/create', 'BidController@adsCreate');
     Route::post('{id}', 'BidController@show');
     Route::post('{id}/update', 'BidController@update');
     Route::post('{id}/launch', 'BidController@launch');

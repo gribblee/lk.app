@@ -124,12 +124,21 @@
         <div :style="{ padding: '20px 0 0 0' }">
           <div :style="{ display: 'flex' }">
             <div class="action-button">
+              <a-button
+                type="primary"
+                :style="{ zIndex: '99' }"
+                size="large"
+                @click="handleCreatePackage"
+              >
+                <a-icon type="plus" />
+                Запустить рекламную компанию
+              </a-button>
               <a-tooltip
                 :visible="helpTooltip == '1'"
                 title="Чтобы начать, нажмите"
               >
                 <a-button
-                  type="primary"
+                  type="default"
                   :style="{ zIndex: '99' }"
                   size="large"
                   @click="handleCreateBid"
@@ -315,40 +324,66 @@
                   <template v-else>{{ text }}</template>
                 </template>
                 <div slot="status" slot-scope="text, record">
-                  <template v-if="record.status == '0'">
-                    <a-tooltip title="Запустить">
-                      <a-button
-                        type="link"
-                        @click="handleStatusChange(record, true)"
-                      >
-                        <a-icon
-                          type="pause-circle"
-                          :style="{ color: '#E8523F' }"
-                        />
-                      </a-button>
-                    </a-tooltip>
+                  <template v-if="!record.is_ads">
+                    <template v-if="record.status == '0'">
+                      <a-tooltip title="Запустить">
+                        <a-button
+                          type="link"
+                          @click="handleStatusChange(record, true)"
+                        >
+                          <a-icon
+                            type="pause-circle"
+                            :style="{ color: '#E8523F' }"
+                          />
+                        </a-button>
+                      </a-tooltip>
+                    </template>
+                    <template v-if="record.status == '1'">
+                      <a-tooltip title="Остановить">
+                        <a-button
+                          type="link"
+                          @click="handleStatusChange(record, false)"
+                        >
+                          <a-icon
+                            type="play-circle"
+                            :style="{ color: '#0A1428' }"
+                          />
+                        </a-button>
+                      </a-tooltip>
+                    </template>
                   </template>
-                  <template v-if="record.status == '1'">
-                    <a-tooltip title="Остановить">
-                      <a-button
-                        type="link"
-                        @click="handleStatusChange(record, false)"
-                      >
+                  <template v-else>
+                    <a-tag color="#87d068">
+                      <template v-if="record.is_launch">
                         <a-icon
                           type="play-circle"
-                          :style="{ color: '#0A1428' }"
+                          :style="{ color: '#FFF' }"
                         />
-                      </a-button>
-                    </a-tooltip>
+                      </template>
+                      <template v-else>
+                        <a-icon
+                          type="pause-circle"
+                          :style="{ color: '#FFF' }"
+                        /> </template
+                      ><span :style="{ marginLeft: '5px' }"
+                        >Рекламная компания</span
+                      ></a-tag
+                    >
                   </template>
                 </div>
-                <nuxt-link
-                  slot="direction"
-                  slot-scope="text, record"
-                  :to="{ path: `/bids/${record.id}` }"
-                >
-                  {{ record.direction.name }}
-                </nuxt-link>
+
+                <template slot="direction" slot-scope="text, record">
+                  <template v-if="!record.is_ads">
+                    <nuxt-link :to="{ path: `/bids/${record.id}` }">
+                      {{ record.direction.name }}
+                    </nuxt-link>
+                  </template>
+                  <template v-else>
+                    <nuxt-link :to="{ path: `/bids/package/${record.id}` }">
+                      {{ record.direction.name }}
+                    </nuxt-link>
+                  </template>
+                </template>
                 <span slot="spent_money" slot-scope="text, record">
                   {{ record.max_rate * record.deals_count }}
                 </span>
@@ -410,7 +445,6 @@ const columns = [
     scopedSlots: { customRender: "user" },
   },
 ];
-
 export default {
   name: "home",
   head() {
@@ -418,7 +452,6 @@ export default {
       title: "Управление",
     };
   },
-
   head() {
     return {
       title: "Личный кабинет",
@@ -497,6 +530,9 @@ export default {
     });
   },
   methods: {
+    handleCreatePackage() {
+      this.$router.push("/bids/package/create");
+    },
     onChange(selectedRowKeys, selectedRows) {
       console.log(
         `selectedRowKeys:${selectedRowKeys}`,

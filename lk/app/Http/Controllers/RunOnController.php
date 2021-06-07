@@ -84,7 +84,13 @@ class RunOnController extends Controller
                         } catch (Exception $e) {
                             $bitrixError = $e->getMessage();
                         }
-                        $userPay = $this->userPayment($user, $claim); //Оплата
+                        if (!$claim->is_ads) {
+                            $userPay = $this->userPayment($user, $claim); //Оплата
+                        } else {
+                            $userPay = [
+                                'bonus' => 0
+                            ];
+                        }
                         //** Обновление поступившей заявки
                         $deal->update([
                             'amount_bonus' => $userPay['bonus'] ?? 0,
@@ -92,6 +98,21 @@ class RunOnController extends Controller
                             'bid_id' => $claim->id,
                             'is_insurance' => $claim->is_insurance,
                             'status_id' => Status::firstStatus()->id,
+                        ]);
+                        $claimLaunch = $claim->is_launch;
+                        if ($claim->employee_count + 1 >= $claim->employee_target) {
+                            $claimLaunch = false;
+                            if ($claim->discount != null && $claim->discount > 0) {
+                                User::where('id', $user->id)->update([
+                                    'bonus' => $user->bonus + $claim->discount
+                                ]);
+                                Log::info("User: {$user->id} cashback {$claim->discount}");
+                            }
+                            Log::info("Claim: {$claim->id} is launch = false\r\n");
+                        }
+                        Bid::where('id', $claim->id)->update([
+                            'employee_count' => $claim->employee_count + 1,
+                            'is_launch' => $claimLaunch
                         ]);
                         //** Отправка на почту
                         $this->sendMail($user);

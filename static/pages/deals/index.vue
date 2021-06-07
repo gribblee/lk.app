@@ -394,7 +394,7 @@
       <a-divider />
       <p :style="pStyle">Запись звонков</p>
       <a-row>
-        <a-col :span="24">
+        <a-col :span="24"> 
           <a-upload-dragger
             name="file"
             :multiple="true"
@@ -815,7 +815,7 @@ export default {
         .post(`/deal/${_id}`)
         .then(({ data }) => {
           this.dealData = data;
-          this.uploadURL = `http://lk.leadz.monster/api/deal/${this.dealData.deal_id}/upload`;
+          this.uploadURL = `https://lk.leadz.monster/api/deal/${this.dealData.deal_id}/upload`;
           this.dealStatus = data.status.id.toString();
           this.fileList.splice(0, this.fileList.length);
           if (record.is_view == false) {
@@ -827,7 +827,7 @@ export default {
               uid: _n.id,
               name: _n.name,
               status: "done",
-              url: `http://lk.leadz.monster/api/deal/${data.deal_id}/storage/${_n.id}`,
+              url: `https://lk.leadz.monster/api/deal/${data.deal_id}/storage/${_n.id}`,
             });
           });
           if (
@@ -883,7 +883,7 @@ export default {
           .post(`/deal/${record.deal_id}`)
           .then(({ data }) => {
             this.dealData = data;
-            this.uploadURL = `http://lk.leadz.monster/api/deal/${this.dealData.deal_id}/upload`;
+            this.uploadURL = `https://lk.leadz.monster/api/deal/${this.dealData.deal_id}/upload`;
             this.dealStatus = data.status.id.toString();
             this.fileList.splice(0, this.fileList.length);
           })
