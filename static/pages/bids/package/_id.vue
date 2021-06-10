@@ -33,10 +33,10 @@
           <div class="statistic-row">
             <a-row :gutter="[24, 24]">
               <a-col :span="24">
-                <a-card title="Поулчено клиентов">
+                <a-card title="Поулчено заявок">
                   <a-statistic
                     :value="recivedEmployee"
-                    suffix="клиентов"
+                    suffix="заявок"
                     :value-style="{ color: '#3f8600' }"
                   />
                   <a-progress
@@ -51,7 +51,7 @@
               <a-col :span="24">
                 <a-card>
                   <a-statistic
-                    title="Ваш бюджет бюджет"
+                    title="Ваш бюджет"
                     :precision="2"
                     :value="computedFunel.totalBudget - computedFunel.discount"
                     suffix="₽"
@@ -171,7 +171,7 @@
                 />
               </div>
               <div class="bid-item">
-                <div class="bid-label">Вы платите за одного клиента:</div>
+                <div class="bid-label">Вы платите за одну заявку:</div>
                 <a-input-number
                   v-model="computedVMcostPerRate"
                   :min="computedMincostPerRate"
@@ -467,7 +467,7 @@ export default Vue.extend({
           }
         : {
             color: "red",
-            text: "Остановлено",
+            text: "Завершено",
             type: "primary",
             button: "Запустить",
           };

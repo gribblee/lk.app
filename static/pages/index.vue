@@ -131,7 +131,7 @@
                 @click="handleCreatePackage"
               >
                 <a-icon type="plus" />
-                Запустить рекламную компанию
+                Запустить рекламную кампанию
               </a-button>
               <a-tooltip
                 :visible="helpTooltip == '1'"
@@ -353,7 +353,7 @@
                     </template>
                   </template>
                   <template v-else>
-                    <a-tag color="#87d068">
+                    <a-tag :color="record.is_launch ? '#87d068' : '#F50'">
                       <template v-if="record.is_launch">
                         <a-icon
                           type="play-circle"

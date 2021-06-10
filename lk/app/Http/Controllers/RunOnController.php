@@ -24,6 +24,7 @@ use App\Helpers\RunOn;
 
 use App\Helpers\Math\SVDMatrix;
 use App\Models\Category;
+use App\Models\Notification;
 
 class RunOnController extends Controller
 {
@@ -99,9 +100,14 @@ class RunOnController extends Controller
                             'is_insurance' => $claim->is_insurance,
                             'status_id' => Status::firstStatus()->id,
                         ]);
+                        // Уведомление для РК
                         $claimLaunch = $claim->is_launch;
                         if ($claim->employee_count + 1 >= $claim->employee_target) {
                             $claimLaunch = false;
+                            Notification::create([
+                                'description' => 'Ваша рекламная компания закончилась!',
+                                'user_id' =>$user->id
+                            ]);
                             if ($claim->discount != null && $claim->discount > 0) {
                                 User::where('id', $user->id)->update([
                                     'bonus' => $user->bonus + $claim->discount

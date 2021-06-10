@@ -77,7 +77,7 @@
               <a-col :span="24">
                 <a-card>
                   <a-statistic
-                    title="Ваша скидка"
+                    title="Ваш кэшбек"
                     :precision="2"
                     :value="computedFunel.discount"
                     suffix="₽"
@@ -89,10 +89,10 @@
           </div>
         </a-col>
         <a-col :xs="22" :md="8" :lg="8">
-          <a-card title="Настройка получения клиентов">
+          <a-card title="Настройка получения заявок">
             <div class="bid-form">
               <div class="bid-item">
-                <div class="bid-label">Укажите какие клиенты нужны:</div>
+                <div class="bid-label">Укажите какие заявки нужны:</div>
                 <a-select
                   size="large"
                   placeholder="Выберите направление"
@@ -173,7 +173,7 @@
               </div>
               <div class="bid-item">
                 <div class="bid-label">
-                  Сколько Вы готовы платить за клиента:
+                  Сколько Вы готовы платить за заявку:
                 </div>
                 <a-input-number
                   v-model="computedVMcostPerRate"
@@ -487,7 +487,7 @@ export default Vue.extend({
           }
         : {
             color: "red",
-            text: "Остановлено",
+            text: "Завершено",
             type: "primary",
             button: "Запустить",
           };
