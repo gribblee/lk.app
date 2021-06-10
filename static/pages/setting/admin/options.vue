@@ -47,6 +47,50 @@
               </a-form-model-item>
               <a-form-model-item
                 has-feedback
+                label="Процент гарантии"
+                prop="garantRate"
+              >
+                <a-input
+                  v-model="optionsForm.garant_rate"
+                  type="text"
+                  autocomplete="off"
+                />
+              </a-form-model-item>
+              <a-form-model-item
+                has-feedback
+                label="Шаг прибавления скидки"
+                prop="stepDiscount"
+              >
+                <a-input
+                  v-model="optionsForm.step_discount"
+                  type="text"
+                  autocomplete="off"
+                />
+              </a-form-model-item>
+              <a-form-model-item
+                has-feedback
+                label="Максимальная скидка"
+                prop="maxDiscount"
+              >
+                <a-input
+                  v-model="optionsForm.max_discount"
+                  type="text"
+                  autocomplete="off"
+                />
+              </a-form-model-item>
+              <a-form-model-item
+                has-feedback
+                label="Размер скидки"
+                prop="discountRate"
+              >
+                <a-input
+                  v-model="optionsForm.discount_rate"
+                  type="text"
+                  autocomplete="off"
+                />
+              </a-form-model-item>
+              <a-form-model-item
+                has-feedback
                 label="Процент списания бонусов"
                 prop="billBonus"
               >
@@ -200,7 +244,11 @@ export default Vue.extend({
         bonus_store: "0",
         score_registration: "0",
         score_payment: "0",
-        day_claim_close: "5"
+        day_claim_close: "5",
+        garant_rate: "20",
+        step_discount: "50000",
+        max_discount: "20",
+        discount_rate: "5",
       },
     };
   },

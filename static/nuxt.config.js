@@ -128,6 +128,7 @@ export default {
    */
   axios: {
     baseURL: "http://dev.leadz.monster/api" //`${process.env.NODE_BASE_URL}`
+    // baseURL: "https://lk.leadz.monster/api"
   },
 
   // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
