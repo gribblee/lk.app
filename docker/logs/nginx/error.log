@@ -1,0 +1,10 @@
+2020/12/17 08:06:09 [emerg] 1#1: host not found in upstream "nuxt" in /etc/nginx/conf.d/lk.conf:14
+2020/12/17 08:07:47 [emerg] 1#1: host not found in upstream "nuxt" in /etc/nginx/conf.d/lk.conf:14
+2021/02/26 08:07:00 [emerg] 1#1: host not found in upstream "nuxt" in /etc/nginx/conf.d/lk.conf:14
+2021/02/26 08:10:44 [emerg] 1#1: host not found in upstream "nuxt" in /etc/nginx/conf.d/lk.conf:14
+2021/02/26 08:11:17 [emerg] 1#1: host not found in upstream "nuxt" in /etc/nginx/conf.d/lk.conf:14
+2021/02/26 08:11:24 [emerg] 1#1: host not found in upstream "nuxt" in /etc/nginx/conf.d/lk.conf:14
+2021/02/26 08:25:47 [emerg] 1#1: host not found in upstream "nuxt" in /etc/nginx/conf.d/lk.conf:14
+2021/05/22 21:50:12 [emerg] 1#1: the "alias" directive cannot be used inside the named location in /etc/nginx/conf.d/lk.conf:41
+2021/05/22 21:52:48 [emerg] 1#1: invalid location modifier "/" in /etc/nginx/conf.d/lk.conf:27
+2021/05/22 22:25:01 [emerg] 1#1: duplicate location "/" in /etc/nginx/conf.d/lk.conf:33

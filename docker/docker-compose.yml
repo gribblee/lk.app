@@ -1,0 +1,118 @@
+version: "3.5"
+
+services:
+  nginx:
+    container_name: lk-nginx
+    build:
+      context: .
+      dockerfile: _nginx.dockerfile
+    ports:
+      - "80:80"
+    depends_on: 
+      - php-fpm
+      - nuxt
+    networks: 
+      - backend
+      - frontend
+    volumes: 
+      - ./../lk:/var/www/backend:delegated
+      - ./../static:/var/www/frontend:delegated
+      - ./logs/nginx/:/var/log/nginx
+    
+  php-fpm:
+    container_name: lk-laravel
+    build:
+      context: .
+      dockerfile: _php.dockerfile
+    volumes:
+      - ./../lk:/var/www/backend:delegated
+    ports:
+      - "9000:9000"
+    networks:
+      - backend
+      - postgres
+
+  nuxt:
+    container_name: lk-nuxt
+    # user: node
+    build:
+      context: ../
+      dockerfile: ./docker/_nuxt.dockerfile
+    environment:
+      - NODE_ENV=development
+    command: "yarn run start"
+    volumes:
+      - ./../nuxt:/var/www/frontend:delegated
+    ports:
+      - 3001:3001
+    networks:
+      - frontend
+
+  composer:
+    build:
+      context: .
+      dockerfile: _composer.dockerfile
+    container_name: lk-composer
+    volumes:
+      - ./../lk:/var/www/backend
+    working_dir: /var/www/backend
+    depends_on:
+      - php-fpm
+    user: laravel
+    networks:
+      - backend
+    #entrypoint: ['composer', '--ignore-platform-reqs']
+  
+  artisan:
+    build:
+      context: .
+      dockerfile: _php.dockerfile
+    container_name: lk-artisan
+    volumes:
+      - ./../lk:/var/www/backend:delegated
+    depends_on:
+      - postgres
+    working_dir: /var/www/backend
+    user: laravel
+    entrypoint: ['php', '/var/www/backend/artisan']
+    networks:
+      - backend
+
+  postgres:
+    container_name: lk-postgres
+    image: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-OV#05WagIDYnfnA_pgsql_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-BS%mM?EA7W5ghAqS#o}
+      PGDATA: /data/postgres
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres
+    restart: unless-stopped
+
+  pgadmin:
+    container_name: lk-pgadmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin@leadz.monster}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-1zGSsH~9IN#pbyX@vK%2TA}
+    volumes:
+      - pgadmin:/root/.pgadmin
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    networks:
+      - postgres
+    restart: unless-stopped
+
+networks:
+  postgres:
+    driver: bridge
+  backend:
+  frontend:
+
+volumes:
+  postgres:
+  pgadmin:
