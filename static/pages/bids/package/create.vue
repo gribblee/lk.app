@@ -35,7 +35,7 @@
                   <a-statistic
                     title="Вам нужен бюджет"
                     :precision="2"
-                    :value="computedFunel.totalBudget - computedFunel.discount"
+                    :value="computedFunel.totalBudget"
                     suffix="₽"
                     :value-style="{ color: '#3f8600' }"
                   />
@@ -80,7 +80,18 @@
                     title="Ваш кэшбек"
                     :precision="2"
                     :value="computedFunel.discount"
-                    suffix="₽"
+                    suffix=""
+                    :value-style="{ color: '#3f8600' }"
+                  />
+                </a-card>
+              </a-col>
+              <a-col :span="24">
+                <a-card>
+                  <a-statistic
+                    title="Ваш доход"
+                    :precision="2"
+                    :value="computedFunel.income"
+                    suffix=""
                     :value-style="{ color: '#3f8600' }"
                   />
                 </a-card>
@@ -157,7 +168,7 @@
                 </div>
                 <a-input-number
                   v-model="computedVMCountEmployee"
-                  :min="1"
+                  :min="5"
                   :max="500"
                   size="large"
                   @blur="handlecostPerRate"
@@ -294,23 +305,25 @@
                   </div>
                 </div>
               </div>
-              <template v-if="computedIsBalance">
-                <div class="bid-item">
-                  <!-- <p>Здесь текст</p> -->
-                  <a-button size="large" type="danger" @click="handleLaunch"
-                    >Запустить</a-button
-                  >
-                </div>
-              </template>
-              <template v-else>
-                <div class="bid-item">
-                  <a-button
-                    size="large"
-                    type="primary"
-                    @click="handlePayBalance"
-                    >Пополнить</a-button
-                  >
-                </div>
+              <template v-if="computedFunel.totalBudget > 0">
+                <template v-if="computedIsBalance">
+                  <div class="bid-item">
+                    <!-- <p>Здесь текст</p> -->
+                    <a-button size="large" type="danger" @click="handleLaunch"
+                      >Запустить</a-button
+                    >
+                  </div>
+                </template>
+                <template v-else>
+                  <div class="bid-item">
+                    <a-button
+                      size="large"
+                      type="primary"
+                      @click="handlePayBalance"
+                      >Пополнить</a-button
+                    >
+                  </div>
+                </template>
               </template>
             </div>
           </a-card>
@@ -446,7 +459,7 @@ export default Vue.extend({
         }
         app.insuranceRate = Number(data.options.insurance_rate);
         app.garantRate = Number(data.options.garant_rate);
-        app.StepDiscount = Number(data.options.step_discount);//Шаг скидки
+        app.StepDiscount = Number(data.options.step_discount); //Шаг скидки
         app.DiscountRate = Number(data.options.discount_rate); //Размер скидки
         app.MaxDiscount = Number(data.options.max_discount); //Максимальаня скидка
         app.dealGarantRate = Number(data.options.garant_rate);
@@ -458,17 +471,24 @@ export default Vue.extend({
   mounted() {},
   methods: {
     handleCreate() {},
-    handlePayBalance() {},
+    handlePayBalance() {
+      const app : any = this;
+      app.$store.dispatch('payment/setVisiblePayCard', true);
+    },
     handleLaunch() {
       const app: any = this;
-      app.$axios.post(`/bid/ads/create`, {
-        directionId: app.direction.id,
-        costPerRate: app.costPerRate,
-        regions: app.regions.map((r:any) => r.id),
-        isDealGarant: app.isDealGarant,
-        isDealInsurance: app.isInsurance,
-        countEmployee: app.countEmployee
-      }).then(({ data }: any) => {});
+      app.$axios
+        .post(`/bid/ads/create`, {
+          directionId: app.direction.id,
+          costPerRate: app.costPerRate,
+          regions: app.regions.map((r: any) => r.id),
+          isDealGarant: app.isDealGarant,
+          isDealInsurance: app.isInsurance,
+          countEmployee: app.countEmployee,
+        })
+        .then(({ data }: any) => {
+          app.$route.push(`/bids/package/${data.data.id}`);
+        });
     },
     handleIBuy(id: any, e: any) {},
     handleDealGarantBuy(id: any, e: any) {},
@@ -507,10 +527,11 @@ export default Vue.extend({
       let conversionMeetings = Number(app.direction.conversion_meetings) / 100;
       let conversionContract = Number(app.direction.conversion_contract) / 100;
       let costPerRate = app.costPerRate;
-      let conversionCall = (conversionMeetings * conversionContract);
+      let conversionCall = conversionMeetings * conversionContract;
       let countEmployee = Math.ceil(app.countEmployee / conversionCall);
       let costContract = 0;
       let discount = 0;
+      let income = 0;
       if (app.isInsurance) {
         costPerRate = costPerRate + costPerRate * (app.insuranceRate / 100);
       }
@@ -519,23 +540,28 @@ export default Vue.extend({
       }
       totalBudget = countEmployee * costPerRate;
       costContract = Math.ceil(totalBudget / app.countEmployee);
-      let discountRate = Math.floor(totalBudget / app.StepDiscount) * app.DiscountRate;
+      let discountRate =
+        Math.floor(totalBudget / app.StepDiscount) * app.DiscountRate;
 
       if (discountRate > app.MaxDiscount) {
         discount = totalBudget * (app.MaxDiscount / 100);
+        discountRate = app.MaxDiscount;
       } else {
         discount = totalBudget * (discountRate / 100);
       }
 
       let total = totalBudget - discount;
+      income = Number(app.direction.avarage_check) * app.countEmployee;
       app.totalBudget = total;
+
       return {
         budget: totalBudget, //Общий бюджет
-        totalBudget: total, //Нужен бюджет 
+        totalBudget: total, //Нужен бюджет
         totalContract: `От ${app.countEmployee} До ${app.countEmployee * 2}`, //Гарантированно договоров
         count: `От ${countEmployee} До ${countEmployee * 2}`, // Количество сколько нужно
         costContract: isNaN(costContract) ? 0 : costContract, //Себестоимость договора
-        discount: discount, //Скидка
+        discount: `${String(discount).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽ (${discountRate}%)`, //Скидка
+        income: isNaN(income) ? 0 : income, //Доход
       };
     },
     computedIsRegions() {
