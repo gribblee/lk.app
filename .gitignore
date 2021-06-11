@@ -1,4 +1,6 @@
 docker
+docker/logs
+docker/logs/nginx/access.logs
 nuxt/nuxt.config.js
 nuxt/package.json
 nuxt/test
