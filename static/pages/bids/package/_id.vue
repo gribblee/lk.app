@@ -523,7 +523,7 @@ export default Vue.extend({
 
       let total = totalBudget - discount;
       app.totalBudget = total;
-      income = Number(app.direction.avarage_check) * app.countEmployee;
+      income = Number(app.direction.average_check) * app.countEmployee;
       return {
         budget: totalBudget, //Общий бюджет
         totalBudget: total, //Нужен бюджет

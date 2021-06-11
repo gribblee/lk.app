@@ -551,7 +551,7 @@ export default Vue.extend({
       }
 
       let total = totalBudget - discount;
-      income = Number(app.direction.avarage_check) * app.countEmployee;
+      income = Number(app.direction.average_check) * app.countEmployee;
       app.totalBudget = total;
 
       return {
