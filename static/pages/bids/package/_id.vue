@@ -53,7 +53,7 @@
                   <a-statistic
                     title="Ваш бюджет"
                     :precision="2"
-                    :value="computedFunel.totalBudget - computedFunel.discount"
+                    :value="computedFunel.totalBudget"
                     suffix="₽"
                     :value-style="{ color: '#3f8600' }"
                   />
@@ -65,7 +65,7 @@
                     title="Вам вернётся кэшбек"
                     :precision="2"
                     :value="computedFunel.discount"
-                    suffix="₽"
+                    suffix=""
                     :value-style="{ color: '#3f8600' }"
                   />
                 </a-card>
@@ -87,6 +87,17 @@
                     :precision="2"
                     :value="computedFunel.costContract"
                     suffix="₽"
+                    :value-style="{ color: '#3f8600' }"
+                  />
+                </a-card>
+              </a-col>
+              <a-col :span="24">
+                <a-card>
+                  <a-statistic
+                    title="Ваш доход"
+                    :precision="2"
+                    :value="computedFunel.income"
+                    suffix=""
                     :value-style="{ color: '#3f8600' }"
                   />
                 </a-card>
@@ -163,7 +174,7 @@
                 <div class="bid-label">Вы получите платящих клиентов:</div>
                 <a-input-number
                   v-model="computedVMCountEmployee"
-                  :min="1"
+                  :min="5"
                   :max="500"
                   :disabled="true"
                   size="large"
@@ -491,6 +502,7 @@ export default Vue.extend({
       let countEmployee = Math.ceil(app.countEmployee / conversionCall);
       let costContract = 0;
       let discount = 0;
+      let income = 0;
       if (app.isInsurance) {
         costPerRate = costPerRate + costPerRate * (app.insuranceRate / 100);
       }
@@ -504,19 +516,22 @@ export default Vue.extend({
 
       if (discountRate > app.MaxDiscount) {
         discount = totalBudget * (app.MaxDiscount / 100);
+        discountRate = app.MaxDiscount;
       } else {
         discount = totalBudget * (discountRate / 100);
       }
 
       let total = totalBudget - discount;
       app.totalBudget = total;
+      income = Number(app.direction.avarage_check) * app.countEmployee;
       return {
         budget: totalBudget, //Общий бюджет
         totalBudget: total, //Нужен бюджет
         totalContract: `От ${app.countEmployee} До ${app.countEmployee * 2}`, //Гарантированно договоров
         count: `От ${countEmployee} До ${countEmployee * 2}`, // Количество сколько нужно
         costContract: isNaN(costContract) ? 0 : costContract, //Себестоимость договора
-        discount: discount, //Скидка
+        discount: `${String(discount).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ₽ (${discountRate}%)`, //Скидка
+        income: isNaN(income) ? 0 : income, //Доход
       };
     },
     computedIsRegions() {

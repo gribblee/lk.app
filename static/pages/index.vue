@@ -353,22 +353,32 @@
                     </template>
                   </template>
                   <template v-else>
-                    <a-tag :color="record.is_launch ? '#87d068' : '#F50'">
-                      <template v-if="record.is_launch">
-                        <a-icon
-                          type="play-circle"
-                          :style="{ color: '#FFF' }"
-                        />
-                      </template>
-                      <template v-else>
-                        <a-icon
-                          type="pause-circle"
-                          :style="{ color: '#FFF' }"
-                        /> </template
-                      ><span :style="{ marginLeft: '5px' }"
-                        >Рекламная компания</span
-                      ></a-tag
-                    >
+                    <div :style="{maxWidth: '188px'}">
+                      <a-tag :color="record.is_launch ? '#87d068' : '#F50'">
+                        <template v-if="record.is_launch">
+                          <a-icon
+                            type="play-circle"
+                            :style="{ color: '#FFF' }"
+                          />
+                        </template>
+                        <template v-else>
+                          <a-icon
+                            type="pause-circle"
+                            :style="{ color: '#FFF' }"
+                          /> </template
+                        ><span :style="{ marginLeft: '5px' }"
+                          >Рекламная компания</span
+                        ></a-tag
+                      >
+                      <a-progress
+                        :percent="
+                          record.employee_count > 0
+                            ? (record.employee_count / record.employee_target) *
+                              100
+                            : 0
+                        "
+                      />
+                    </div>
                   </template>
                 </div>
 
