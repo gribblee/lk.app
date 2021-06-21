@@ -2,6 +2,9 @@
 
 namespace App\Helpers;
 
+use Closure;
+use Exception;
+
 class stdObject
 {
     public function __construct(array $arguments = array())

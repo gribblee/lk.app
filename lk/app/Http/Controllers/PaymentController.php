@@ -19,6 +19,8 @@ use App\Helpers\SendPulse;
 use App\Helpers\Tinkoff;
 use App\Helpers\HelperPayment;
 
+use App\Helpers\DreamKassa;
+
 use PDF;
 use PHPUnit\TextUI\Help;
 
@@ -26,6 +28,7 @@ class PaymentController extends Controller
 {
     protected $bookIdBill;
     protected $bookIdBalance;
+    protected $dreamKassa;
 
     function __construct()
     {
@@ -34,6 +37,7 @@ class PaymentController extends Controller
         $this->sendPulse = new SendPulse;
         $this->bookIdBill = $options->bookIdBill ?? 0;
         $this->bookIdBalance = $options->bookIdBalance ?? 0;
+        $this->dreamKassa = new DreamKassa;
     }
 
     /**
@@ -107,6 +111,29 @@ class PaymentController extends Controller
                 $payment->status = HelperPayment::CD_STATUS_PAID;
                 $payment->payment_id = $request->PaymentId;
                 $payment->card = $request->Pan;
+                /**
+                 * Здесь DreamKassa
+                 */
+                $this->dreamKassa->receipts([
+                    [
+                        "name" => "Пополнение лицевого счёта на сервисе Лидз.Монстер",
+                        "type" => "SERVICES",
+                        "quantity" => 1,
+                        "price" => $payment->sum,
+                        "priceSum" => $payment->sum,
+                        "tax" => "NDS_NO_TAX",
+                        // "taxSum" => 1620,
+                        "tags" => [
+                          [
+                            "tag" => 1212,
+                            "value" => 12
+                          ]
+                        ]
+                      ]
+                ], [
+                    'email' => $user->email,
+                    'phone' => $user->phone
+                ]);
 
                 $this->sendPulse->addEmails($this->bookIdBalance, [
                     [
@@ -312,6 +339,7 @@ class PaymentController extends Controller
                     'NDS'   => config('tinkoff.nds'),
                 ];
                 $paymentURL = $tinkoff->paymentURL($paymentTinkoff, $tinkoffSettings);
+
                 if (!$paymentURL) {
                     return response()->json([
                         'success' => false,
