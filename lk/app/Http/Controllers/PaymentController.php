@@ -117,7 +117,7 @@ class PaymentController extends Controller
                 $this->dreamKassa->receipts([
                     [
                         "name" => "Пополнение лицевого счёта на сервисе Лидз.Монстер",
-                        "type" => "SERVICES",
+                        "type" => "SERVICE",
                         "quantity" => 1,
                         "price" => $payment->sum,
                         "priceSum" => $payment->sum,
