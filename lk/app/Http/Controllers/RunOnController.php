@@ -100,26 +100,28 @@ class RunOnController extends Controller
                             'is_insurance' => $claim->is_insurance,
                             'status_id' => Status::firstStatus()->id,
                         ]);
-                        // Уведомление для РК
-                        $claimLaunch = $claim->is_launch;
-                        if ($claim->employee_count + 1 >= $claim->employee_target) {
-                            $claimLaunch = false;
-                            Notification::create([
-                                'description' => 'Ваша рекламная компания закончилась!',
-                                'user_id' =>$user->id
-                            ]);
-                            if ($claim->discount != null && $claim->discount > 0) {
-                                User::where('id', $user->id)->update([
-                                    'bonus' => $user->bonus + $claim->discount
+                        if ($claim->is_ads) {
+                            // Уведомление для РК
+                            $claimLaunch = $claim->is_launch;
+                            if ($claim->employee_count + 1 >= $claim->employee_target) {
+                                $claimLaunch = false;
+                                Notification::create([
+                                    'description' => 'Ваша рекламная компания закончилась!',
+                                    'user_id' => $user->id
                                 ]);
-                                Log::info("User: {$user->id} cashback {$claim->discount}");
+                                if ($claim->discount != null && $claim->discount > 0) {
+                                    User::where('id', $user->id)->update([
+                                        'bonus' => $user->bonus + $claim->discount
+                                    ]);
+                                    Log::info("User: {$user->id} cashback {$claim->discount}");
+                                }
+                                Log::info("Claim: {$claim->id} is launch = false\r\n");
                             }
-                            Log::info("Claim: {$claim->id} is launch = false\r\n");
+                            Bid::where('id', $claim->id)->update([
+                                'employee_count' => $claim->employee_count + 1,
+                                'is_launch' => $claimLaunch
+                            ]);
                         }
-                        Bid::where('id', $claim->id)->update([
-                            'employee_count' => $claim->employee_count + 1,
-                            'is_launch' => $claimLaunch
-                        ]);
                         //** Отправка на почту
                         $this->sendMail($user);
 
