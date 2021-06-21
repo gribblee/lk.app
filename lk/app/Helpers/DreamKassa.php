@@ -12,8 +12,6 @@ class DreamKassa extends Helper
 
     function __construct()
     {
-        parent::__construct();
-
         $this->token = config('dreamkassa.login');
         $this->url_init = config('dreamkassa.receipts_url');
     }
