@@ -22,7 +22,7 @@ use App\Helpers\HelperPayment;
 use PDF;
 use PHPUnit\TextUI\Help;
 
-use App\Helpers\Dreamkas\DreamkasApi as Dreamkas;
+use App\Helpers\Dreamkas\Api as Dreamkas;
 use App\Helpers\Dreamkas\CustomerAttributes;
 use App\Helpers\Dreamkas\exceptions\ValidationException;
 use App\Helpers\Dreamkas\Payment as DreamkasPayment;
