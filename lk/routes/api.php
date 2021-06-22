@@ -32,9 +32,9 @@ Route::get('/receipt/test', function () {
         'email' => 'monsidev@gmail.com', // почта покупателя
         'phone' => '+7(938) 305-07-24', // телефон покупателя
     ]);
-    $receipt->calculateSum();
-    // А можно завалидировать чек
-    $receipt->validate();
+    // $receipt->calculateSum();
+    // // А можно завалидировать чек
+    // $receipt->validate();
     $response = [];
     try {
         $response = $dreamkasApi->postReceipt($receipt);
