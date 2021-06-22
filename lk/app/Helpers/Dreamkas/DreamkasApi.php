@@ -7,7 +7,7 @@ use GuzzleHttp\Client;
 /**
  * Class Api
  */
-class Api
+class DreamkasApi
 {
     const MODE_PRODUCTION = 0;
     const MODE_MOCK = 1;
