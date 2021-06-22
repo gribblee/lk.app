@@ -17,7 +17,7 @@ use App\Helpers\Dreamkas\TaxMode;
 use GuzzleHttp\Exception\ClientException;
 
 Route::get('/receipt/test', function () {
-    $dreamkasApi = new Dreamkas('2aabc4ab-4844-4378-ab37-9ee60bde7064', 129174, Dreamkas::MODE_MOCK);
+    $dreamkasApi = new Dreamkas('2aabc4ab-4844-4378-ab37-9ee60bde7064', 129174, Dreamkas::MODE_PRODUCTION);
     $receipt = new Receipt();
     $receipt->taxMode = TaxMode::MODE_PATENT;
     $receipt->positions[] = new Position([
