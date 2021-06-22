@@ -45,7 +45,7 @@ class PaymentController extends Controller
         $this->sendPulse = new SendPulse;
         $this->bookIdBill = $options->bookIdBill ?? 0;
         $this->bookIdBalance = $options->bookIdBalance ?? 0;
-        $this->dreamkasApi = new Dreamkas(config('dreamkassa.token'), config('dreamkassa.deviceId'), Dreamkas::MODE_MOCK);
+        $this->dreamkasApi = new Dreamkas(config('dreamkassa.token'), config('dreamkassa.deviceId'), Dreamkas::MODE_PRODUCTION);
     }
 
     /**
