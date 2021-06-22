@@ -19,16 +19,24 @@ use App\Helpers\SendPulse;
 use App\Helpers\Tinkoff;
 use App\Helpers\HelperPayment;
 
-use App\Helpers\DreamKassa;
-
 use PDF;
 use PHPUnit\TextUI\Help;
+
+use Api\Helpers\Dreamkas\Api as Dreamkas;
+use Api\Helpers\Dreamkas\CustomerAttributes;
+use Api\Helpers\Dreamkas\exceptions\ValidationException;
+use Api\Helpers\Dreamkas\Payment as DreamkasPayment;
+use Api\Helpers\Dreamkas\Position;
+use Api\Helpers\Dreamkas\Receipt;
+use Api\Helpers\Dreamkas\TaxMode;
+use GuzzleHttp\Exception\ClientException;
+
 
 class PaymentController extends Controller
 {
     protected $bookIdBill;
     protected $bookIdBalance;
-    protected $dreamKassa;
+    protected $Dreamkas;
 
     function __construct()
     {
@@ -37,7 +45,7 @@ class PaymentController extends Controller
         $this->sendPulse = new SendPulse;
         $this->bookIdBill = $options->bookIdBill ?? 0;
         $this->bookIdBalance = $options->bookIdBalance ?? 0;
-        $this->dreamKassa = new DreamKassa;
+        $this->dreamkasApi = new Dreamkas(config('dreamkassa.token'), config('dreamkassa.deviceId'), Dreamkas::MODE_MOCK);
     }
 
     /**
@@ -114,26 +122,30 @@ class PaymentController extends Controller
                 /**
                  * Здесь DreamKassa
                  */
-                $this->dreamKassa->receipts([
-                    [
-                        "name" => "Пополнение лицевого счёта на сервисе Лидз.Монстер",
-                        "type" => "SERVICE",
-                        "quantity" => 1,
-                        "price" => $payment->sum,
-                        "priceSum" => $payment->sum,
-                        "tax" => "NDS_NO_TAX",
-                        // "taxSum" => 1620,
-                        "tags" => [
-                          [
-                            "tag" => 1212,
-                            "value" => 12
-                          ]
-                        ]
-                      ]
-                ], [
-                    'email' => $user->email,
-                    'phone' => $user->phone
+                $receipt = new Receipt();
+                $receipt->taxMode = TaxMode::MODE_PATENT;
+                $receipt->positions[] = new Position([
+                    'name' => 'Пополнение личного кабинета Лидз.Монстер',
+                    'quantity' => 1,
+                    'price' => $request->Amount, // цена в копейках за 1 шт. или 1 грамм
                 ]);
+                $receipt->payments[] = new Payment([
+                    'sum' => $request->Amount, // стоимость оплаты по чеку
+                ]);
+                $receipt->attributes = new CustomerAttributes([
+                    'email' => $user->email, // почта покупателя
+                    'phone' => $user->phone, // телефон покупателя
+                ]);
+                $response = [];
+                try {
+                    $response = $this->dreamkasApi->postReceipt($receipt);
+                } catch (ValidationException $e) {
+                    Log::error("Receipt Valid Error: " . json_encode($e->getMessage()) . "\r\n");
+                } catch (ClientException $e) {
+                    Log::error("Receipt Response Error: " . json_encode(['body' => $e->getResponse()->getBody()]) . "\r\n");
+                    // Это исключение кидается, когда при передачи чека в Дрикас произошла ошибка. Лучше отправить чек ещё раз
+                    // Если будут дубли - потом отменяйте через $receipt->type = Receipt::TYPE_REFUND;
+                }
 
                 $this->sendPulse->addEmails($this->bookIdBalance, [
                     [
@@ -280,9 +292,10 @@ class PaymentController extends Controller
                                 'after_bonus' => $pid->user->bonus
                             ]);
                         }
-                        // $payment->update([
-                        //     'after_balance' => $payment->user->balance,
-                        //     'status' => HelperPayment::RQ_STATUS_PAID]);
+                        $payment->update([
+                            'after_balance' => $payment->user->balance,
+                            'status' => HelperPayment::RQ_STATUS_PAID
+                        ]);
                         break;
                     case 5:
                         $payment->update(['status' => HelperPayment::RQ_STATUS_CANCEL]);
