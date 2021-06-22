@@ -2,3 +2,4 @@ docker
 nuxt/nuxt.config.js
 nuxt/package.json
 nuxt/test
+./docker
