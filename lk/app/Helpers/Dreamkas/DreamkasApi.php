@@ -1,6 +1,6 @@
 <?php
 
-namespace Api\Helpers\Dreamkas;
+namespace App\Helpers\Dreamkas;
 
 use GuzzleHttp\Client;
 

@@ -1,9 +1,9 @@
 <?php
 
-namespace Api\Helpers\Dreamkas;
+namespace App\Helpers\Dreamkas;
 
 
-use Api\Helpers\Dreamkas\exceptions\ValidationException;
+use App\Helpers\Dreamkas\exceptions\ValidationException;
 
 /**
  * Class CustomerAttributes описывает информацию о покупателе, куда ему высылать чек

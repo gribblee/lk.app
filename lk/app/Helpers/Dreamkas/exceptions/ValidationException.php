@@ -1,6 +1,6 @@
 <?php
 
-namespace Api\Helpers\Dreamkas\exceptions;
+namespace App\Helpers\Dreamkas\exceptions;
 
 
 /**

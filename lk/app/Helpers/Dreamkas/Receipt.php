@@ -1,7 +1,7 @@
 <?php
 
-namespace Api\Helpers\Dreamkas;
-use Api\Helpers\Dreamkas\exceptions\ValidationException;
+namespace App\Helpers\Dreamkas;
+use App\Helpers\Dreamkas\exceptions\ValidationException;
 
 
 /**

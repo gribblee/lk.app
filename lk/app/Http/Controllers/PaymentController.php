@@ -22,13 +22,13 @@ use App\Helpers\HelperPayment;
 use PDF;
 use PHPUnit\TextUI\Help;
 
-use Api\Helpers\Dreamkas\DreamkasApi as Dreamkas;
-use Api\Helpers\Dreamkas\CustomerAttributes;
-use Api\Helpers\Dreamkas\exceptions\ValidationException;
-use Api\Helpers\Dreamkas\Payment as DreamkasPayment;
-use Api\Helpers\Dreamkas\Position;
-use Api\Helpers\Dreamkas\Receipt;
-use Api\Helpers\Dreamkas\TaxMode;
+use App\Helpers\Dreamkas\DreamkasApi as Dreamkas;
+use App\Helpers\Dreamkas\CustomerAttributes;
+use App\Helpers\Dreamkas\exceptions\ValidationException;
+use App\Helpers\Dreamkas\Payment as DreamkasPayment;
+use App\Helpers\Dreamkas\Position;
+use App\Helpers\Dreamkas\Receipt;
+use App\Helpers\Dreamkas\TaxMode;
 use GuzzleHttp\Exception\ClientException;
 
 
