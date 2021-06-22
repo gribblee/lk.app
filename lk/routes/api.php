@@ -23,10 +23,10 @@ Route::get('/receipt/test', function () {
     $receipt->positions[] = new Position([
         'name' => 'лк - тест',
         'quantity' => 1,
-        'price' => 1, // цена в копейках за 1 шт. или 1 грамм
+        'price' => 100, // цена в копейках за 1 шт. или 1 грамм
     ]);
     $receipt->payments[] = new DreamkasPayment([
-        'sum' => 1, // стоимость оплаты по чеку
+        'sum' => 100, // стоимость оплаты по чеку
     ]);
     $receipt->attributes = new CustomerAttributes([
         'email' => 'monsidev@gmail.com', // почта покупателя

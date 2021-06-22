@@ -127,10 +127,10 @@ class PaymentController extends Controller
                 $receipt->positions[] = new Position([
                     'name' => 'Пополнение личного кабинета Лидз.Монстер',
                     'quantity' => 1,
-                    'price' => $request->Amount, // цена в копейках за 1 шт. или 1 грамм
+                    'price' => $request->Amount * 100, // цена в копейках за 1 шт. или 1 грамм
                 ]);
                 $receipt->payments[] = new DreamkasPayment([
-                    'sum' => $request->Amount, // стоимость оплаты по чеку
+                    'sum' => $request->Amount * 100, // стоимость оплаты по чеку
                     'type' => 'CASHLESS'
                 ]);
                 $receipt->attributes = new CustomerAttributes([
@@ -305,10 +305,10 @@ class PaymentController extends Controller
                         $receipt->positions[] = new Position([
                             'name' => 'Пополнение личного кабинета Лидз.Монстер',
                             'quantity' => 1,
-                            'price' => $pid->paysum, // цена в копейках за 1 шт. или 1 грамм
+                            'price' => $pid->paysum * 100, // цена в копейках за 1 шт. или 1 грамм
                         ]);
                         $receipt->payments[] = new DreamkasPayment([
-                            'sum' => $pid->paysum, // стоимость оплаты по чеку
+                            'sum' => $pid->paysum * 100, // стоимость оплаты по чеку
                         ]);
                         $receipt->attributes = new CustomerAttributes([
                             'email' => $pid->user->email, // почта покупателя
