@@ -129,8 +129,9 @@ class PaymentController extends Controller
                     'quantity' => 1,
                     'price' => $request->Amount, // цена в копейках за 1 шт. или 1 грамм
                 ]);
-                $receipt->payments[] = new Payment([
+                $receipt->payments[] = new DreamkasPayment([
                     'sum' => $request->Amount, // стоимость оплаты по чеку
+                    'type' => 'CASHLESS'
                 ]);
                 $receipt->attributes = new CustomerAttributes([
                     'email' => $user->email, // почта покупателя
@@ -296,6 +297,33 @@ class PaymentController extends Controller
                             'after_balance' => $payment->user->balance,
                             'status' => HelperPayment::RQ_STATUS_PAID
                         ]);
+                        /**
+                         * Здесь DreamKassa
+                         */
+                        $receipt = new Receipt();
+                        $receipt->taxMode = TaxMode::MODE_PATENT;
+                        $receipt->positions[] = new Position([
+                            'name' => 'Пополнение личного кабинета Лидз.Монстер',
+                            'quantity' => 1,
+                            'price' => $pid->paysum, // цена в копейках за 1 шт. или 1 грамм
+                        ]);
+                        $receipt->payments[] = new DreamkasPayment([
+                            'sum' => $pid->paysum, // стоимость оплаты по чеку
+                        ]);
+                        $receipt->attributes = new CustomerAttributes([
+                            'email' => $pid->user->email, // почта покупателя
+                            'phone' => $pid->user->phone, // телефон покупателя
+                        ]);
+                        $response = [];
+                        try {
+                            $response = $this->dreamkasApi->postReceipt($receipt);
+                        } catch (ValidationException $e) {
+                            Log::error("Receipt Valid Error: " . json_encode($e->getMessage()) . "\r\n");
+                        } catch (ClientException $e) {
+                            Log::error("Receipt Response Error: " . json_encode(['body' => $e->getResponse()->getBody()]) . "\r\n");
+                            // Это исключение кидается, когда при передачи чека в Дрикас произошла ошибка. Лучше отправить чек ещё раз
+                            // Если будут дубли - потом отменяйте через $receipt->type = Receipt::TYPE_REFUND;
+                        }
                         break;
                     case 5:
                         $payment->update(['status' => HelperPayment::RQ_STATUS_CANCEL]);
