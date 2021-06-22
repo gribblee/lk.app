@@ -29,6 +29,7 @@ use App\Helpers\Dreamkas\Payment as DreamkasPayment;
 use App\Helpers\Dreamkas\Position;
 use App\Helpers\Dreamkas\Receipt;
 use App\Helpers\Dreamkas\TaxMode;
+use App\Models\DreamkasReceipt;
 use GuzzleHttp\Exception\ClientException;
 
 
@@ -140,6 +141,14 @@ class PaymentController extends Controller
                 $response = [];
                 try {
                     $response = $this->dreamkasApi->postReceipt($receipt);
+                    // Запись чека в БД
+                    DreamkasReceipt::create([
+                        'receiptId' => $response['id'],
+                        'status' => $response['status'],
+                        'user_id' => $user->id,
+                        'amount' => $request->Amount * 100,
+                        'type' => 'CASHLESS'
+                    ]);
                 } catch (ValidationException $e) {
                     Log::error("Receipt Valid Error: " . json_encode($e->getMessage()) . "\r\n");
                 } catch (ClientException $e) {
@@ -317,6 +326,14 @@ class PaymentController extends Controller
                         $response = [];
                         try {
                             $response = $this->dreamkasApi->postReceipt($receipt);
+                            // Здесь запись чека в БД
+                            DreamkasReceipt::create([
+                                'receiptId' => $response['id'],
+                                'status' => $response['status'],
+                                'user_id' => $pid->user->id,
+                                'amount' => $pid->paysum * 100,
+                                'type' => 'CONSIDERATION'
+                            ]);
                         } catch (ValidationException $e) {
                             Log::error("Receipt Valid Error: " . json_encode($e->getMessage()) . "\r\n");
                         } catch (ClientException $e) {
