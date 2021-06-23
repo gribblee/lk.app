@@ -78,6 +78,6 @@
     'normal' => $rootDir . '/lib/fonts/DejaVuSerif',
   ),
   'helvetica neue' => array(
-    'bold' => $fontDir . '/helvetica-neue-bold_480a313770c02be46800005d8008e8e6',
+    'bold' => $fontDir . '/helvetica-neue-bold_c72c3166900b0b27adfbe8dd109c87ab',
   ),
 ) ?>

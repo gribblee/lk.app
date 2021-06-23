@@ -19,7 +19,7 @@ use App\Helpers\SendPulse;
 use App\Helpers\Tinkoff;
 use App\Helpers\HelperPayment;
 
-use Barryvdh\DomPDF\PDF;
+use PDF;
 use PHPUnit\TextUI\Help;
 
 use App\Helpers\Dreamkas\Api as Dreamkas;
@@ -455,7 +455,7 @@ class PaymentController extends Controller
                      *  BEGIN
                      */
                     $pdfPath = '/payment/pdf/' . date("dmY", strtotime($paymentData->created_at)) . '-' . str_pad($paymentData->id . $paymentData->requisite_id, 6, '000000', STR_PAD_LEFT) . '.pdf';
-
+                        
                     $pdf = PDF::loadView('pdf.contract', [
                         'payment' => $paymentData,
                         'requisite' => $requis,
