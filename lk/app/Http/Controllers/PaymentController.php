@@ -272,12 +272,12 @@ class PaymentController extends Controller
                         $paid = Payment::with('user')->whereIn('id', $request->ids)->get();
                         foreach ($paid as $pid) {
                             $bonus = $pid->user->bonus;
-                            if (
-                                ($pid->paysum > 3000 && $pid->paysum < 10000) //Здесь поменять на данные с опций
-                                && ($pid->user->balance + ($pid->paysum / 2))
-                            ) {
-                                $bonus = ($pid->paysum / 100) * 10;
-                            }
+                            // if (
+                            //     ($pid->paysum > 3000 && $pid->paysum < 10000) //Здесь поменять на данные с опций
+                            //     && ($pid->user->balance + ($pid->paysum / 2))
+                            // ) {
+                            //     $bonus = ($pid->paysum / 100) * 10;
+                            // }
                             $pid->user->balance = floor($pid->user->balance + $pid->paysum);
                             $pid->user->bonus = floor($pid->user->bonus + $bonus);
                             $pid->user->save();
