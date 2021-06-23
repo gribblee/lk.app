@@ -30,6 +30,7 @@ use App\Helpers\Dreamkas\Position;
 use App\Helpers\Dreamkas\Receipt;
 use App\Helpers\Dreamkas\TaxMode;
 use App\Models\DreamkasReceipt;
+use Exception;
 use GuzzleHttp\Exception\ClientException;
 
 
@@ -477,14 +478,18 @@ class PaymentController extends Controller
                     Requisite::where('id', $requis->id)->update([
                         'requisite_payment_id' => $paymentId
                     ]);
-
-                    Mail::send([], [], function ($message) use ($request, $pdfPath, $paymentData, $paymentId) {
-                        $message->from('system@b2l.online', 'Leadz.Monster');
-                        $message->subject('Счёт на пополнение в сервисе Leadz.Monster');
-                        $message->to($request->user()->email)->cc($request->user()->email);
-                        $message->attach(Storage::disk('public')->path($pdfPath));
-                        $message->setBody('<h1>Здравствуйте</h1><br/><p>Вам выставлен счёт № ' . $paymentId . ' на сумму ' . $paymentData->paysum . ' ₽ в сервисе Leadz.Monster</p>', 'text/html');
-                    });
+                    $errors = [];
+                    try {
+                        Mail::send([], [], function ($message) use ($request, $pdfPath, $paymentData, $paymentId) {
+                            $message->from('system@b2l.online', 'Leadz.Monster');
+                            $message->subject('Счёт на пополнение в сервисе Leadz.Monster');
+                            $message->to($request->user()->email)->cc($request->user()->email);
+                            $message->attach(Storage::disk('public')->path($pdfPath));
+                            $message->setBody('<h1>Здравствуйте</h1><br/><p>Вам выставлен счёт № ' . $paymentId . ' на сумму ' . $paymentData->paysum . ' ₽ в сервисе Leadz.Monster</p>', 'text/html');
+                        });
+                    } catch (Exception $e) {
+                        $errors['mail'] = $e->getMessage();
+                    }
 
                     $this->sendPulse->addEmails($this->bookIdBill, [
                         [
@@ -499,7 +504,8 @@ class PaymentController extends Controller
                     return response()->json([
                         'success' => true,
                         'message' => 'Успешно',
-                        'data' => $paymentData
+                        'data' => $paymentData,
+                        'errors' => $errors
                     ], 200);
                 }
                 return response()->json([
