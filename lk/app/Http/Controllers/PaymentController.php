@@ -454,7 +454,7 @@ class PaymentController extends Controller
                     /**
                      *  BEGIN
                      */
-                    $pdfPath = '/payment/pdf/' . date("dmY", strtotime($paymentData->created_at)) . '-' . str_pad($paymentData->id . $paymentData->requisite_id, 6, '000000', STR_PAD_LEFT) . '.pdf';
+                    $pdfPath = 'payment/pdf/' . date("dmY", strtotime($paymentData->created_at)) . '-' . str_pad($paymentData->id . $paymentData->requisite_id, 6, '000000', STR_PAD_LEFT) . '.pdf';
                         
                     $pdf = PDF::loadView('pdf.contract', [
                         'payment' => $paymentData,
