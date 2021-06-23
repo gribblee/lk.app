@@ -303,10 +303,10 @@ class PaymentController extends Controller
                                 'after_bonus' => $pid->user->bonus
                             ]);
                         }
-                        $payment->update([
-                            'after_balance' => $payment->user->balance,
-                            'status' => HelperPayment::RQ_STATUS_PAID
-                        ]);
+                        // $payment->update([
+                        //     'after_balance' => $payment->user->balance,
+                        //     'status' => HelperPayment::RQ_STATUS_PAID
+                        // ]);
                         /**
                          * Здесь DreamKassa
                          */
