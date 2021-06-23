@@ -19,7 +19,7 @@ use App\Helpers\SendPulse;
 use App\Helpers\Tinkoff;
 use App\Helpers\HelperPayment;
 
-use PDF;
+use Barryvdh\DomPDF\PDF;
 use PHPUnit\TextUI\Help;
 
 use App\Helpers\Dreamkas\Api as Dreamkas;
