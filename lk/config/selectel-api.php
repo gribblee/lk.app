@@ -15,7 +15,7 @@ return [
     /*
      * API url
      */
-    'apiUrl' => 'https://api.selcdn.ru/v1/',
+    'apiUrl' => 'https://auth.selcdn.ru/',
 
     /*
      * Default value for request timeout
@@ -25,7 +25,7 @@ return [
     /*
      * Default storage url
      */
-    'storageUrl' => env('SELECTEL_STORAGE_URL', 'https://auth.selcdn.ru/'),
+    'storageUrl' => env('SELECTEL_STORAGE_URL', 'https://api.selcdn.ru/v1/'),
 
     /*
      * Response view
