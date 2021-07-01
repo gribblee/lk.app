@@ -15,7 +15,7 @@ return [
     /*
      * API url
      */
-    'apiUrl' => 'https://auth.selcdn.ru/',
+    'apiUrl' => 'https://api.selcdn.ru/v1/',
 
     /*
      * Default value for request timeout
