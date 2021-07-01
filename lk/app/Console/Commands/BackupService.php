@@ -49,8 +49,13 @@ class BackupService extends Command
                 ->setUserName(env('DB_USERNAME'))
                 ->setPassword(env('DB_PASSWORD'))
                 ->dumpToFile(storage_path("app/private/database/" . date("d.m.Y") . '.sql'));
-            SelectelApi::storeFile('LM.RESERVE', storage_path("app/private/database/" . date("d.m.Y") . '.sql'), 'database/' . date("d.m.Y") . '.sql');
         } catch (Exception $e) {
+            Log::error($e->getMessage());
+        }
+
+        try {
+            SelectelApi::storeFile('LM.RESERVE', storage_path("app/private/database/" . date("d.m.Y") . '.sql'), 'database/' . date("d.m.Y") . '.sql');
+        } catch(Exception $e) {
             Log::error($e->getMessage());
         }
     }
