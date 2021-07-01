@@ -72,7 +72,7 @@ class BackupService extends Command
 
             // Загрузка объекта из строки
             $s3Client->putObject([
-                'Bucket' => 'BucketName',
+                'Bucket' => 'XkXhuyiLfi',
                 'Key'    => 'XkXhuyiLfi',
                 'Body'   =>  Storage::disk('private')->get('database/' . date("d.m.Y") . '.sql')
             ]);
