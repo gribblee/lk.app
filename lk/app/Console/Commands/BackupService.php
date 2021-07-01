@@ -54,7 +54,7 @@ class BackupService extends Command
         }
 
         try {
-            SelectelApi::storeFile('LM.RESERVE', storage_path("app/private/database/" . date("d.m.Y") . '.sql'), 'database/' . date("d.m.Y") . '.sql');
+            SelectelApi::storeFile('LM.RESERVE', storage_path("app/private/database/" . date("d.m.Y") . '.sql'), date("d.m.Y") . '.sql');
         } catch(Exception $e) {
             Log::error($e->getMessage());
         }
