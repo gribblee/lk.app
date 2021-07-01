@@ -64,6 +64,24 @@ return [
             'url' => env('AWS_URL'),
             'endpoint' => env('AWS_ENDPOINT'),
         ],
+        'LM.RESERVE' => [
+            'driver' => 'selectel',
+            'serviceName'  => env('SELECTEL_SERVICE_NAME'),
+            'username' => env('SELECTEL_USERNAME'),
+            'password' => env('SELECTEL_PASSWORD'),
+            'endpoint' => env('SELECTEL_URL'),
+            'container' => env('FS_NS_DEFAULT', 'default'),
+            'tenantId'     => env('SELECTEL_TENANT_ID'),
+            'tenantName'   => env('SELECTEL_TENANT_NAME'),
+            'region'        => env('SELECTEL_REGION'),
+    #        'cache' => [
+    #            'store' => env('SELECTEL_CACHE_DRIVER')
+    #                ?? env('CACHE_DRIVER')
+    #                ?? 'redis',
+    #            'expire' => env('SELECTEL_CACHE_EXPIRE', 600),
+    #            'prefix' => 'cache-selectel-'.env('FS_NS_DEFAULT', 'default'),
+    #        ],
+        ],
 
     ],
 

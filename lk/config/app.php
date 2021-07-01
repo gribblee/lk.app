@@ -177,6 +177,7 @@ return [
         Maatwebsite\Excel\ExcelServiceProvider::class,
         Barryvdh\DomPDF\ServiceProvider::class,
         Chipk4\Selectel\SelectelApiServiceProvider::class,
+        BAGArt\SelectelStorage\SelectelServiceProvider::class,
     ],
 
     /*
