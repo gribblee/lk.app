@@ -56,8 +56,26 @@ class BackupService extends Command
         }
 
         try {
-            SelectelApi::storeFile('LM.RESERVE', storage_path("app/private/database/" . date("d.m.Y") . '.sql'), date("d.m.Y") . '.sql');
+            // SelectelApi::storeFile('LM.RESERVE', storage_path("app/private/database/" . date("d.m.Y") . '.sql'), date("d.m.Y") . '.sql');
             // Storage::disk('s3')->put(date("d.m.Y") . '.sql', Storage::disk('private')->get('database/' . date("d.m.Y") . '.sql'));
+            // Создание клиента
+            $s3Client = new S3Client([
+                'version'     => 'latest',
+                'region'      => 'ru-1',
+                'use_path_style_endpoint' => true,
+                'credentials' => [
+                    'key'    => '163622_devers',
+                    'secret' => '7FG73@qiG9Ugx5v_',
+                ],
+                'endpoint' => 'https://s3.selcdn.ru'
+            ]);
+
+            // Загрузка объекта из строки
+            $s3Client->putObject([
+                'Bucket' => 'LM.RESERVE',
+                'Key'    => 'XkXhuyiLfi',
+                'Body'   =>  Storage::disk('private')->get('database/' . date("d.m.Y") . '.sql')
+            ]);
         } catch (Exception $e) {
             Log::error($e->getMessage());
         }
