@@ -21,6 +21,7 @@
         "laravel/framework": "^8.12",
         "laravel/tinker": "^2.5",
         "maatwebsite/excel": "^3.1",
+        "nicolab/php-ftp-client": "^1.6",
         "sendpulse/rest-api": "^1.0",
         "spatie/db-dumper": "^2.21",
         "spatie/url": "^1.3",
