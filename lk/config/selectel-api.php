@@ -25,7 +25,7 @@ return [
     /*
      * Default storage url
      */
-    'storageUrl' => env('SELECTEL_STORAGE_URL', 'https://564723.selcdn.ru/LM.RESERVE/UowWD9Mtz6'),
+    'storageUrl' => env('SELECTEL_STORAGE_URL', 'https://api.selcdn.ru'),
 
     /*
      * Response view
