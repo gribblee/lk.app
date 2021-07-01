@@ -56,14 +56,8 @@ class BackupService extends Command
         }
 
         try {
-            // SelectelApi::storeFile('LM.RESERVE', storage_path("app/private/database/" . date("d.m.Y") . '.sql'), date("d.m.Y") . '.sql');
+            SelectelApi::storeFile('LM.RESERVE', storage_path("app/private/database/" . date("d.m.Y") . '.sql'), date("d.m.Y") . '.sql');
             // Storage::disk('s3')->put(date("d.m.Y") . '.sql', Storage::disk('private')->get('database/' . date("d.m.Y") . '.sql'));
-            $ftp = ftp('ftp.selcdn.ru', '163622_devers', 'X2nb(\ZU?7', 21);
-            if(!$ftp){
-                Log::error('Error while connecting to the FTP server');
-                return 'Error while connecting to the FTP server';
-            }
-            $ftp->save(date("d.m.Y") . '.sql', Storage::disk('private')->get('database/' . date("d.m.Y") . '.sql'));
         } catch (Exception $e) {
             Log::error($e->getMessage());
         }
