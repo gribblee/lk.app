@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cb779ef7344504a2267855cf2c901165",
+    "content-hash": "7eaec08d8b482f0f220d7823a4284351",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -171,6 +171,48 @@
                 }
             ],
             "time": "2021-01-20T22:51:39+00:00"
+        },
+        {
+            "name": "chipk4/selectel",
+            "version": "v0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/chipk4/selectel-cloud-storage.git",
+                "reference": "705401578e3552271e33b5873b164e1f25054379"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/chipk4/selectel-cloud-storage/zipball/705401578e3552271e33b5873b164e1f25054379",
+                "reference": "705401578e3552271e33b5873b164e1f25054379",
+                "shasum": ""
+            },
+            "require": {
+                "php": "~5.6|~7.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Chipk4\\Selectel\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Andrew Chirskiy",
+                    "email": "chipk4@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Laravel Package for Selectel API cloud storage (selectel.com)",
+            "homepage": "https://github.com/chipk4/selectel-cloud-storage",
+            "keywords": [
+                "laravel",
+                "selectel"
+            ],
+            "time": "2017-03-26T11:48:18+00:00"
         },
         {
             "name": "composer/package-versions-deprecated",
@@ -3671,6 +3713,62 @@
                 "sendpulse"
             ],
             "time": "2020-12-15T15:25:41+00:00"
+        },
+        {
+            "name": "spatie/db-dumper",
+            "version": "2.21.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/spatie/db-dumper.git",
+                "reference": "05e5955fb882008a8947c5a45146d86cfafa10d1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/spatie/db-dumper/zipball/05e5955fb882008a8947c5a45146d86cfafa10d1",
+                "reference": "05e5955fb882008a8947c5a45146d86cfafa10d1",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.2|^8.0",
+                "symfony/process": "^4.2|^5.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^7.0|^8.0|^9.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Spatie\\DbDumper\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Freek Van der Herten",
+                    "email": "freek@spatie.be",
+                    "homepage": "https://spatie.be",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Dump databases",
+            "homepage": "https://github.com/spatie/db-dumper",
+            "keywords": [
+                "database",
+                "db-dumper",
+                "dump",
+                "mysqldump",
+                "spatie"
+            ],
+            "funding": [
+                {
+                    "url": "https://github.com/spatie",
+                    "type": "github"
+                }
+            ],
+            "time": "2021-02-24T14:56:42+00:00"
         },
         {
             "name": "spatie/macroable",

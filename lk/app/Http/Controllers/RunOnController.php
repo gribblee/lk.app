@@ -25,6 +25,7 @@ use App\Helpers\RunOn;
 use App\Helpers\Math\SVDMatrix;
 use App\Models\Category;
 use App\Models\Notification;
+use App\Models\WebmasterReport;
 
 class RunOnController extends Controller
 {
@@ -57,11 +58,12 @@ class RunOnController extends Controller
             'message' => 'Заявка поступила'
         ]);
         try {
-            $AppToken = AppToken::where('hash', $hash)->firstOrFail();
+            $AppToken = AppToken::with(['direction'])->where('hash', $hash)->firstOrFail();
 
 
             $region = $this->definitionRegion($request); //Определение региона
             $deal = $this->createDeal($request, $AppToken, $region); //Создание заявки
+            $this->appendWebmaster($request, $deal, $AppToken); //Для вебмастера
             $notClaimsId = $this->foundedDealsClaimsId($AppToken, $request);
             $claims = $this->findClaims($AppToken, $region, $notClaimsId); //Поиск заявок
 
@@ -100,6 +102,7 @@ class RunOnController extends Controller
                             'is_insurance' => $claim->is_insurance,
                             'status_id' => Status::firstStatus()->id,
                         ]);
+
                         if ($claim->is_ads) {
                             // Уведомление для РК
                             $claimLaunch = $claim->is_launch;
@@ -138,6 +141,26 @@ class RunOnController extends Controller
                 'message' => 'OK',
             ], 200);
         }
+    }
+
+    protected function appendWebmaster($request, $deal, $api)
+    {
+        $webmaster = User::find($api->user_id);
+        WebmasterReport::create([
+            'deal_id' => $deal->id,
+            'api_id' => $api->id,
+            'utm' => json_encode(
+                $this->getUTM($request->all())
+            ),
+            'amount' => (float)$api->direction->cost_price
+        ]);
+        $webmaster->balance = ceil($webmaster->balance + $api->direction->cost_price);
+        $webmaster->save();
+        Notification::create([
+            'description' => "Поступила заявка №{$deal->id} на сумму {$api->direction->cost_price} руб.",
+            'user_id' => $webmaster->id
+        ]);
+        return true;
     }
 
     protected function userPayment($user, $claim)

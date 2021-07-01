@@ -25,6 +25,16 @@ Route::group([
     Route::get('/updated', 'UserController@updated');
     Route::get('/me', 'UserController@meUser');
 
+    Route::get('/me/requisite', 'WebmasterController@meRequisite'); // Все реквизиты
+    Route::put('/me/requisite', 'WebmasterController@createRequisite'); // Создать реквизиты
+    Route::post('/me/requisite/{id}', 'WebmasterController@updateRequisite'); // Обновить реквизиты
+    Route::delete('/me/requisite/{id}', 'WebmasterController@deleteRequisite'); // Удалить реквизиты
+    
+    Route::get('/me/funds', 'PaymentFundsController@index'); // Все выплаты
+    Route::put('/me/fund', 'PaymentFundsController@create'); // Подать завяку на вывод средств
+    Route::post('/me/fund/{id}', 'PaymentFundsController@update'); // Обновить заявку на вывод средств
+    // Реквизиты
+
     Route::post('show', "AdminController@showUser");
     Route::post('add', "AdminController@addUser");
     Route::post('updates', "AdminController@updateUser");

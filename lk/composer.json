@@ -10,6 +10,7 @@
     "require": {
         "php": "^7.4|^8.0",
         "barryvdh/laravel-dompdf": "^0.8.7",
+        "chipk4/selectel": "^0.4.0",
         "dirape/token": "^2.3",
         "doctrine/dbal": "^3.0",
         "fideloper/proxy": "^4.4",
@@ -20,6 +21,7 @@
         "laravel/tinker": "^2.5",
         "maatwebsite/excel": "^3.1",
         "sendpulse/rest-api": "^1.0",
+        "spatie/db-dumper": "^2.21",
         "spatie/url": "^1.3",
         "staudenmeir/eloquent-json-relations": "^1.1",
         "tymon/jwt-auth": "^1.0"

@@ -102,6 +102,18 @@
                     <template slot="icon">Пополнить</template>
                   </a-dropdown-button>
                 </span>
+                <template
+                  v-if="
+                    user.role === 'ROLE_WEBMASTER' || user.role === 'ROLE_ADMIN'
+                  "
+                >
+                  <span :style="{ paddingLeft: '20px' }">
+                    <a-button type="primary">Вывести средства</a-button>
+                  </span>
+                  <span :style="{ paddingLeft: '10px' }">
+                    <a-button @click="() => $router.push('/setting/funds')">Реквизиты</a-button>
+                  </span>
+                </template>
               </a-tooltip>
             </span>
             <div

@@ -23,7 +23,7 @@ class WebmasterController extends Controller
             || $request->user()->role === 'ROLE_ADMIN'
         ) {
             return response()->json(
-                AppToken::with('direction')->when($request->role == 'ROLE_WEBMASTER', function($q) use($request) {
+                AppToken::with('direction')->when($request->role == 'ROLE_WEBMASTER', function ($q) use ($request) {
                     return $q->where('user_id', $request->user()->id);
                 })->get(),
                 200
@@ -74,5 +74,37 @@ class WebmasterController extends Controller
         return response()->json([
             'message' => 'Доступ запрещён'
         ], 403);
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function meRequisite(Request $request)
+    {
+    }
+
+    /** Создать реквизиты
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function createRequisite(Request $request)
+    {
+    }
+
+    /** Обновить реквизиты
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function updateRequisite(Request $request, $id)
+    {
+    }
+
+    /** Удалить реквизиты
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function deleteRequisite(Request $request)
+    {
     }
 }

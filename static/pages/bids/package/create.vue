@@ -556,7 +556,7 @@ export default Vue.extend({
 
       return {
         budget: totalBudget, //Общий бюджет
-        totalBudget: total, //Нужен бюджет
+        totalBudget: totalBudget, //Нужен бюджет
         totalContract: `От ${app.countEmployee} До ${app.countEmployee * 2}`, //Гарантированно договоров
         count: `От ${countEmployee} До ${countEmployee * 2}`, // Количество сколько нужно
         costContract: isNaN(costContract) ? 0 : costContract, //Себестоимость договора
